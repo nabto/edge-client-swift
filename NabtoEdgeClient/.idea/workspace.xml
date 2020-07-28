@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="1c65a4f5-6dbb-4cf0-bced-49181204e989" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/NabtoEdgeClient.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations/NabtoEdgeClientTests.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/xcode.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClient.xcodeproj/project.pbxproj" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClient.xcodeproj/project.xcworkspace/contents.xcworkspacedata" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClient.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClient.xcodeproj/project.xcworkspace/xcuserdata/ug.xcuserdatad/UserInterfaceState.xcuserstate" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClient.xcodeproj/project.xcworkspace/xcuserdata/ug.xcuserdatad/xcschemes/xcschememanagement.plist" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClient.xcodeproj/xcshareddata/xcschemes/NabtoEdgeClientTests.xcscheme" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClient.xcodeproj/xcuserdata/ug.xcuserdatad/xcschemes/-[NabtoEdgeClientObjCTest].xcscheme" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClient.xcodeproj/xcuserdata/ug.xcuserdatad/xcschemes/NabtoEdgeClient.xcscheme" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClient.xcodeproj/xcuserdata/ug.xcuserdatad/xcschemes/NabtoEdgeClientTests.testExample.xcscheme" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClient.xcodeproj/xcuserdata/ug.xcuserdatad/xcschemes/xcschememanagement.plist" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClient.xcworkspace/contents.xcworkspacedata" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClient.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClient.xcworkspace/xcuserdata/ug.xcuserdatad/UserInterfaceState.xcuserstate" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClient.xcworkspace/xcuserdata/ug.xcuserdatad/xcschemes/xcschememanagement.plist" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClient/Info.plist" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClient/NabtoEdgeClient.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClient/NabtoEdgeClient.swift" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClient/impl/NabtoEdgeClientObjC.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClient/impl/NabtoEdgeClientObjC.mm" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClientTests/Info.plist" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClientTests/NabtoEdgeClientObjCTest.m" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClientTests/NabtoEdgeClientTests-Bridging-Header.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NabtoEdgeClientTests/NabtoEdgeClientTests.swift" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Podfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Podfile.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NabtoEdgeClientHello/.idea/NabtoEdgeClientHello.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NabtoEdgeClientHello/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NabtoEdgeClientHello/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NabtoEdgeClientHello/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NabtoEdgeClientHello/.idea/xcode.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NabtoEdgeClientHello/NabtoEdgeClientHello.xcodeproj/project.pbxproj" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NabtoEdgeClientHello/NabtoEdgeClientHello.xcodeproj/project.xcworkspace/contents.xcworkspacedata" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NabtoEdgeClientHello/NabtoEdgeClientHello.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NabtoEdgeClientHello/NabtoEdgeClientHello.xcodeproj/project.xcworkspace/xcuserdata/ug.xcuserdatad/UserInterfaceState.xcuserstate" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NabtoEdgeClientHello/NabtoEdgeClientHello.xcodeproj/project.xcworkspace/xcuserdata/ug.xcuserdatad/xcschemes/xcschememanagement.plist" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NabtoEdgeClientHello/NabtoEdgeClientHello.xcodeproj/xcuserdata/ug.xcuserdatad/xcschemes/NabtoEdgeClientHello.xcscheme" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NabtoEdgeClientHello/NabtoEdgeClientHello.xcodeproj/xcuserdata/ug.xcuserdatad/xcschemes/xcschememanagement.plist" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NabtoEdgeClientHello/NabtoEdgeClientHello/AppDelegate.swift" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NabtoEdgeClientHello/NabtoEdgeClientHello/Assets.xcassets/AppIcon.appiconset/Contents.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NabtoEdgeClientHello/NabtoEdgeClientHello/Assets.xcassets/Contents.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NabtoEdgeClientHello/NabtoEdgeClientHello/Base.lproj/LaunchScreen.storyboard" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NabtoEdgeClientHello/NabtoEdgeClientHello/Base.lproj/Main.storyboard" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NabtoEdgeClientHello/NabtoEdgeClientHello/Info.plist" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NabtoEdgeClientHello/NabtoEdgeClientHello/SceneDelegate.swift" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../NabtoEdgeClientHello/NabtoEdgeClientHello/ViewController.swift" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="iphonesimulator_35B62628-4661-4CB1-9B0F-68A0AA9BCB32" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectId" id="1fJ9WSUU6gzWUItBnqtAEF9Izol" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="autoscrollFromSource" value="true" />
+    <option name="autoscrollToSource" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="false" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showMembers" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="OBJC.PRESERVED_TARGET_SELECTION" value="NabtoEdgeClient" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/NabtoEdgeClient.xcworkspace" />
+  </component>
+  <component name="RunManager" selected="XCTest.-[NabtoEdgeClientObjCTest]">
+    <configuration name="NabtoEdgeClient" type="AppleRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="NabtoEdgeClient" TARGET_NAME="NabtoEdgeClient" CONFIG_NAME="Debug" SCHEME_NAME="NabtoEdgeClient" IS_LOCATION_SIMULATION_ALLOWED="true" APPLICATION_LANGUAGE="IDELaunchSchemeLanguageUseSystemLanguage" APPLICATION_REGION="" MAKE_ACTIVE="TRUE" SHOULD_DEBUG_EXTENSIONS="false">
+      <EXTENSION ID="org.jetbrains.appcode.reveal.RevealRunConfigurationExtension">
+        <REVEAL_SETTINGS autoInject="false" autoInstall="true" askToEnableAutoInstall="true" />
+      </EXTENSION>
+      <embedded_app_extension_list />
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="-[NabtoEdgeClientObjCTest]" type="OCUnitRunConfiguration" factoryName="XCTest/Kiwi" temporary="true" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="NabtoEdgeClient" TARGET_NAME="NabtoEdgeClientTests" CONFIG_NAME="Debug" SCHEME_NAME="-[NabtoEdgeClientObjCTest]" IS_LOCATION_SIMULATION_ALLOWED="true" APPLICATION_LANGUAGE="IDELaunchSchemeLanguageUseSystemLanguage" APPLICATION_REGION="" TEST_CLASS="NabtoEdgeClientObjCTest" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="NabtoEdgeClientTests.testExample" type="OCUnitRunConfiguration" factoryName="XCTest/Kiwi" temporary="true" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="NabtoEdgeClient" TARGET_NAME="NabtoEdgeClientTests" CONFIG_NAME="Debug" SCHEME_NAME="NabtoEdgeClientTests.testExample" IS_LOCATION_SIMULATION_ALLOWED="true" APPLICATION_LANGUAGE="IDELaunchSchemeLanguageUseSystemLanguage" APPLICATION_REGION="" TEST_CLASS="NabtoEdgeClientTests" TEST_METHOD="testExample" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Application.NabtoEdgeClient" />
+      <item itemvalue="XCTest.NabtoEdgeClientTests" />
+      <item itemvalue="XCTest.NabtoEdgeClientTests.testExample" />
+      <item itemvalue="XCTest.-[NabtoEdgeClientObjCTest]" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="XCTest.-[NabtoEdgeClientObjCTest]" />
+        <item itemvalue="XCTest.NabtoEdgeClientTests.testExample" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1c65a4f5-6dbb-4cf0-bced-49181204e989" name="Default Changelist" comment="" />
+      <created>1595925360884</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1595925360884</updated>
+      <workItem from="1595925362763" duration="1102000" />
+      <workItem from="1595930315228" duration="7089000" />
+    </task>
+    <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="1737" y="571" key="#com.intellij.ide.util.MemberChooser" timestamp="1595931234023">
+      <screen x="0" y="23" width="3008" height="1669" />
+    </state>
+    <state x="1737" y="571" key="#com.intellij.ide.util.MemberChooser/0.23.3008.1669/-1920.938.1920.1177@0.23.3008.1669" timestamp="1595931234023" />
+    <state x="1743" y="611" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1595935981743">
+      <screen x="0" y="23" width="3008" height="1669" />
+    </state>
+    <state x="1743" y="611" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.23.3008.1669/-1920.938.1920.1177@0.23.3008.1669" timestamp="1595935981743" />
+    <state width="1963" height="492" key="GridCell.Tab.0.bottom" timestamp="1595939964296">
+      <screen x="0" y="23" width="3008" height="1669" />
+    </state>
+    <state width="1963" height="492" key="GridCell.Tab.0.bottom/0.23.3008.1669/-1920.938.1920.1177@0.23.3008.1669" timestamp="1595939964296" />
+    <state width="1963" height="492" key="GridCell.Tab.0.center" timestamp="1595939964295">
+      <screen x="0" y="23" width="3008" height="1669" />
+    </state>
+    <state width="1963" height="492" key="GridCell.Tab.0.center/0.23.3008.1669/-1920.938.1920.1177@0.23.3008.1669" timestamp="1595939964295" />
+    <state width="1963" height="492" key="GridCell.Tab.0.left" timestamp="1595939964295">
+      <screen x="0" y="23" width="3008" height="1669" />
+    </state>
+    <state width="1963" height="492" key="GridCell.Tab.0.left/0.23.3008.1669/-1920.938.1920.1177@0.23.3008.1669" timestamp="1595939964295" />
+    <state width="1963" height="492" key="GridCell.Tab.0.right" timestamp="1595939964296">
+      <screen x="0" y="23" width="3008" height="1669" />
+    </state>
+    <state width="1963" height="492" key="GridCell.Tab.0.right/0.23.3008.1669/-1920.938.1920.1177@0.23.3008.1669" timestamp="1595939964296" />
+  </component>
+</project>
