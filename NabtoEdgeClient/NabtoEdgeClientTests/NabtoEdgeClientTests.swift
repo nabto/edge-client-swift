@@ -18,7 +18,6 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testVersionString() throws {
-        let sut = NabtoEdgeClient()
-        XCTAssertEqual("5.", sut.versionString().prefix(2))
+        XCTAssertEqual("5.", NabtoEdgeClient.versionString().prefix(2))
     }
 }

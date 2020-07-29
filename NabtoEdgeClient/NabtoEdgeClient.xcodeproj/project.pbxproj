@@ -11,10 +11,8 @@
 		D42A03BC24CEE19E008E4B2D /* NabtoEdgeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D42A03BB24CEE19E008E4B2D /* NabtoEdgeClient.swift */; };
 		D4B54C3924D045D500BBC161 /* NabtoEdgeClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B54C3824D045D500BBC161 /* NabtoEdgeClientTests.swift */; };
 		D4B54C3B24D045D500BBC161 /* NabtoEdgeClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42A03B024CEE12D008E4B2D /* NabtoEdgeClient.framework */; };
-		D4B54C4524D04DA700BBC161 /* NabtoEdgeClientObjCTest.m in Sources */ = {isa = PBXBuildFile; fileRef = D4B54C4424D04DA700BBC161 /* NabtoEdgeClientObjCTest.m */; };
-		E920B4988DC662822A8E6B3A /* NabtoEdgeClientObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = E927109B66B2C72ED77DBE85 /* NabtoEdgeClientObjC.mm */; };
-		E926006AE925FAFFA40EC757 /* NabtoEdgeClientObjC.h in Headers */ = {isa = PBXBuildFile; fileRef = E92C7D9765125B7F0B90A44A /* NabtoEdgeClientObjC.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E92E33BF71D273770C0D8246 /* NabtoEdgeClient.h in Headers */ = {isa = PBXBuildFile; fileRef = E9259B60A754046879860BB3 /* NabtoEdgeClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E92EF12F25F8DF3116CB8B2B /* module.map in Sources */ = {isa = PBXBuildFile; fileRef = E926B7741A2C63A0353F530E /* module.map */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,10 +36,8 @@
 		D4B54C3824D045D500BBC161 /* NabtoEdgeClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NabtoEdgeClientTests.swift; sourceTree = "<group>"; };
 		D4B54C3A24D045D500BBC161 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D4B54C4324D04DA600BBC161 /* NabtoEdgeClientTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NabtoEdgeClientTests-Bridging-Header.h"; sourceTree = "<group>"; };
-		D4B54C4424D04DA700BBC161 /* NabtoEdgeClientObjCTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NabtoEdgeClientObjCTest.m; sourceTree = "<group>"; };
 		E9259B60A754046879860BB3 /* NabtoEdgeClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NabtoEdgeClient.h; sourceTree = "<group>"; };
-		E927109B66B2C72ED77DBE85 /* NabtoEdgeClientObjC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = NabtoEdgeClientObjC.mm; sourceTree = "<group>"; };
-		E92C7D9765125B7F0B90A44A /* NabtoEdgeClientObjC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NabtoEdgeClientObjC.h; sourceTree = "<group>"; };
+		E926B7741A2C63A0353F530E /* module.map */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = module.map; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,8 +102,8 @@
 			children = (
 				D42A03B424CEE12D008E4B2D /* Info.plist */,
 				D42A03BB24CEE19E008E4B2D /* NabtoEdgeClient.swift */,
-				E92A4E30F93A5C282FFD084A /* impl */,
 				E9259B60A754046879860BB3 /* NabtoEdgeClient.h */,
+				E926B7741A2C63A0353F530E /* module.map */,
 			);
 			path = NabtoEdgeClient;
 			sourceTree = "<group>";
@@ -117,19 +113,9 @@
 			children = (
 				D4B54C3824D045D500BBC161 /* NabtoEdgeClientTests.swift */,
 				D4B54C3A24D045D500BBC161 /* Info.plist */,
-				D4B54C4424D04DA700BBC161 /* NabtoEdgeClientObjCTest.m */,
 				D4B54C4324D04DA600BBC161 /* NabtoEdgeClientTests-Bridging-Header.h */,
 			);
 			path = NabtoEdgeClientTests;
-			sourceTree = "<group>";
-		};
-		E92A4E30F93A5C282FFD084A /* impl */ = {
-			isa = PBXGroup;
-			children = (
-				E927109B66B2C72ED77DBE85 /* NabtoEdgeClientObjC.mm */,
-				E92C7D9765125B7F0B90A44A /* NabtoEdgeClientObjC.h */,
-			);
-			path = impl;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -140,7 +126,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				E92E33BF71D273770C0D8246 /* NabtoEdgeClient.h in Headers */,
-				E926006AE925FAFFA40EC757 /* NabtoEdgeClientObjC.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -271,7 +256,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D42A03BC24CEE19E008E4B2D /* NabtoEdgeClient.swift in Sources */,
-				E920B4988DC662822A8E6B3A /* NabtoEdgeClientObjC.mm in Sources */,
+				E92EF12F25F8DF3116CB8B2B /* module.map in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -279,7 +264,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D4B54C4524D04DA700BBC161 /* NabtoEdgeClientObjCTest.m in Sources */,
 				D4B54C3924D045D500BBC161 /* NabtoEdgeClientTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -433,9 +417,11 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				MODULEMAP_PRIVATE_FILE = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.nabto.edge.NabtoEdgeClient;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_INCLUDE_PATHS = "$(SRCROOT)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -460,9 +446,11 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				MODULEMAP_PRIVATE_FILE = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.nabto.edge.NabtoEdgeClient;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_INCLUDE_PATHS = "$(SRCROOT)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -486,6 +474,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "\"${PROJECT_DIR}/Pods\"/**";
 			};
 			name = Debug;
 		};
@@ -506,6 +495,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "NabtoEdgeClientTests/NabtoEdgeClientTests-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "\"${PROJECT_DIR}/Pods\"/**";
 			};
 			name = Release;
 		};

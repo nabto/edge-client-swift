@@ -16,4 +16,5 @@ FOUNDATION_EXPORT const unsigned char NabtoEdgeClientVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <NabtoEdgeClient/PublicHeader.h>
 
-#import "NabtoEdgeClientObjC.h"
+//#import "NabtoEdgeClientObjC.h"
+//#import "nabto_client.h"
