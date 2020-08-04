@@ -5,16 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1c65a4f5-6dbb-4cf0-bced-49181204e989" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/NabtoEdgeClient.xcodeproj/xcuserdata/ug.xcuserdatad/xcschemes/NabtoEdgeClientTests.testSetOptionsInvalidParameter.xcscheme" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/NabtoEdgeClient.xcodeproj/xcuserdata/ug.xcuserdatad/xcschemes/NabtoEdgeClientTests.testSetOptionsValid.xcscheme" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NabtoEdgeClient.xcodeproj/xcuserdata/ug.xcuserdatad/xcschemes/-[NabtoEdgeClientObjCTest].xcscheme" beforeDir="false" afterPath="$PROJECT_DIR$/NabtoEdgeClient.xcodeproj/xcuserdata/ug.xcuserdatad/xcschemes/NabtoEdgeClientTests (1).xcscheme" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NabtoEdgeClient.xcodeproj/xcuserdata/ug.xcuserdatad/xcschemes/NabtoEdgeClientTests.testExample.xcscheme" beforeDir="false" afterPath="$PROJECT_DIR$/NabtoEdgeClient.xcodeproj/xcuserdata/ug.xcuserdatad/xcschemes/NabtoEdgeClientTests.testSetOptions.xcscheme" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NabtoEdgeClient.xcodeproj/xcuserdata/ug.xcuserdatad/xcschemes/NabtoEdgeClientTests.testVersionString.xcscheme" beforeDir="false" afterPath="$PROJECT_DIR$/NabtoEdgeClient.xcodeproj/xcuserdata/ug.xcuserdatad/xcschemes/NabtoEdgeClientTests.testSetLogLevelValid.xcscheme" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/NabtoEdgeClient.xcodeproj/xcuserdata/ug.xcuserdatad/xcschemes/xcschememanagement.plist" beforeDir="false" afterPath="$PROJECT_DIR$/NabtoEdgeClient.xcodeproj/xcuserdata/ug.xcuserdatad/xcschemes/xcschememanagement.plist" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/NabtoEdgeClient.xcworkspace/xcuserdata/ug.xcuserdatad/UserInterfaceState.xcuserstate" beforeDir="false" afterPath="$PROJECT_DIR$/NabtoEdgeClient.xcworkspace/xcuserdata/ug.xcuserdatad/UserInterfaceState.xcuserstate" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/NabtoEdgeClient/NabtoEdgeClient.swift" beforeDir="false" afterPath="$PROJECT_DIR$/NabtoEdgeClient/NabtoEdgeClient.swift" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/NabtoEdgeClientTests/NabtoEdgeClientTests.swift" beforeDir="false" afterPath="$PROJECT_DIR$/NabtoEdgeClientTests/NabtoEdgeClientTests.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../NabtoEdgeClientHello/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../NabtoEdgeClientHello/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +40,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/NabtoEdgeClient.xcworkspace" />
   </component>
-  <component name="RunManager" selected="XCTest.NabtoEdgeClientTests (1)">
+  <component name="RunManager" selected="XCTest.NabtoEdgeClientTests.testSetLogLevelValid">
     <configuration name="NabtoEdgeClient" type="AppleRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="NabtoEdgeClient" TARGET_NAME="NabtoEdgeClient" CONFIG_NAME="Debug" SCHEME_NAME="NabtoEdgeClient" IS_LOCATION_SIMULATION_ALLOWED="true" APPLICATION_LANGUAGE="IDELaunchSchemeLanguageUseSystemLanguage" APPLICATION_REGION="" MAKE_ACTIVE="TRUE" SHOULD_DEBUG_EXTENSIONS="false">
       <EXTENSION ID="org.jetbrains.appcode.reveal.RevealRunConfigurationExtension">
         <REVEAL_SETTINGS autoInject="false" autoInstall="true" askToEnableAutoInstall="true" />
@@ -55,6 +51,11 @@
       </method>
     </configuration>
     <configuration name="NabtoEdgeClientTests (1)" type="OCUnitRunConfiguration" factoryName="XCTest/Kiwi" temporary="true" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="NabtoEdgeClient" TARGET_NAME="NabtoEdgeClientTests" CONFIG_NAME="Debug" SCHEME_NAME="NabtoEdgeClientTests (1)" IS_LOCATION_SIMULATION_ALLOWED="true" APPLICATION_LANGUAGE="IDELaunchSchemeLanguageUseSystemLanguage" APPLICATION_REGION="" TEST_CLASS="NabtoEdgeClientTests" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="NabtoEdgeClientTests.testSetLogLevelValid" type="OCUnitRunConfiguration" factoryName="XCTest/Kiwi" temporary="true" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="NabtoEdgeClient" TARGET_NAME="NabtoEdgeClientTests" CONFIG_NAME="Debug" SCHEME_NAME="NabtoEdgeClientTests.testSetLogLevelValid" IS_LOCATION_SIMULATION_ALLOWED="true" APPLICATION_LANGUAGE="IDELaunchSchemeLanguageUseSystemLanguage" APPLICATION_REGION="" TEST_CLASS="NabtoEdgeClientTests" TEST_METHOD="testSetLogLevelValid" TEST_MODE="SUITE_TEST">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -74,27 +75,22 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="NabtoEdgeClientTests.testVersionString" type="OCUnitRunConfiguration" factoryName="XCTest/Kiwi" temporary="true" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="NabtoEdgeClient" TARGET_NAME="NabtoEdgeClientTests" CONFIG_NAME="Debug" SCHEME_NAME="NabtoEdgeClientTests.testVersionString" IS_LOCATION_SIMULATION_ALLOWED="true" APPLICATION_LANGUAGE="IDELaunchSchemeLanguageUseSystemLanguage" APPLICATION_REGION="" TEST_CLASS="NabtoEdgeClientTests" TEST_METHOD="testVersionString" TEST_MODE="SUITE_TEST">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
     <list>
       <item itemvalue="Application.NabtoEdgeClient" />
       <item itemvalue="XCTest.NabtoEdgeClientTests" />
-      <item itemvalue="XCTest.NabtoEdgeClientTests.testVersionString" />
       <item itemvalue="XCTest.NabtoEdgeClientTests (1)" />
       <item itemvalue="XCTest.NabtoEdgeClientTests.testSetOptions" />
       <item itemvalue="XCTest.NabtoEdgeClientTests.testSetOptionsValid" />
       <item itemvalue="XCTest.NabtoEdgeClientTests.testSetOptionsInvalidParameter" />
+      <item itemvalue="XCTest.NabtoEdgeClientTests.testSetLogLevelValid" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="XCTest.NabtoEdgeClientTests.testSetLogLevelValid" />
         <item itemvalue="XCTest.NabtoEdgeClientTests (1)" />
         <item itemvalue="XCTest.NabtoEdgeClientTests.testSetOptionsInvalidParameter" />
         <item itemvalue="XCTest.NabtoEdgeClientTests.testSetOptionsValid" />
         <item itemvalue="XCTest.NabtoEdgeClientTests.testSetOptions" />
-        <item itemvalue="XCTest.NabtoEdgeClientTests.testVersionString" />
       </list>
     </recent_temporary>
   </component>
@@ -109,7 +105,7 @@
       <workItem from="1595925362763" duration="1102000" />
       <workItem from="1595930315228" duration="7089000" />
       <workItem from="1596454637573" duration="6976000" />
-      <workItem from="1596480553937" duration="10432000" />
+      <workItem from="1596480553937" duration="15649000" />
     </task>
     <servers />
   </component>
@@ -127,25 +123,25 @@
       <screen x="0" y="23" width="1920" height="1177" />
     </state>
     <state x="352" y="187" key="CommitChangelistDialog2/0.23.1920.1177@0.23.1920.1177" timestamp="1596527592312" />
-    <state width="1878" height="328" key="GridCell.Tab.0.bottom" timestamp="1596530550674">
+    <state width="1878" height="450" key="GridCell.Tab.0.bottom" timestamp="1596539816936">
       <screen x="0" y="23" width="1920" height="1177" />
     </state>
-    <state width="1878" height="328" key="GridCell.Tab.0.bottom/0.23.1920.1177@0.23.1920.1177" timestamp="1596530550674" />
+    <state width="1878" height="450" key="GridCell.Tab.0.bottom/0.23.1920.1177@0.23.1920.1177" timestamp="1596539816936" />
     <state width="1963" height="354" key="GridCell.Tab.0.bottom/0.23.3008.1669/-1920.938.1920.1177@0.23.3008.1669" timestamp="1596457854092" />
-    <state width="1878" height="328" key="GridCell.Tab.0.center" timestamp="1596530550673">
+    <state width="1878" height="450" key="GridCell.Tab.0.center" timestamp="1596539816935">
       <screen x="0" y="23" width="1920" height="1177" />
     </state>
-    <state width="1878" height="328" key="GridCell.Tab.0.center/0.23.1920.1177@0.23.1920.1177" timestamp="1596530550673" />
+    <state width="1878" height="450" key="GridCell.Tab.0.center/0.23.1920.1177@0.23.1920.1177" timestamp="1596539816935" />
     <state width="1963" height="354" key="GridCell.Tab.0.center/0.23.3008.1669/-1920.938.1920.1177@0.23.3008.1669" timestamp="1596457854091" />
-    <state width="1878" height="328" key="GridCell.Tab.0.left" timestamp="1596530550673">
+    <state width="1878" height="450" key="GridCell.Tab.0.left" timestamp="1596539816935">
       <screen x="0" y="23" width="1920" height="1177" />
     </state>
-    <state width="1878" height="328" key="GridCell.Tab.0.left/0.23.1920.1177@0.23.1920.1177" timestamp="1596530550673" />
+    <state width="1878" height="450" key="GridCell.Tab.0.left/0.23.1920.1177@0.23.1920.1177" timestamp="1596539816935" />
     <state width="1963" height="354" key="GridCell.Tab.0.left/0.23.3008.1669/-1920.938.1920.1177@0.23.3008.1669" timestamp="1596457854090" />
-    <state width="1878" height="328" key="GridCell.Tab.0.right" timestamp="1596530550674">
+    <state width="1878" height="450" key="GridCell.Tab.0.right" timestamp="1596539816936">
       <screen x="0" y="23" width="1920" height="1177" />
     </state>
-    <state width="1878" height="328" key="GridCell.Tab.0.right/0.23.1920.1177@0.23.1920.1177" timestamp="1596530550674" />
+    <state width="1878" height="450" key="GridCell.Tab.0.right/0.23.1920.1177@0.23.1920.1177" timestamp="1596539816936" />
     <state width="1963" height="354" key="GridCell.Tab.0.right/0.23.3008.1669/-1920.938.1920.1177@0.23.3008.1669" timestamp="1596457854091" />
     <state x="625" y="286" key="run.anything.popup" timestamp="1596053663048">
       <screen x="0" y="23" width="1920" height="1177" />

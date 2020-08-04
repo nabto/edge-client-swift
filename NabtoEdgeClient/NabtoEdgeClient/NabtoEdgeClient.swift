@@ -19,13 +19,11 @@ public enum NabtoEdgeClientError: Error {
 }
 
 public typealias LogCallBackReceiver = (NabtoEdgeClientLogMessage) -> Void
-public typealias NabtoEdgeClientLogMessage = NabtoClientLogMessage
 
-public struct NabtoEdgeClientLogMessXage {
+public struct NabtoEdgeClientLogMessage {
     var severity: Int
     var severityString: String
-    var module: String?
-    var file: String?
+    var file: String
     var line: Int
     var message: String
 }
@@ -58,8 +56,11 @@ public class NabtoEdgeClient: NSObject {
         self.setLogCallBack(cb: defaultLogCallback)
     }
 
-    public func setLogLevel(level: String) {
-        nabto_client_set_log_level(self.plaincNabtoClient, level)
+    public func setLogLevel(level: String) throws {
+        let status: NabtoClientError = nabto_client_set_log_level(self.plaincNabtoClient, level)
+        if (status != NABTO_CLIENT_EC_OK) {
+            throw NabtoEdgeClientError.INVALID_ARGUMENT
+        }
     }
 
     public func setLogCallBack(cb: @escaping LogCallBackReceiver) {
@@ -72,7 +73,21 @@ public class NabtoEdgeClient: NSObject {
     }
 
     private func defaultLogCallback(msg: NabtoEdgeClientLogMessage) {
-        NSLog("Nabto log: \(msg.file):\(msg.line) [\(msg.severityString)] \(msg.message)")
+        NSLog("Nabto log: \(msg.file):\(msg.line) [\(msg.severity)/\(msg.severityString)]: \(msg.message)")
+    }
+
+    private func apiLogCallback(msg: NabtoClientLogMessage) {
+        guard let cb = self.userLogCallBack else {
+            return
+        }
+        // let theFileName = (string as NSString).lastPathComponent
+        let userMsg = NabtoEdgeClientLogMessage(
+                severity: Int(msg.severity.rawValue),
+                severityString: String(cString: msg.severityString),
+                file: (String(cString: msg.file) as NSString).lastPathComponent,
+                line: Int(msg.line),
+                message: String(cString: msg.message))
+        cb(userMsg)
     }
 
     private func registerApiLogCallback() {
@@ -83,7 +98,7 @@ public class NabtoEdgeClient: NSObject {
             }
             let msg: NabtoClientLogMessage = pmsg!.pointee
             let mySelf = Unmanaged<NabtoEdgeClient>.fromOpaque(data!).takeUnretainedValue()
-            mySelf.userLogCallBack?(msg)
+            mySelf.apiLogCallback(msg: msg)
         }, rawSelf)
         if (res == NABTO_CLIENT_EC_OK) {
             self.apiLogCallBackRegistered = true
@@ -96,11 +111,13 @@ public class NabtoEdgeClient: NSObject {
 
 public class Connection: NSObject {
 
-    private var plaincNabtoConnection: OpaquePointer
+    private let plaincNabtoConnection: OpaquePointer
 
     fileprivate init(nabtoClient: OpaquePointer) throws {
-        plaincNabtoConnection = nabto_client_connection_new(nabtoClient)
-        if (plaincNabtoConnection == nil) {
+        let p = nabto_client_connection_new(nabtoClient)
+        if (p != nil) {
+            self.plaincNabtoConnection = p!
+        } else {
             throw NabtoEdgeClientError.ALLOCATION_ERROR
         }
     }

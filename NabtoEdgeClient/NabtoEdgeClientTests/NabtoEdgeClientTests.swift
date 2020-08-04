@@ -32,6 +32,21 @@ class NabtoEdgeClientTests: XCTestCase {
         let connection = try! client.createConnection()
     }
 
+    func testSetLogLevelValid() {
+        let client = NabtoEdgeClient()
+        try! client.setLogLevel(level: "trace")
+        client.enableOsLogLogging()
+        let connection = try! client.createConnection()
+        try! connection.updateOptions(json: "{\n\"ProductId\": \"pr-12345678\",\n\"DeviceId\": \"de-12345678\",\n\"ServerUrl\": \"https://pr-12345678.clients.nabto.net\",\n\"ServerKey\": \"sk-12345678123456781234567812345678\"\n}")
+    }
+
+    func testSetLogLevelInvalid() {
+        let client = NabtoEdgeClient()
+        XCTAssertThrowsError(try client.setLogLevel(level: "foo")) { error in
+            XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.INVALID_ARGUMENT)
+        }
+    }
+
     func testSetOptionsBadJson() {
         let client = NabtoEdgeClient()
         let connection = try! client.createConnection()
