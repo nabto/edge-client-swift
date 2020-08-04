@@ -68,4 +68,27 @@ class NabtoEdgeClientTests: XCTestCase {
         let connection = try! client.createConnection()
         try! connection.updateOptions(json: "{\n\"ProductId\": \"pr-12345678\",\n\"DeviceId\": \"de-12345678\",\n\"ServerUrl\": \"https://pr-12345678.clients.nabto.net\",\n\"ServerKey\": \"sk-12345678123456781234567812345678\"\n}")
     }
+
+    func testGetOptions() {
+        let client = NabtoEdgeClient()
+        let connection = try! client.createConnection()
+        try! connection.updateOptions(json: "{\n\"ProductId\": \"pr-12345678\"}")
+        let allOptions = try! connection.getOptions()
+        XCTAssertTrue(allOptions.contains("ProductId"))
+        XCTAssertTrue(allOptions.contains("pr-12345678"))
+    }
+
+    func testGetDeviceFingerprintHex() {
+        let client = NabtoEdgeClient()
+        let connection = try! client.createConnection()
+        // TODO - we need some public, always-on test device for wrapper tests (as bs cannot bs+device cannot be embedded for self-contained test)
+    }
+
+    func testGetDeviceFingerprintHexFail() {
+        let client = NabtoEdgeClient()
+        let connection = try! client.createConnection()
+        XCTAssertThrowsError(try connection.getDeviceFingerprintHex()) { error in
+            XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.INVALID_STATE)
+        }
+    }
 }
