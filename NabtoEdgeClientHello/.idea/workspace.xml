@@ -2,18 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b0edb217-d40a-4531-9dbf-1889b0264115" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../NabtoEdgeClient/NabtoEdgeClient.xcodeproj/xcuserdata/ug.xcuserdatad/xcschemes/NabtoEdgeClientTests.testVersionString.xcscheme" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../NabtoEdgeClient/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../NabtoEdgeClient/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../NabtoEdgeClient/NabtoEdgeClient.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/../NabtoEdgeClient/NabtoEdgeClient.xcodeproj/project.pbxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../NabtoEdgeClient/NabtoEdgeClient.xcodeproj/xcuserdata/ug.xcuserdatad/xcschemes/xcschememanagement.plist" beforeDir="false" afterPath="$PROJECT_DIR$/../NabtoEdgeClient/NabtoEdgeClient.xcodeproj/xcuserdata/ug.xcuserdatad/xcschemes/xcschememanagement.plist" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../NabtoEdgeClient/NabtoEdgeClient.xcworkspace/xcuserdata/ug.xcuserdatad/UserInterfaceState.xcuserstate" beforeDir="false" afterPath="$PROJECT_DIR$/../NabtoEdgeClient/NabtoEdgeClient.xcworkspace/xcuserdata/ug.xcuserdatad/UserInterfaceState.xcuserstate" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../NabtoEdgeClient/NabtoEdgeClient/NabtoEdgeClient.h" beforeDir="false" afterPath="$PROJECT_DIR$/../NabtoEdgeClient/NabtoEdgeClient/NabtoEdgeClient.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../NabtoEdgeClient/NabtoEdgeClient/NabtoEdgeClient.swift" beforeDir="false" afterPath="$PROJECT_DIR$/../NabtoEdgeClient/NabtoEdgeClient/NabtoEdgeClient.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../NabtoEdgeClient/NabtoEdgeClient/impl/NabtoEdgeClientObjC.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../NabtoEdgeClient/NabtoEdgeClient/impl/NabtoEdgeClientObjC.mm" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../NabtoEdgeClient/NabtoEdgeClientTests/NabtoEdgeClientObjCTest.m" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../NabtoEdgeClient/NabtoEdgeClientTests/NabtoEdgeClientTests.swift" beforeDir="false" afterPath="$PROJECT_DIR$/../NabtoEdgeClient/NabtoEdgeClientTests/NabtoEdgeClientTests.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

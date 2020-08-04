@@ -8,20 +8,20 @@
 
 import Foundation
 import NabtoEdgeClientApi
+import os.log
 
 // useful read - perhaps it is acceptably clean to interact directly with c api from swift:
 // https://www.uraimo.com/2016/04/07/swift-and-c-everything-you-need-to-know
 
 public enum NabtoEdgeClientError: Error {
     case ALLOCATION_ERROR
+    case INVALID_ARGUMENT
 }
 
-// typedef void (*NabtoClientLogCallback)(const NabtoClientLogMessage* message, void* data);
-private typealias NativelLogCallBack = (Optional<UnsafePointer<NabtoClientLogMessage>>, Optional<UnsafeMutableRawPointer>) -> Void
+public typealias LogCallBackReceiver = (NabtoEdgeClientLogMessage) -> Void
+public typealias NabtoEdgeClientLogMessage = NabtoClientLogMessage
 
-public typealias LogCallBack = (NabtoEdgeClientLogMessage) -> Void
-
-public struct NabtoEdgeClientLogMessage {
+public struct NabtoEdgeClientLogMessXage {
     var severity: Int
     var severityString: String
     var module: String?
@@ -30,41 +30,69 @@ public struct NabtoEdgeClientLogMessage {
     var message: String
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 public class NabtoEdgeClient: NSObject {
 
     private let plaincNabtoClient: OpaquePointer
+    private var userLogCallBack: LogCallBackReceiver?
+    private var apiLogCallBackRegistered: Bool = false
 
     override public init() {
         self.plaincNabtoClient = nabto_client_new()
-//        (39, 63) Cannot convert value of type '(NabtoClientLogMessage, UnsafePointer<Void>) -> ()' (aka '(NabtoClientLogMessage_, UnsafePointer<()>) -> ()') to expected argument type 'NabtoClientLogCallback?' (aka 'Optional<@convention(c) (Optional<UnsafePointer<NabtoClientLogMessage_>>, Optional<UnsafeMutableRawPointer>) -> ()>')
-        // nabto_client_set_log_callback(self.plaincNabtoClient, defaultLogCallback, nil)
-    }
-
-    static func defaultLogCallback(m: Optional<UnsafePointer<NabtoClientLogMessage>>, data: Optional<UnsafeMutableRawPointer>) {
-//        NSLog(String(cString: m!.message))
-        // todo - handle other fields
     }
 
     deinit {
         nabto_client_free(self.plaincNabtoClient)
     }
 
-    public func setLogLevel(level: String) {
-        nabto_client_set_log_level(self.plaincNabtoClient, level)
-    }
-
-    public func setLogCallBack(cb: @escaping LogCallBack) {
+    static public func versionString() -> String {
+        return String(cString: nabto_client_version())
     }
 
     public func createConnection() throws -> Connection {
         return try Connection(nabtoClient: plaincNabtoClient)
     }
 
-
-    static public func versionString() -> String {
-        return String(cString: nabto_client_version())
+    public func enableOsLogLogging() {
+        self.setLogCallBack(cb: defaultLogCallback)
     }
+
+    public func setLogLevel(level: String) {
+        nabto_client_set_log_level(self.plaincNabtoClient, level)
+    }
+
+    public func setLogCallBack(cb: @escaping LogCallBackReceiver) {
+        self.userLogCallBack = cb
+        if (!self.apiLogCallBackRegistered) {
+            self.registerApiLogCallback()
+        } else {
+            // nabto_client_set_log_callback seems to always succeed
+        }
+    }
+
+    private func defaultLogCallback(msg: NabtoEdgeClientLogMessage) {
+        NSLog("Nabto log: \(msg.file):\(msg.line) [\(msg.severityString)] \(msg.message)")
+    }
+
+    private func registerApiLogCallback() {
+        let rawSelf = Unmanaged.passUnretained(self).toOpaque()
+        let res = nabto_client_set_log_callback(self.plaincNabtoClient, { (pmsg: Optional<UnsafePointer<NabtoClientLogMessage>>, data: Optional<UnsafeMutableRawPointer>) -> Void in
+            if (pmsg == nil || data == nil) {
+                return
+            }
+            let msg: NabtoClientLogMessage = pmsg!.pointee
+            let mySelf = Unmanaged<NabtoEdgeClient>.fromOpaque(data!).takeUnretainedValue()
+            mySelf.userLogCallBack?(msg)
+        }, rawSelf)
+        if (res == NABTO_CLIENT_EC_OK) {
+            self.apiLogCallBackRegistered = true
+        }
+    }
+
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 public class Connection: NSObject {
 
@@ -80,5 +108,17 @@ public class Connection: NSObject {
     deinit {
         nabto_client_connection_free(self.plaincNabtoConnection)
     }
+
+    public func updateOptions(json: String) throws {
+        let status: NabtoClientError = nabto_client_connection_set_options(self.plaincNabtoConnection, json)
+        if (status != NABTO_CLIENT_EC_OK) {
+            throw NabtoEdgeClientError.INVALID_ARGUMENT
+        }
+    }
+    
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
