@@ -12,7 +12,8 @@
 		D4B54C3924D045D500BBC161 /* NabtoEdgeClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B54C3824D045D500BBC161 /* NabtoEdgeClientTests.swift */; };
 		D4B54C3B24D045D500BBC161 /* NabtoEdgeClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42A03B024CEE12D008E4B2D /* NabtoEdgeClient.framework */; };
 		E925D05C1F5E162B0381020C /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E923BA86B8DCE94DF9DFF0E0 /* Connection.swift */; };
-		E92E33BF71D273770C0D8246 /* NabtoEdgeClient.h in Headers */ = {isa = PBXBuildFile; fileRef = E9259B60A754046879860BB3 /* NabtoEdgeClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E9270FECE2194BD901532109 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92C442D4196F3F94E893327 /* Helper.swift */; };
+		E92B785CFDB4C73F3E30EA72 /* CoapRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92365CF645619AA908C6A8B /* CoapRequest.swift */; };
 		E92EF12F25F8DF3116CB8B2B /* module.map in Sources */ = {isa = PBXBuildFile; fileRef = E926B7741A2C63A0353F530E /* module.map */; };
 /* End PBXBuildFile section */
 
@@ -37,9 +38,10 @@
 		D4B54C3824D045D500BBC161 /* NabtoEdgeClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NabtoEdgeClientTests.swift; sourceTree = "<group>"; };
 		D4B54C3A24D045D500BBC161 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D4B54C4324D04DA600BBC161 /* NabtoEdgeClientTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NabtoEdgeClientTests-Bridging-Header.h"; sourceTree = "<group>"; };
+		E92365CF645619AA908C6A8B /* CoapRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoapRequest.swift; sourceTree = "<group>"; };
 		E923BA86B8DCE94DF9DFF0E0 /* Connection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Connection.swift; sourceTree = "<group>"; };
-		E9259B60A754046879860BB3 /* NabtoEdgeClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NabtoEdgeClient.h; sourceTree = "<group>"; };
 		E926B7741A2C63A0353F530E /* module.map */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = module.map; sourceTree = SOURCE_ROOT; };
+		E92C442D4196F3F94E893327 /* Helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,9 +106,10 @@
 			children = (
 				D42A03B424CEE12D008E4B2D /* Info.plist */,
 				D42A03BB24CEE19E008E4B2D /* NabtoEdgeClient.swift */,
-				E9259B60A754046879860BB3 /* NabtoEdgeClient.h */,
 				E926B7741A2C63A0353F530E /* module.map */,
 				E923BA86B8DCE94DF9DFF0E0 /* Connection.swift */,
+				E92C442D4196F3F94E893327 /* Helper.swift */,
+				E92365CF645619AA908C6A8B /* CoapRequest.swift */,
 			);
 			path = NabtoEdgeClient;
 			sourceTree = "<group>";
@@ -128,7 +131,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E92E33BF71D273770C0D8246 /* NabtoEdgeClient.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -261,6 +263,8 @@
 				D42A03BC24CEE19E008E4B2D /* NabtoEdgeClient.swift in Sources */,
 				E92EF12F25F8DF3116CB8B2B /* module.map in Sources */,
 				E925D05C1F5E162B0381020C /* Connection.swift in Sources */,
+				E9270FECE2194BD901532109 /* Helper.swift in Sources */,
+				E92B785CFDB4C73F3E30EA72 /* CoapRequest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

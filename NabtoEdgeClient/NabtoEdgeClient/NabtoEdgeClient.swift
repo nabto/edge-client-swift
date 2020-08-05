@@ -8,15 +8,15 @@
 
 import Foundation
 import NabtoEdgeClientApi
-import os.log
 
-// useful read - perhaps it is acceptably clean to interact directly with c api from swift:
-// https://www.uraimo.com/2016/04/07/swift-and-c-everything-you-need-to-know
+// useful read: https://www.uraimo.com/2016/04/07/swift-and-c-everything-you-need-to-know
 
 public enum NabtoEdgeClientError: Error {
     case ALLOCATION_ERROR
     case INVALID_ARGUMENT
     case INVALID_STATE
+    case NO_DATA
+    case UNEXPECTED_API_STATUS
 }
 
 public typealias LogCallBackReceiver = (NabtoEdgeClientLogMessage) -> Void
@@ -51,8 +51,8 @@ public class NabtoEdgeClient: NSObject {
         return try Connection(nabtoClient: plaincNabtoClient)
     }
 
-    public func enableOsLogLogging() {
-        self.setLogCallBack(cb: defaultLogCallback)
+    public func enableNsLogLogging() {
+        self.setLogCallBack(cb: nslogLogCallback)
     }
 
     public func setLogLevel(level: String) throws {
@@ -71,7 +71,13 @@ public class NabtoEdgeClient: NSObject {
         }
     }
 
-    private func defaultLogCallback(msg: NabtoEdgeClientLogMessage) {
+    public func createPrivateKey() throws -> String {
+        var p: UnsafeMutablePointer<Int8>? = nil
+        let status = nabto_client_create_private_key(self.plaincNabtoClient, &p)
+        return try Helper.handleStringResult(status: status, cstring: p)
+    }
+
+    private func nslogLogCallback(msg: NabtoEdgeClientLogMessage) {
         NSLog("Nabto log: \(msg.file):\(msg.line) [\(msg.severity)/\(msg.severityString)]: \(msg.message)")
     }
 

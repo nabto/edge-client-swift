@@ -5,11 +5,11 @@
 
 import Foundation
 import NabtoEdgeClientApi
-import os.log
 
 public class Connection: NSObject {
 
     private let plaincNabtoConnection: OpaquePointer
+    private let plaincNabtoClient: OpaquePointer
 
     internal init(nabtoClient: OpaquePointer) throws {
         let p = nabto_client_connection_new(nabtoClient)
@@ -18,6 +18,7 @@ public class Connection: NSObject {
         } else {
             throw NabtoEdgeClientError.ALLOCATION_ERROR
         }
+        self.plaincNabtoClient = nabtoClient
     }
 
     deinit {
@@ -26,38 +27,51 @@ public class Connection: NSObject {
 
     public func updateOptions(json: String) throws {
         let status: NabtoClientError = nabto_client_connection_set_options(self.plaincNabtoConnection, json)
-        if (status != NABTO_CLIENT_EC_OK) {
-            throw NabtoEdgeClientError.INVALID_ARGUMENT
-        }
+        try Helper.throwIfNotOk(status)
     }
 
     public func getOptions() throws -> String {
         var p: UnsafeMutablePointer<Int8>? = nil
         let status = nabto_client_connection_get_options(self.plaincNabtoConnection, &p)
-        return try handleStringResult(status: status, cstring: p)
+        return try Helper.handleStringResult(status: status, cstring: p)
     }
 
     public func getDeviceFingerprintHex() throws -> String {
         var p: UnsafeMutablePointer<Int8>? = nil
         let status = nabto_client_connection_get_device_fingerprint_full_hex(self.plaincNabtoConnection, &p)
-        return try handleStringResult(status: status, cstring: p)
+        return try Helper.handleStringResult(status: status, cstring: p)
     }
 
     public func getClientFingerprintHex() throws -> String {
         var p: UnsafeMutablePointer<Int8>? = nil
-        let status = nabto_client_connection_get_device_fingerprint_full_hex(self.plaincNabtoConnection, &p)
-        return try handleStringResult(status: status, cstring: p)
+        let status = nabto_client_connection_get_client_fingerprint_full_hex(self.plaincNabtoConnection, &p)
+        return try Helper.handleStringResult(status: status, cstring: p)
     }
 
-    private func handleStringResult(status: NabtoClientError, cstring: UnsafeMutablePointer<Int8>?) throws -> String {
-        if (status == NABTO_CLIENT_EC_INVALID_STATE) {
-            throw NabtoEdgeClientError.INVALID_STATE
-        } else if (status != NABTO_CLIENT_EC_OK || cstring == nil) {
-            throw NabtoEdgeClientError.ALLOCATION_ERROR
-        }
-        let result = String(cString: cstring!)
-        nabto_client_string_free(cstring)
-        return result
+    public func createStream() {
+        // TODO
     }
+
+    public func createCoapRequest(method: String, path: String) throws -> CoapRequest {
+        return try CoapRequest(nabtoClient: self.plaincNabtoClient, nabtoConnection: self.plaincNabtoConnection, method: method, path: path)
+    }
+
+    public func createTcpTunnel() {
+        // TODO
+    }
+
+    public func close() {
+        // TODO
+    }
+
+    public func addConnectionEventsListener() {
+        // TODO
+    }
+
+    public func removeConnectionEventsListener() {
+        // TODO
+    }
+
+
 
 }

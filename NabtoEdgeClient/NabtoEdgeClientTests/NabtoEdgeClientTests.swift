@@ -23,19 +23,19 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func testCreateClientConnection() throws {
         let client = NabtoEdgeClient()
-        let connection = try client.createConnection()
+        let _ = try client.createConnection()
     }
 
     func testDefaultLog() {
         let client = NabtoEdgeClient()
-        client.enableOsLogLogging()
-        let connection = try! client.createConnection()
+        client.enableNsLogLogging()
+        let _ = try! client.createConnection()
     }
 
     func testSetLogLevelValid() {
         let client = NabtoEdgeClient()
         try! client.setLogLevel(level: "trace")
-        client.enableOsLogLogging()
+        client.enableNsLogLogging()
         let connection = try! client.createConnection()
         try! connection.updateOptions(json: "{\n\"ProductId\": \"pr-12345678\",\n\"DeviceId\": \"de-12345678\",\n\"ServerUrl\": \"https://pr-12345678.clients.nabto.net\",\n\"ServerKey\": \"sk-12345678123456781234567812345678\"\n}")
     }
@@ -45,6 +45,12 @@ class NabtoEdgeClientTests: XCTestCase {
         XCTAssertThrowsError(try client.setLogLevel(level: "foo")) { error in
             XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.INVALID_ARGUMENT)
         }
+    }
+
+    func testCreatePrivateKey() {
+        let client = NabtoEdgeClient()
+        let key = try! client.createPrivateKey()
+        XCTAssertTrue(key.contains("BEGIN EC PRIVATE KEY"))
     }
 
     func testSetOptionsBadJson() {
@@ -91,4 +97,19 @@ class NabtoEdgeClientTests: XCTestCase {
             XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.INVALID_STATE)
         }
     }
+
+    func testGetClientFingerprintHex() {
+        let client = NabtoEdgeClient()
+        let connection = try! client.createConnection()
+        // TODO - we need some public, always-on test device for wrapper tests (as bs cannot bs+Client cannot be embedded for self-contained test)
+    }
+
+    func testGetClientFingerprintHexFail() {
+        let client = NabtoEdgeClient()
+        let connection = try! client.createConnection()
+        XCTAssertThrowsError(try connection.getClientFingerprintHex()) { error in
+            XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.INVALID_STATE)
+        }
+    }
+
 }

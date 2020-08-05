@@ -15,9 +15,11 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let c: NabtoEdgeClient = NabtoEdgeClient()
-        label.text = c.versionString()
-        // Do any additional setup after loading the view.
+        let client: NabtoEdgeClient = NabtoEdgeClient()
+        let connection = try! client.createConnection()
+        let options = try! connection.getOptions()
+       // label.text = "Version: " + NabtoEdgeClient.versionString() + "\nOptions: [\(options)]"
+        label.text = "Options: [\(options)]"
     }
 
 
