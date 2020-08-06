@@ -10,6 +10,7 @@ public class Connection: NSObject {
 
     private let plaincNabtoConnection: OpaquePointer
     private let plaincNabtoClient: OpaquePointer
+    private let helper: Helper
 
     internal init(nabtoClient: OpaquePointer) throws {
         let p = nabto_client_connection_new(nabtoClient)
@@ -19,6 +20,7 @@ public class Connection: NSObject {
             throw NabtoEdgeClientError.ALLOCATION_ERROR
         }
         self.plaincNabtoClient = nabtoClient
+        self.helper = Helper(nabtoClient: self.plaincNabtoClient)
     }
 
     deinit {
@@ -34,6 +36,11 @@ public class Connection: NSObject {
         var p: UnsafeMutablePointer<Int8>? = nil
         let status = nabto_client_connection_get_options(self.plaincNabtoConnection, &p)
         return try Helper.handleStringResult(status: status, cstring: p)
+    }
+
+    public func setPrivateKey(key: String) throws {
+        let status = nabto_client_connection_set_private_key(self.plaincNabtoConnection, key)
+        return try Helper.throwIfNotOk(status)
     }
 
     public func getDeviceFingerprintHex() throws -> String {
@@ -60,8 +67,16 @@ public class Connection: NSObject {
         // TODO
     }
 
-    public func close() {
-        // TODO
+    public func close() throws {
+        try helper.wait() { future in
+            nabto_client_connection_close(self.plaincNabtoConnection, future)
+        }
+    }
+
+    public func connect() throws {
+        try helper.wait() { future in
+            nabto_client_connection_connect(self.plaincNabtoConnection, future)
+        }
     }
 
     public func addConnectionEventsListener() {

@@ -16,6 +16,8 @@ public enum NabtoEdgeClientError: Error {
     case INVALID_ARGUMENT
     case INVALID_STATE
     case NO_DATA
+    case NO_CHANNELS
+    case NOT_CONNECTED
     case UNEXPECTED_API_STATUS
 }
 

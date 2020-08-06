@@ -84,10 +84,53 @@ class NabtoEdgeClientTests: XCTestCase {
         XCTAssertTrue(allOptions.contains("pr-12345678"))
     }
 
-    func testGetDeviceFingerprintHex() {
+    func connect() throws -> Connection {
         let client = NabtoEdgeClient()
-        let connection = try! client.createConnection()
-        // TODO - we need some public, always-on test device for wrapper tests (as bs cannot bs+device cannot be embedded for self-contained test)
+        try! client.setLogLevel(level: "trace")
+        client.enableNsLogLogging()
+        let connection: Connection = try! client.createConnection()
+        let key = try! client.createPrivateKey()
+        try! connection.setPrivateKey(key: key)
+        try! connection.updateOptions(json: """
+                                            {\n
+                                            \"ProductId\": \"pr-fatqcwj9\",\n
+                                            \"DeviceId\": \"de-3x4st7ru\",\n
+                                            \"ServerUrl\": \"https://pr-fatqcwj9.clients.nabto.net\",\n
+                                            \"ServerKey\": \"sk-5f3ab4bea7cc2585091539fb950084ce\"\n}
+                                            """)
+        try! connection.connect()
+        return connection
+    }
+
+    func testConnect() {
+        try! connect().close()
+    }
+
+    func testConnectFail() {
+        let client = NabtoEdgeClient()
+        try! client.setLogLevel(level: "trace")
+        client.enableNsLogLogging()
+        let connection: Connection = try! client.createConnection()
+        let key = try! client.createPrivateKey()
+        try! connection.setPrivateKey(key: key)
+        try! connection.updateOptions(json: """
+                                            {\n
+                                            \"ProductId\": \"pr-fatqcwj9\",\n
+                                            \"DeviceId\": \"de-zqw7vehm\",\n
+                                            \"ServerUrl\": \"https://www.google.com\",\n
+                                            \"ServerKey\": \"sk-5f3ab4bea7cc2585091539fb950084ce\"\n}
+                                            """)
+        XCTAssertThrowsError(try connection.connect()) { error in
+            XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.NO_CHANNELS)
+        }
+    }
+
+
+    func testGetDeviceFingerprintHex() {
+        let connection = try! connect()
+        defer { try! connection.close() }
+        let fp = try! connection.getDeviceFingerprintHex()
+        XCTAssertEqual(fp, "3bab7ad3a583ad31b291e0c298d1e0966cba5ff31bdd422a01341c32d3894871")
     }
 
     func testGetDeviceFingerprintHexFail() {
@@ -100,8 +143,11 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func testGetClientFingerprintHex() {
         let client = NabtoEdgeClient()
-        let connection = try! client.createConnection()
-        // TODO - we need some public, always-on test device for wrapper tests (as bs cannot bs+Client cannot be embedded for self-contained test)
+        let connection: Connection = try! client.createConnection()
+        let key = try! client.createPrivateKey()
+        try! connection.setPrivateKey(key: key)
+        let fp = try! connection.getClientFingerprintHex()
+        XCTAssertEqual(fp.count, 64)
     }
 
     func testGetClientFingerprintHexFail() {
@@ -110,6 +156,20 @@ class NabtoEdgeClientTests: XCTestCase {
         XCTAssertThrowsError(try connection.getClientFingerprintHex()) { error in
             XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.INVALID_STATE)
         }
+    }
+
+    func testCoapRequest() {
+        let connection = try! connect()
+        defer { try! connection.close() }
+        let coap = try! connection.createCoapRequest(method: "GET", path: "/hello-world")
+        try! coap.execute()
+        XCTAssertEqual(try! coap.getResponseStatusCode(), 205)
+        XCTAssertEqual(try! coap.getResponseContentFormat(), 0)
+        XCTAssertEqual(try! String(decoding: coap.getResponsePayload(), as: UTF8.self), "Hello world")
+    }
+
+    func testTodo() throws {
+        //    throw XCTSkip("todo")
     }
 
 }
