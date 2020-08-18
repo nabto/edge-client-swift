@@ -6,11 +6,24 @@
 import Foundation
 import NabtoEdgeClientApi
 
+@objc public enum NabtoEdgeClientConnectionEvent: Int {
+    case CONNECTED
+    case CLOSED
+    case CHANNEL_CHANGED
+    case UNEXPECTED_EVENT
+}
+
+@objc public protocol ConnectionEventsCallbackReceiver {
+    func onEvent(event: NabtoEdgeClientConnectionEvent)
+}
+
 public class Connection: NSObject {
 
     private let plaincNabtoConnection: OpaquePointer
     private let plaincNabtoClient: OpaquePointer
     private let helper: Helper
+    private var apiEventCallBackRegistered: Bool = false
+    private var connectionEventListener: ConnectionEventListener? = nil
 
     internal init(nabtoClient: OpaquePointer) throws {
         let p = nabto_client_connection_new(nabtoClient)
@@ -79,14 +92,19 @@ public class Connection: NSObject {
         }
     }
 
-    public func addConnectionEventsListener() {
-        // TODO
+    // may throw NabtoEdgeClientError.INVALID_STATE
+    public func addConnectionEventsListener(cb: ConnectionEventsCallbackReceiver) throws {
+        if (self.connectionEventListener == nil) {
+            self.connectionEventListener = try ConnectionEventListener(plaincNabtoConnection: self.plaincNabtoConnection, plaincNabtoClient: self.plaincNabtoClient)
+        }
+        self.connectionEventListener!.addUserCb(cb)
     }
 
-    public func removeConnectionEventsListener() {
-        // TODO
+    public func removeConnectionEventsListener(cb: ConnectionEventsCallbackReceiver) throws {
+        guard let listener = self.connectionEventListener else {
+            return
+        }
+        listener.removeUserCb(cb)
     }
-
-
 
 }

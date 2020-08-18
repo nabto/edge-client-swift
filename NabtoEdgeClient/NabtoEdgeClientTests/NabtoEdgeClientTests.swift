@@ -9,7 +9,16 @@
 import XCTest
 import NabtoEdgeClient
 
+// test org: or-3uhjvwuh
+// test device source: nabto-embedded-sdk/examples/simple_coap
+
 class NabtoEdgeClientTests: XCTestCase {
+
+    let productId = "pr-fatqcwj9"
+    let deviceId = "de-avmqjaje" // in device, change from "avmqjaxe..." in public example source
+    let deviceFingerprint = "3bab7ad3a583ad31b291e0c298d1e0966cba5ff31bdd422a01341c32d3894871"
+    let clientServerKey = "sk-5f3ab4bea7cc2585091539fb950084ce"
+    let clientUrl = "https://pr-fatqcwj9.clients.nabto.net"
 
     override func setUpWithError() throws {
     }
@@ -93,10 +102,10 @@ class NabtoEdgeClientTests: XCTestCase {
         try! connection.setPrivateKey(key: key)
         try! connection.updateOptions(json: """
                                             {\n
-                                            \"ProductId\": \"pr-fatqcwj9\",\n
-                                            \"DeviceId\": \"de-3x4st7ru\",\n
-                                            \"ServerUrl\": \"https://pr-fatqcwj9.clients.nabto.net\",\n
-                                            \"ServerKey\": \"sk-5f3ab4bea7cc2585091539fb950084ce\"\n}
+                                            \"ProductId\": \"\(self.productId)\",\n
+                                            \"DeviceId\": \"\(self.deviceId)\",\n
+                                            \"ServerUrl\": \"\(self.clientUrl)\",\n
+                                            \"ServerKey\": \"\(self.clientServerKey)\"\n}
                                             """)
         try! connection.connect()
         return connection
@@ -115,8 +124,8 @@ class NabtoEdgeClientTests: XCTestCase {
         try! connection.setPrivateKey(key: key)
         try! connection.updateOptions(json: """
                                             {\n
-                                            \"ProductId\": \"pr-fatqcwj9\",\n
-                                            \"DeviceId\": \"de-zqw7vehm\",\n
+                                            \"ProductId\": \"\(self.productId)\",\n
+                                            \"DeviceId\": \"\(self.deviceId)\",\n
                                             \"ServerUrl\": \"https://www.google.com\",\n
                                             \"ServerKey\": \"sk-5f3ab4bea7cc2585091539fb950084ce\"\n}
                                             """)
@@ -130,7 +139,7 @@ class NabtoEdgeClientTests: XCTestCase {
         let connection = try! connect()
         defer { try! connection.close() }
         let fp = try! connection.getDeviceFingerprintHex()
-        XCTAssertEqual(fp, "3bab7ad3a583ad31b291e0c298d1e0966cba5ff31bdd422a01341c32d3894871")
+        XCTAssertEqual(fp, self.deviceFingerprint)
     }
 
     func testGetDeviceFingerprintHexFail() {
@@ -158,6 +167,11 @@ class NabtoEdgeClientTests: XCTestCase {
         }
     }
 
+
+    func testTodo() throws {
+//        throw XCTSkip("todo")
+    }
+
     func testCoapRequest() {
         let connection = try! connect()
         defer { try! connection.close() }
@@ -168,8 +182,43 @@ class NabtoEdgeClientTests: XCTestCase {
         XCTAssertEqual(try! String(decoding: coap.getResponsePayload(), as: UTF8.self), "Hello world")
     }
 
-    func testTodo() throws {
-        //    throw XCTSkip("todo")
+    public class TestConnectionEventCallbackReceiver : ConnectionEventsCallbackReceiver {
+        var events: [NabtoEdgeClientConnectionEvent] = []
+        let exp: XCTestExpectation
+
+        public init(_ exp: XCTestExpectation) {
+            self.exp = exp
+        }
+
+        func onEvent(event: NabtoEdgeClientConnectionEvent) {
+            events.append(event)
+            exp.fulfill()
+        }
     }
+    
+
+    func testConnectionEventListener() {
+        let client = NabtoEdgeClient()
+        try! client.setLogLevel(level: "trace")
+        client.enableNsLogLogging()
+        let connection: Connection = try! client.createConnection()
+        let exp = XCTestExpectation(description: "expect event callback")
+        let listener = TestConnectionEventCallbackReceiver(exp)
+        try! connection.addConnectionEventsListener(cb: listener)
+        let key = try! client.createPrivateKey()
+        try! connection.setPrivateKey(key: key)
+        try! connection.updateOptions(json: """
+                                            {\n
+                                            \"ProductId\": \"\(self.productId)\",\n
+                                            \"DeviceId\": \"\(self.deviceId)\",\n
+                                            \"ServerUrl\": \"\(self.clientUrl)\",\n
+                                            \"ServerKey\": \"\(self.clientServerKey)\"\n}
+                                            """)
+        try! connection.connect()
+        wait(for: [exp], timeout: 2.0)
+        XCTAssertEqual(listener.events.count, 1)
+        XCTAssertEqual(listener.events[0], .CONNECTED)
+    }
+
 
 }

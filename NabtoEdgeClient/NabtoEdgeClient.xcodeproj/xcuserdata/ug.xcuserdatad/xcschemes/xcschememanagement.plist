@@ -14,21 +14,21 @@
 			<key>orderHint</key>
 			<integer>1</integer>
 		</dict>
-		<key>NabtoEdgeClientTests.testConnect.xcscheme</key>
+		<key>NabtoEdgeClientTests (1).xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />
 			<key>orderHint</key>
 			<integer>4</integer>
 		</dict>
-		<key>NabtoEdgeClientTests (1).xcscheme</key>
+		<key>NabtoEdgeClientTests.testConnectFail.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />
 			<key>orderHint</key>
 			<integer>5</integer>
 		</dict>
-		<key>NabtoEdgeClientTests.testGetClientFingerprintHex.xcscheme</key>
+		<key>NabtoEdgeClientTests.testConnect.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />
@@ -42,7 +42,7 @@
 			<key>orderHint</key>
 			<integer>7</integer>
 		</dict>
-		<key>NabtoEdgeClientTests.testGetDeviceFingerprintHexFail.xcscheme</key>
+		<key>NabtoEdgeClientTests.testConnectionEventListener.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />

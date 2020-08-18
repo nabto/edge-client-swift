@@ -87,7 +87,6 @@ public class NabtoEdgeClient: NSObject {
         guard let cb = self.userLogCallBack else {
             return
         }
-        // let theFileName = (string as NSString).lastPathComponent
         let userMsg = NabtoEdgeClientLogMessage(
                 severity: Int(msg.severity.rawValue),
                 severityString: String(cString: msg.severityString),
