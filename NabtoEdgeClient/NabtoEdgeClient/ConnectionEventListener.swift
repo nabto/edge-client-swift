@@ -7,8 +7,8 @@ import Foundation
 import NabtoEdgeClientApi
 
 internal class ConnectionEventListener {
-    private let connection: OpaquePointer
-    private let client: OpaquePointer
+    private let connection: NativeConnectionWrapper
+    private let client: NativeClientWrapper
     private let future: OpaquePointer
     private let listener: OpaquePointer
     private let helper: Helper
@@ -18,14 +18,14 @@ internal class ConnectionEventListener {
     private var userCbs: NSHashTable<ConnectionEventsCallbackReceiver> = NSHashTable<ConnectionEventsCallbackReceiver>()
     private var event: NabtoClientConnectionEvent = -1
 
-    init(plaincNabtoConnection: OpaquePointer, plaincNabtoClient: OpaquePointer) throws {
-        self.connection = plaincNabtoConnection
-        self.client = plaincNabtoClient
+    init(nabtoConnection: NativeConnectionWrapper, nabtoClient: NativeClientWrapper) throws {
+        self.connection = nabtoConnection
+        self.client = nabtoClient
         self.helper = Helper(nabtoClient: self.client)
-        self.future = nabto_client_future_new(self.client)
-        self.listener = nabto_client_listener_new(self.client)
+        self.future = nabto_client_future_new(self.client.nativeClient)
+        self.listener = nabto_client_listener_new(self.client.nativeClient)
 
-        let ec = nabto_client_connection_events_init_listener(self.connection, self.listener)
+        let ec = nabto_client_connection_events_init_listener(self.connection.nativeConnection, self.listener)
         try Helper.throwIfNotOk(ec)
 
         nabto_client_listener_connection_event(self.listener, self.future, &self.event)
@@ -35,6 +35,11 @@ internal class ConnectionEventListener {
             let mySelf = Unmanaged<ConnectionEventListener>.fromOpaque(data!).takeUnretainedValue()
             mySelf.apiEventCallback(ec: ec)
         }, rawSelf)
+    }
+
+    deinit {
+        nabto_client_listener_free(self.listener)
+        nabto_client_future_free(self.future)
     }
 
     private func apiEventCallback(ec: NabtoClientError) {
@@ -63,8 +68,4 @@ internal class ConnectionEventListener {
         self.userCbs.remove(cb)
     }
 
-    deinit {
-        nabto_client_listener_free(self.listener)
-        nabto_client_future_free(self.future)
-    }
 }

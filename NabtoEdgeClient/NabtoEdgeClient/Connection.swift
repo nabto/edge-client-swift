@@ -17,63 +17,68 @@ import NabtoEdgeClientApi
     func onEvent(event: NabtoEdgeClientConnectionEvent)
 }
 
-public class Connection: NSObject {
+internal protocol NativeConnectionWrapper {
+    var nativeConnection: OpaquePointer { get }
+}
 
-    private let plaincNabtoConnection: OpaquePointer
-    private let plaincNabtoClient: OpaquePointer
+public class Connection: NSObject, NativeConnectionWrapper {
+    internal let nativeConnection: OpaquePointer
+    private let client: NativeClientWrapper
     private let helper: Helper
     private var apiEventCallBackRegistered: Bool = false
     private var connectionEventListener: ConnectionEventListener? = nil
 
-    internal init(nabtoClient: OpaquePointer) throws {
-        let p = nabto_client_connection_new(nabtoClient)
+    internal init(client: NativeClientWrapper) throws {
+        let p = nabto_client_connection_new(client.nativeClient)
         if (p != nil) {
-            self.plaincNabtoConnection = p!
+            self.nativeConnection = p!
         } else {
             throw NabtoEdgeClientError.ALLOCATION_ERROR
         }
-        self.plaincNabtoClient = nabtoClient
-        self.helper = Helper(nabtoClient: self.plaincNabtoClient)
+        // keep a swift level reference to client (ie to NativeClientWrapper instance vs raw OpaquePointer) to prevent client
+        // from being freed by ARC if owning app only keeps reference to connection
+        self.client = client
+        self.helper = Helper(nabtoClient: self.client)
     }
 
     deinit {
-        nabto_client_connection_free(self.plaincNabtoConnection)
+        nabto_client_connection_free(self.nativeConnection)
     }
 
     public func updateOptions(json: String) throws {
-        let status: NabtoClientError = nabto_client_connection_set_options(self.plaincNabtoConnection, json)
+        let status: NabtoClientError = nabto_client_connection_set_options(self.nativeConnection, json)
         try Helper.throwIfNotOk(status)
     }
 
     public func getOptions() throws -> String {
         var p: UnsafeMutablePointer<Int8>? = nil
-        let status = nabto_client_connection_get_options(self.plaincNabtoConnection, &p)
+        let status = nabto_client_connection_get_options(self.nativeConnection, &p)
         return try Helper.handleStringResult(status: status, cstring: p)
     }
 
     public func setPrivateKey(key: String) throws {
-        let status = nabto_client_connection_set_private_key(self.plaincNabtoConnection, key)
+        let status = nabto_client_connection_set_private_key(self.nativeConnection, key)
         return try Helper.throwIfNotOk(status)
     }
 
     public func getDeviceFingerprintHex() throws -> String {
         var p: UnsafeMutablePointer<Int8>? = nil
-        let status = nabto_client_connection_get_device_fingerprint_full_hex(self.plaincNabtoConnection, &p)
+        let status = nabto_client_connection_get_device_fingerprint_full_hex(self.nativeConnection, &p)
         return try Helper.handleStringResult(status: status, cstring: p)
     }
 
     public func getClientFingerprintHex() throws -> String {
         var p: UnsafeMutablePointer<Int8>? = nil
-        let status = nabto_client_connection_get_client_fingerprint_full_hex(self.plaincNabtoConnection, &p)
+        let status = nabto_client_connection_get_client_fingerprint_full_hex(self.nativeConnection, &p)
         return try Helper.handleStringResult(status: status, cstring: p)
     }
 
-    public func createStream() {
-        // TODO
+    public func createStream() throws -> Stream {
+        return try Stream(nabtoClient: self.client, nabtoConnection: self)
     }
 
     public func createCoapRequest(method: String, path: String) throws -> CoapRequest {
-        return try CoapRequest(nabtoClient: self.plaincNabtoClient, nabtoConnection: self.plaincNabtoConnection, method: method, path: path)
+        return try CoapRequest(nabtoClient: self.client, nabtoConnection: self, method: method, path: path)
     }
 
     public func createTcpTunnel() {
@@ -82,20 +87,20 @@ public class Connection: NSObject {
 
     public func close() throws {
         try helper.wait() { future in
-            nabto_client_connection_close(self.plaincNabtoConnection, future)
+            nabto_client_connection_close(self.nativeConnection, future)
         }
     }
 
     public func connect() throws {
         try helper.wait() { future in
-            nabto_client_connection_connect(self.plaincNabtoConnection, future)
+            nabto_client_connection_connect(self.nativeConnection, future)
         }
     }
 
     // may throw NabtoEdgeClientError.INVALID_STATE
     public func addConnectionEventsListener(cb: ConnectionEventsCallbackReceiver) throws {
         if (self.connectionEventListener == nil) {
-            self.connectionEventListener = try ConnectionEventListener(plaincNabtoConnection: self.plaincNabtoConnection, plaincNabtoClient: self.plaincNabtoClient)
+            self.connectionEventListener = try ConnectionEventListener(nabtoConnection: self, nabtoClient: self.client)
         }
         self.connectionEventListener!.addUserCb(cb)
     }

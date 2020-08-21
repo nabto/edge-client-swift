@@ -8,10 +8,10 @@ import NabtoEdgeClientApi
 
 internal class Helper {
 
-    private let nabtoClient: OpaquePointer
+    private let client: NativeClientWrapper
 
-    init(nabtoClient: OpaquePointer) {
-        self.nabtoClient = nabtoClient
+    init(nabtoClient: NativeClientWrapper) {
+        self.client = nabtoClient
     }
 
     internal static func throwIfNotOk(_ status: NabtoClientError?) throws {
@@ -20,11 +20,14 @@ internal class Helper {
         }
         switch (status) {
         case NABTO_CLIENT_EC_OK: return
-        case NABTO_CLIENT_EC_INVALID_STATE: throw NabtoEdgeClientError.INVALID_STATE
+        case NABTO_CLIENT_EC_ABORTED: throw NabtoEdgeClientError.ABORTED
+        case NABTO_CLIENT_EC_EOF: throw NabtoEdgeClientError.EOF
         case NABTO_CLIENT_EC_INVALID_ARGUMENT: throw NabtoEdgeClientError.INVALID_ARGUMENT
-        case NABTO_CLIENT_EC_NO_DATA: throw NabtoEdgeClientError.NO_DATA
+        case NABTO_CLIENT_EC_INVALID_STATE: throw NabtoEdgeClientError.INVALID_STATE
         case NABTO_CLIENT_EC_NO_CHANNELS: throw NabtoEdgeClientError.NO_CHANNELS
+        case NABTO_CLIENT_EC_NO_DATA: throw NabtoEdgeClientError.NO_DATA
         case NABTO_CLIENT_EC_NOT_CONNECTED: throw NabtoEdgeClientError.NOT_CONNECTED
+        case NABTO_CLIENT_EC_OPERATION_IN_PROGRESS: throw NabtoEdgeClientError.OPERATION_IN_PROGRESS
         default:
             throw NabtoEdgeClientError.UNEXPECTED_API_STATUS
         }
@@ -41,7 +44,7 @@ internal class Helper {
     }
 
     internal func wait(closure: (OpaquePointer?) -> Void) throws {
-        let future = nabto_client_future_new(self.nabtoClient)
+        let future = nabto_client_future_new(self.client.nativeClient)
         closure(future)
         nabto_client_future_wait(future)
         let status = nabto_client_future_error_code(future)
