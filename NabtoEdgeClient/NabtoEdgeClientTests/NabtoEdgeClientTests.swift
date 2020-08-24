@@ -126,7 +126,7 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func connect(_ device: Device) throws -> Connection {
         let client = NabtoEdgeClient()
-        try! client.setLogLevel(level: "trace")
+        try! client.setLogLevel(level: "info")
         client.enableNsLogLogging()
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
@@ -265,17 +265,18 @@ class NabtoEdgeClientTests: XCTestCase {
         XCTAssertGreaterThan(result.count, 0)
     }
 
-
     func testStreamWriteThenReadAll() {
         try! self.connection = self.connect(self.streamDevice)
         let stream = try! self.connection.createStream()
         try! stream.open(streamPort: self.streamPort)
-        let len = 256 * 1024 + 87
+        let len = 17 * 1024 + 87
         let input = String(repeating: "X", count: len)
         try! stream.write(data: input.data(using: .utf8)!)
         let result = try! stream.readAll(length: len)
         XCTAssertEqual(result.count, len)
+        XCTAssertEqual(input, String(decoding: result, as: UTF8.self))
     }
+
 
 
 }
