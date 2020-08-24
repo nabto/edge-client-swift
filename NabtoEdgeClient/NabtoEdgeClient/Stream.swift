@@ -32,16 +32,9 @@ public class Stream {
     }
 
     public func open(streamPort: UInt32) throws {
-        let future = nabto_client_future_new(self.client.nativeClient)
-        nabto_client_stream_open(self.connection.nativeConnection, future, streamPort)
-        nabto_client_future_wait(future)
-        let status = nabto_client_future_error_code(future)
-        nabto_client_future_free(future)
-        try Helper.throwIfNotOk(status)
-
-//        try self.helper.wait() { future in
-//            nabto_client_stream_open(self.connection, future, streamPort)
-//        }
+        try self.helper.wait() { future in
+            nabto_client_stream_open(self.stream, future, streamPort)
+        }
     }
 
     public func write(data: Data) throws {

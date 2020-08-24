@@ -204,9 +204,9 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testCoapRequest() {
-        self.connection = try! connect(self.coapDevice)
-        defer { try! connection.close() }
-        let coap = try! connection.createCoapRequest(method: "GET", path: "/hello-world")
+        self.connection = try! self.connect(self.coapDevice)
+        defer { try! self.connection.close() }
+        let coap = try! self.connection.createCoapRequest(method: "GET", path: "/hello-world")
         try! coap.execute()
         XCTAssertEqual(try! coap.getResponseStatusCode(), 205)
         XCTAssertEqual(try! coap.getResponseContentFormat(), ContentFormat.TEXT_PLAIN.rawValue)
@@ -252,6 +252,11 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func testStreamWriteThenReadSome() {
         try! self.connection = self.connect(self.streamDevice)
+
+        let coap = try! self.connection.createCoapRequest(method: "GET", path: "/hello-world")
+        try! coap.execute()
+        XCTAssertEqual(try! coap.getResponseStatusCode(), 404)
+
         let stream = try! self.connection.createStream()
         try! stream.open(streamPort: self.streamPort)
         let hello = "Hello"
@@ -259,5 +264,18 @@ class NabtoEdgeClientTests: XCTestCase {
         let result = try! stream.readSome()
         XCTAssertGreaterThan(result.count, 0)
     }
+
+
+    func testStreamWriteThenReadAll() {
+        try! self.connection = self.connect(self.streamDevice)
+        let stream = try! self.connection.createStream()
+        try! stream.open(streamPort: self.streamPort)
+        let len = 256 * 1024 + 87
+        let input = String(repeating: "X", count: len)
+        try! stream.write(data: input.data(using: .utf8)!)
+        let result = try! stream.readAll(length: len)
+        XCTAssertEqual(result.count, len)
+    }
+
 
 }
