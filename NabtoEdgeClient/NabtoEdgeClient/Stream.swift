@@ -6,7 +6,6 @@
 import Foundation
 import NabtoEdgeClientApi
 
-
 public class Stream {
 
     private let connection: NativeConnectionWrapper
@@ -75,5 +74,10 @@ public class Stream {
             nabto_client_stream_close(self.stream, future)
         }
     }
+
+    public func abort() {
+        nabto_client_stream_abort(self.stream)
+    }
+
 
 }

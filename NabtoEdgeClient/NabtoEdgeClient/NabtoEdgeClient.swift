@@ -15,6 +15,8 @@ public enum NabtoEdgeClientError: Error {
     case ABORTED
     case ALLOCATION_ERROR
     case EOF
+    case FORBIDDEN
+    case NOT_FOUND
     case INVALID_ARGUMENT
     case INVALID_STATE
     case NO_CHANNELS

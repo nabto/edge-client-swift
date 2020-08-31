@@ -22,13 +22,18 @@ internal class Helper {
         case NABTO_CLIENT_EC_OK: return
         case NABTO_CLIENT_EC_ABORTED: throw NabtoEdgeClientError.ABORTED
         case NABTO_CLIENT_EC_EOF: throw NabtoEdgeClientError.EOF
+        case NABTO_CLIENT_EC_FORBIDDEN: throw NabtoEdgeClientError.FORBIDDEN
         case NABTO_CLIENT_EC_INVALID_ARGUMENT: throw NabtoEdgeClientError.INVALID_ARGUMENT
         case NABTO_CLIENT_EC_INVALID_STATE: throw NabtoEdgeClientError.INVALID_STATE
         case NABTO_CLIENT_EC_NO_CHANNELS: throw NabtoEdgeClientError.NO_CHANNELS
         case NABTO_CLIENT_EC_NO_DATA: throw NabtoEdgeClientError.NO_DATA
         case NABTO_CLIENT_EC_NOT_CONNECTED: throw NabtoEdgeClientError.NOT_CONNECTED
+        case NABTO_CLIENT_EC_NOT_FOUND: throw NabtoEdgeClientError.NOT_FOUND
         case NABTO_CLIENT_EC_OPERATION_IN_PROGRESS: throw NabtoEdgeClientError.OPERATION_IN_PROGRESS
         default:
+            let str = String(cString: nabto_client_error_get_string(status!)!)
+            let msg = String(cString: nabto_client_error_get_message(status!)!)
+            NSLog("Unexpected API status \(str) (\(status!)): \(msg)")
             throw NabtoEdgeClientError.UNEXPECTED_API_STATUS
         }
     }

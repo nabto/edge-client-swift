@@ -40,12 +40,20 @@ class NabtoEdgeClientTests: XCTestCase {
 
     let streamDevice = Device(
             productId: "pr-fatqcwj9",
-            deviceId: "de-bdsotcgm", // in device, change from "avmqjaxe..." in public example source
+            deviceId: "de-bdsotcgm",
             url: "https://pr-fatqcwj9.clients.nabto.net",
             key: "sk-5f3ab4bea7cc2585091539fb950084ce",
             fp: "19ca7f85c9f4bfc47cffd8564339b897aaaef3225bde5c7b90dfff46b5eaab5b"
     )
-    
+
+    let tunnelDevice = Device(
+            productId: "pr-fatqcwj9",
+            deviceId: "de-ijrdq47i",
+            url: "https://pr-fatqcwj9.clients.nabto.net",
+            key: "sk-5f3ab4bea7cc2585091539fb950084ce",
+            fp: "0b168a3b714ebe92e56b2514e5424c4c544ab760db547c34b7ff00ff90bd72cb"
+    )
+
     let streamPort: UInt32 = 42
 
     var connection: Connection! = nil
@@ -198,8 +206,8 @@ class NabtoEdgeClientTests: XCTestCase {
         }
     }
 
-
     func testTodo() throws {
+        // reproduce OC-20532
 //        throw XCTSkip("todo")
     }
 
@@ -277,6 +285,42 @@ class NabtoEdgeClientTests: XCTestCase {
         XCTAssertEqual(input, String(decoding: result, as: UTF8.self))
     }
 
+    // skipped due to NABTO-2228
+    func testTunnelGetPortFail() throws {
+        // commented out due to OC-20532
+//        throw XCTSkip("Nabto-2228")
+//        try! self.connection = self.connect(self.tunnelDevice)
+//        let tunnel = try! self.connection.createTcpTunnel()
+//        XCTAssertThrowsError(try! tunnel.getLocalPort()) { error in
+//            XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.INVALID_STATE)
+//        }
+    }
+
+    func testTunnelOpen() throws {
+        try! self.connection = self.connect(self.tunnelDevice)
+        let tunnel = try! self.connection.createTcpTunnel()
+        try tunnel.open(service: "http", localPort: 0)
+        let port = try! tunnel.getLocalPort()
+        XCTAssertGreaterThan(port, 0)
+
+        let exp = XCTestExpectation(description: "expect http request finishes")
+        URLSession.shared.dataTask(with: URL(string: "http://127.0.0.1:\(port)/")!) {(data, response, error) in
+            let body = String(data: data!, encoding: String.Encoding.utf8) ?? ""
+            XCTAssertTrue(body.contains("Debian"))
+            exp.fulfill()
+        }.resume()
+
+        wait(for: [exp], timeout: 2.0)
+    }
+
+    func testTunnelOpenError() throws {
+        try! self.connection = self.connect(self.tunnelDevice)
+        let tunnel = try! self.connection.createTcpTunnel()
+        try! self.connection = self.connect(self.tunnelDevice)
+        XCTAssertThrowsError(try tunnel.open(service: "httpblab", localPort: 0)) { error in
+            XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.NOT_FOUND)
+        }
+    }
 
 
 }

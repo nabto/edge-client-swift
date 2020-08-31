@@ -81,8 +81,8 @@ public class Connection: NSObject, NativeConnectionWrapper {
         return try CoapRequest(nabtoClient: self.client, nabtoConnection: self, method: method, path: path)
     }
 
-    public func createTcpTunnel() {
-        // TODO
+    public func createTcpTunnel() throws -> Tunnel {
+        return try Tunnel(nabtoClient: self.client, nabtoConnection: self)
     }
 
     public func close() throws {
