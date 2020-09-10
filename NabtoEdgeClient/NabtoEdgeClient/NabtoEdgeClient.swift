@@ -12,6 +12,7 @@ import NabtoEdgeClientApi
 // useful read: https://www.uraimo.com/2016/04/07/swift-and-c-everything-you-need-to-know
 
 public enum NabtoEdgeClientError: Error {
+    case OK
     case ABORTED
     case ALLOCATION_ERROR
     case EOF
@@ -23,10 +24,12 @@ public enum NabtoEdgeClientError: Error {
     case NO_DATA
     case NOT_CONNECTED
     case OPERATION_IN_PROGRESS
+    case TIMEOUT
     case UNEXPECTED_API_STATUS
 }
 
 public typealias LogCallBackReceiver = (NabtoEdgeClientLogMessage) -> Void
+public typealias AsyncStatusReceiver = (NabtoEdgeClientError) -> Void
 
 public struct NabtoEdgeClientLogMessage {
     var severity: Int

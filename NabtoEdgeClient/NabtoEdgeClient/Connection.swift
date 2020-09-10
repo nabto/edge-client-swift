@@ -27,6 +27,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
     private let helper: Helper
     private var apiEventCallBackRegistered: Bool = false
     private var connectionEventListener: ConnectionEventListener? = nil
+    private var activeCallbacks: Set<CallbackWrapper> = Set<CallbackWrapper>()
 
     internal init(client: NativeClientWrapper) throws {
         let p = nabto_client_connection_new(client.nativeClient)
@@ -96,6 +97,29 @@ public class Connection: NSObject, NativeConnectionWrapper {
             nabto_client_connection_connect(self.nativeConnection, future)
         }
     }
+
+    private func asyncConnectionOperation(userClosure: @escaping AsyncStatusReceiver, implClosure: (OpaquePointer) -> Void) {
+        let future: OpaquePointer = nabto_client_future_new(self.client.nativeClient)
+        implClosure(future)
+        let w = CallbackWrapper(client: self.client, future: future, cb: userClosure)
+        w.setCleanupClosure(cleanupClosure: {
+            self.activeCallbacks.remove(w)}
+        )
+        self.activeCallbacks.insert(w)
+    }
+
+    public func connectAsync(closure: @escaping AsyncStatusReceiver) {
+        self.asyncConnectionOperation(userClosure: closure) { future in
+            nabto_client_connection_connect(self.nativeConnection, future)
+        }
+    }
+
+    public func closeAsync(closure: @escaping AsyncStatusReceiver) {
+        self.asyncConnectionOperation(userClosure: closure) { future in
+            nabto_client_connection_close(self.nativeConnection, future)
+        }
+    }
+
 
     // may throw NabtoEdgeClientError.INVALID_STATE
     public func addConnectionEventsListener(cb: ConnectionEventsCallbackReceiver) throws {

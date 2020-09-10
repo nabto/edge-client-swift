@@ -6,6 +6,37 @@
 import Foundation
 import NabtoEdgeClientApi
 
+// ensures client is kept alive until future is resolved
+internal class CallbackWrapper : NSObject {
+    let client: NativeClientWrapper
+    let future: OpaquePointer
+    let cb: AsyncStatusReceiver
+    var cleanupClosure: (() -> Void)?
+
+    init(client: NativeClientWrapper, future: OpaquePointer, cb: @escaping AsyncStatusReceiver) {
+        self.client = client
+        self.future = future
+        self.cb = cb
+        super.init()
+        let rawSelf = Unmanaged.passUnretained(self).toOpaque()
+        nabto_client_future_set_callback(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
+            let mySelf = Unmanaged<CallbackWrapper>.fromOpaque(data!).takeUnretainedValue()
+            mySelf.userCallback(ec)
+        }, rawSelf)
+    }
+
+    func setCleanupClosure(cleanupClosure: @escaping () -> Void) {
+        self.cleanupClosure = cleanupClosure
+    }
+
+    func userCallback(_ ec: NabtoClientError) {
+        let wrapperError = Helper.mapApiStatusToErrorCode(ec)
+        self.cb(wrapperError)
+        nabto_client_future_free(self.future)
+        self.cleanupClosure?()
+    }
+}
+
 internal class Helper {
 
     private let client: NativeClientWrapper
@@ -14,27 +45,31 @@ internal class Helper {
         self.client = nabtoClient
     }
 
+    internal static func mapApiStatusToErrorCode(_ status: NabtoClientError) -> NabtoEdgeClientError {
+        switch (status) {
+        case NABTO_CLIENT_EC_OK: return NabtoEdgeClientError.OK
+        case NABTO_CLIENT_EC_ABORTED: return NabtoEdgeClientError.ABORTED
+        case NABTO_CLIENT_EC_EOF: return NabtoEdgeClientError.EOF
+        case NABTO_CLIENT_EC_FORBIDDEN: return NabtoEdgeClientError.FORBIDDEN
+        case NABTO_CLIENT_EC_INVALID_ARGUMENT: return NabtoEdgeClientError.INVALID_ARGUMENT
+        case NABTO_CLIENT_EC_INVALID_STATE: return NabtoEdgeClientError.INVALID_STATE
+        case NABTO_CLIENT_EC_NO_CHANNELS: return NabtoEdgeClientError.NO_CHANNELS
+        case NABTO_CLIENT_EC_NO_DATA: return NabtoEdgeClientError.NO_DATA
+        case NABTO_CLIENT_EC_NOT_CONNECTED: return NabtoEdgeClientError.NOT_CONNECTED
+        case NABTO_CLIENT_EC_NOT_FOUND: return NabtoEdgeClientError.NOT_FOUND
+        case NABTO_CLIENT_EC_OPERATION_IN_PROGRESS: return NabtoEdgeClientError.OPERATION_IN_PROGRESS
+        case NABTO_CLIENT_EC_TIMEOUT: return NabtoEdgeClientError.TIMEOUT
+        default: return .UNEXPECTED_API_STATUS
+        }
+    }
+
     internal static func throwIfNotOk(_ status: NabtoClientError?) throws {
         if (status == nil) {
             throw NabtoEdgeClientError.UNEXPECTED_API_STATUS
         }
-        switch (status) {
-        case NABTO_CLIENT_EC_OK: return
-        case NABTO_CLIENT_EC_ABORTED: throw NabtoEdgeClientError.ABORTED
-        case NABTO_CLIENT_EC_EOF: throw NabtoEdgeClientError.EOF
-        case NABTO_CLIENT_EC_FORBIDDEN: throw NabtoEdgeClientError.FORBIDDEN
-        case NABTO_CLIENT_EC_INVALID_ARGUMENT: throw NabtoEdgeClientError.INVALID_ARGUMENT
-        case NABTO_CLIENT_EC_INVALID_STATE: throw NabtoEdgeClientError.INVALID_STATE
-        case NABTO_CLIENT_EC_NO_CHANNELS: throw NabtoEdgeClientError.NO_CHANNELS
-        case NABTO_CLIENT_EC_NO_DATA: throw NabtoEdgeClientError.NO_DATA
-        case NABTO_CLIENT_EC_NOT_CONNECTED: throw NabtoEdgeClientError.NOT_CONNECTED
-        case NABTO_CLIENT_EC_NOT_FOUND: throw NabtoEdgeClientError.NOT_FOUND
-        case NABTO_CLIENT_EC_OPERATION_IN_PROGRESS: throw NabtoEdgeClientError.OPERATION_IN_PROGRESS
-        default:
-            let str = String(cString: nabto_client_error_get_string(status!)!)
-            let msg = String(cString: nabto_client_error_get_message(status!)!)
-            NSLog("Unexpected API status \(str) (\(status!)): \(msg)")
-            throw NabtoEdgeClientError.UNEXPECTED_API_STATUS
+        let error = mapApiStatusToErrorCode(status!)
+        if (error != .OK) {
+            throw error
         }
     }
 
@@ -56,6 +91,27 @@ internal class Helper {
         nabto_client_future_free(future)
         try Helper.throwIfNotOk(status)
     }
+
+    internal func futureCallback(closure: (OpaquePointer?) -> Void) throws {
+        let future = nabto_client_future_new(self.client.nativeClient)
+        closure(future)
+        nabto_client_future_wait(future)
+        let status = nabto_client_future_error_code(future)
+        nabto_client_future_free(future)
+        try Helper.throwIfNotOk(status)
+    }
+
+
+
+//    internal func futureCallback(closure: () -> Void) throws {
+//        let future = nabto_client_future_new(self.client.nativeClient)
+//        closure(future)
+//        nabto_client_future_wait(future)
+//        let status = nabto_client_future_error_code(future)
+//        nabto_client_future_free(future)
+//        try Helper.throwIfNotOk(status)
+//    }
+
 
 
 }

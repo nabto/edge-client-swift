@@ -28,35 +28,35 @@
 			<key>orderHint</key>
 			<integer>5</integer>
 		</dict>
-		<key>NabtoEdgeClientTests.testStreamWriteThenReadAll.xcscheme</key>
+		<key>NabtoEdgeClientTests.testCoapRequestAsyncFail.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />
 			<key>orderHint</key>
 			<integer>6</integer>
 		</dict>
-		<key>NabtoEdgeClientTests.testOverhead.xcscheme</key>
+		<key>NabtoEdgeClientTests.testCoapRequestAsyncApiFail.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />
 			<key>orderHint</key>
 			<integer>7</integer>
 		</dict>
-		<key>NabtoEdgeClientTests.testTunnelGetPortFail.xcscheme</key>
+		<key>NabtoEdgeClientTests.testCoapRequestAsyncCoap404.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />
 			<key>orderHint</key>
 			<integer>8</integer>
 		</dict>
-		<key>NabtoEdgeClientTests.testTunnelOpen.xcscheme</key>
+		<key>NabtoEdgeClientTests.testCoapRequestInvalidMethod.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />
 			<key>orderHint</key>
 			<integer>9</integer>
 		</dict>
-		<key>NabtoEdgeClientTests.testTunnelOpenError.xcscheme</key>
+		<key>NabtoEdgeClientTests.testCoapRequestSyncAfterAsyncConnect.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />

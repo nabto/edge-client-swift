@@ -13,14 +13,21 @@ public enum ContentFormat: UInt16 {
     case APPLICATION_CBOR = 60
 }
 
+public typealias CoapResponseReceiver = (NabtoEdgeClientError, CoapResponse?) -> Void
+
 public class CoapRequest {
 
     private let client: NativeClientWrapper
     private let connection: NativeConnectionWrapper
     private let coap: OpaquePointer
     private let helper: Helper
+    private var activeCallbacks: Set<CallbackWrapper> = Set<CallbackWrapper>()
 
     internal init(nabtoClient: NativeClientWrapper, nabtoConnection: NativeConnectionWrapper, method: String, path: String) throws {
+        let validMethods = ["GET", "POST", "PUT", "DELETE"]
+        if (validMethods.firstIndex(of: method) == nil) {
+            throw NabtoEdgeClientError.INVALID_ARGUMENT
+        }
         let p = nabto_client_coap_new(nabtoConnection.nativeConnection, method, path)
         if (p != nil) {
             self.coap = p!
@@ -52,31 +59,33 @@ public class CoapRequest {
         try Helper.throwIfNotOk(status)
     }
 
-    public func execute() throws {
+    public func execute() throws -> CoapResponse {
         try self.helper.wait() { future in
             nabto_client_coap_execute(self.coap, future)
         }
+        return try CoapResponse(self.coap)
     }
 
-    public func getResponseStatusCode() throws -> UInt16 {
-        var statusCode: UInt16 = 0
-        let status = nabto_client_coap_get_response_status_code(self.coap, &statusCode)
-        try Helper.throwIfNotOk(status)
-        return statusCode
+    public func executeAsync(closure: @escaping CoapResponseReceiver) {
+        let future: OpaquePointer = nabto_client_future_new(self.client.nativeClient)
+        nabto_client_coap_execute(self.coap, future)
+        let w = CallbackWrapper(client: self.client, future: future, cb: { ec in
+            if (ec == .OK) {
+                do {
+                    let coapResponse = try CoapResponse(self.coap)
+                    closure(.OK, coapResponse)
+                } catch (let error) {
+                    let coapEc = error as? NabtoEdgeClientError
+                    closure(coapEc ?? NabtoEdgeClientError.UNEXPECTED_API_STATUS, nil)
+                }
+            } else {
+                closure(ec, nil)
+            }
+        })
+        w.setCleanupClosure(cleanupClosure: {
+            self.activeCallbacks.remove(w)
+        })
+        self.activeCallbacks.insert(w)
     }
 
-    public func getResponseContentFormat() throws-> UInt16 {
-        var contentType: UInt16 = 0
-        let status = nabto_client_coap_get_response_content_format(self.coap, &contentType)
-        try Helper.throwIfNotOk(status)
-        return contentType
-    }
-
-    public func getResponsePayload() throws -> Data {
-        var payload: UnsafeMutableRawPointer?
-        var length: Int = 0
-        let status = nabto_client_coap_get_response_payload(self.coap, &payload, &length)
-        try Helper.throwIfNotOk(status)
-        return Data(bytes: payload!, count: length)
-    }
 }
