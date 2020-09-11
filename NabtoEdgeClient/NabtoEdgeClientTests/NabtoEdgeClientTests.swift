@@ -313,6 +313,7 @@ class NabtoEdgeClientTests: XCTestCase {
             XCTAssertEqual(ec, .OK)
             let coap = try! self.connection.createCoapRequest(method: "GET", path: "/hello-world")
             coap.executeAsync { ec, response in
+                XCTAssertEqual(ec, .OK)
                 XCTAssertEqual(response!.status, 205)
                 XCTAssertEqual(response!.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
                 XCTAssertEqual(String(decoding: response!.payload, as: UTF8.self), "Hello world")
@@ -400,10 +401,6 @@ class NabtoEdgeClientTests: XCTestCase {
 //
 //        wait(for: [exp], timeout: 12.0)
 //    }
-
-
-
-
 
     public class TestConnectionEventCallbackReceiver : ConnectionEventsCallbackReceiver {
         var events: [NabtoEdgeClientConnectionEvent] = []
