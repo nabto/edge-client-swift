@@ -4,4 +4,5 @@ Pods
 */xcuserdata/*
 */.DS_Store
 NabtoEdgeClient/.idea/*
-NabtoEdgeClientHello/NabtoEdgeClientHello.xcodeproj/project.xcworkspace/xcuserdata/*
+NabtoEdgeClient/NabtoEdgeClient.xcodeproj/xcuserdata/**/*
+NabtoEdgeClientHello/NabtoEdgeClientHello.xcodeproj/project.xcworkspace/xcuserdata/**/*
