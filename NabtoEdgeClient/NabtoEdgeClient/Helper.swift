@@ -21,7 +21,7 @@ internal class CallbackWrapper : NSObject {
         let rawSelf = Unmanaged.passUnretained(self).toOpaque()
         nabto_client_future_set_callback(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
             let mySelf = Unmanaged<CallbackWrapper>.fromOpaque(data!).takeUnretainedValue()
-            mySelf.userCallback(ec)
+            mySelf.invokeUserCallback(ec)
         }, rawSelf)
     }
 
@@ -29,7 +29,7 @@ internal class CallbackWrapper : NSObject {
         self.cleanupClosure = cleanupClosure
     }
 
-    func userCallback(_ ec: NabtoClientError) {
+    func invokeUserCallback(_ ec: NabtoClientError) {
         let wrapperError = Helper.mapApiStatusToErrorCode(ec)
         self.cb(wrapperError)
         nabto_client_future_free(self.future)
@@ -40,6 +40,7 @@ internal class CallbackWrapper : NSObject {
 internal class Helper {
 
     private let client: NativeClientWrapper
+    private var activeCallbacks: Set<CallbackWrapper> = Set<CallbackWrapper>()
 
     init(nabtoClient: NativeClientWrapper) {
         self.client = nabtoClient
@@ -101,16 +102,16 @@ internal class Helper {
         try Helper.throwIfNotOk(status)
     }
 
+    internal func invokeAsync(userClosure: @escaping AsyncStatusReceiver, implClosure: (OpaquePointer) -> Void) {
+        let future: OpaquePointer = nabto_client_future_new(self.client.nativeClient)
+        implClosure(future)
+        let w = CallbackWrapper(client: self.client, future: future, cb: userClosure)
+        w.setCleanupClosure(cleanupClosure: {
+            self.activeCallbacks.remove(w)}
+        )
+        self.activeCallbacks.insert(w)
+    }
 
-
-//    internal func futureCallback(closure: () -> Void) throws {
-//        let future = nabto_client_future_new(self.client.nativeClient)
-//        closure(future)
-//        nabto_client_future_wait(future)
-//        let status = nabto_client_future_error_code(future)
-//        nabto_client_future_free(future)
-//        try Helper.throwIfNotOk(status)
-//    }
 
 
 

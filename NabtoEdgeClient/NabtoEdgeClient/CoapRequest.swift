@@ -66,7 +66,7 @@ public class CoapRequest {
         return try CoapResponse(self.coap)
     }
 
-    public func executeAsync(closure: @escaping CoapResponseReceiver) {
+    public func executeAsyncCoap(closure: @escaping CoapResponseReceiver) {
         let future: OpaquePointer = nabto_client_future_new(self.client.nativeClient)
         nabto_client_coap_execute(self.coap, future)
         let w = CallbackWrapper(client: self.client, future: future, cb: { ec in
@@ -74,7 +74,7 @@ public class CoapRequest {
                 do {
                     let coapResponse = try CoapResponse(self.coap)
                     closure(.OK, coapResponse)
-                } catch (let error) {
+                } catch {
                     let coapEc = error as? NabtoEdgeClientError
                     closure(coapEc ?? NabtoEdgeClientError.UNEXPECTED_API_STATUS, nil)
                 }

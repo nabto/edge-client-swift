@@ -6,6 +6,11 @@
 import Foundation
 import NabtoEdgeClientApi
 
+/**
+ * Connection events.
+ *
+ * Listen for these using `addConnectionEventsListener()` on a Connection object.
+ */
 @objc public enum NabtoEdgeClientConnectionEvent: Int {
     case CONNECTED
     case CLOSED
@@ -13,6 +18,9 @@ import NabtoEdgeClientApi
     case UNEXPECTED_EVENT
 }
 
+/**
+ * Callback function to receive Connection events.
+ */
 @objc public protocol ConnectionEventsCallbackReceiver {
     func onEvent(event: NabtoEdgeClientConnectionEvent)
 }
@@ -21,13 +29,17 @@ internal protocol NativeConnectionWrapper {
     var nativeConnection: OpaquePointer { get }
 }
 
+/**
+ * This class represents a connection to a specific Nabto Edge device.
+ *
+ * Instances are created using `NabtoEdgeClient::createConnection()`.
+ */
 public class Connection: NSObject, NativeConnectionWrapper {
     internal let nativeConnection: OpaquePointer
     private let client: NativeClientWrapper
     private let helper: Helper
     private var apiEventCallBackRegistered: Bool = false
     private var connectionEventListener: ConnectionEventListener? = nil
-    private var activeCallbacks: Set<CallbackWrapper> = Set<CallbackWrapper>()
 
     internal init(client: NativeClientWrapper) throws {
         let p = nabto_client_connection_new(client.nativeClient)
@@ -46,6 +58,9 @@ public class Connection: NSObject, NativeConnectionWrapper {
         nabto_client_connection_free(self.nativeConnection)
     }
 
+    /**
+     * Set connection options. Options must be set prior to invoking `connect()`.
+     */
     public func updateOptions(json: String) throws {
         let status: NabtoClientError = nabto_client_connection_set_options(self.nativeConnection, json)
         try Helper.throwIfNotOk(status)
@@ -98,24 +113,14 @@ public class Connection: NSObject, NativeConnectionWrapper {
         }
     }
 
-    private func asyncConnectionOperation(userClosure: @escaping AsyncStatusReceiver, implClosure: (OpaquePointer) -> Void) {
-        let future: OpaquePointer = nabto_client_future_new(self.client.nativeClient)
-        implClosure(future)
-        let w = CallbackWrapper(client: self.client, future: future, cb: userClosure)
-        w.setCleanupClosure(cleanupClosure: {
-            self.activeCallbacks.remove(w)}
-        )
-        self.activeCallbacks.insert(w)
-    }
-
     public func connectAsync(closure: @escaping AsyncStatusReceiver) {
-        self.asyncConnectionOperation(userClosure: closure) { future in
+        self.helper.invokeAsync(userClosure: closure) { future in
             nabto_client_connection_connect(self.nativeConnection, future)
         }
     }
 
     public func closeAsync(closure: @escaping AsyncStatusReceiver) {
-        self.asyncConnectionOperation(userClosure: closure) { future in
+        self.helper.invokeAsync(userClosure: closure) { future in
             nabto_client_connection_close(self.nativeConnection, future)
         }
     }

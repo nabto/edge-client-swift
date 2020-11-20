@@ -9,7 +9,7 @@
 import XCTest
 import NabtoEdgeClient
 
-// test org: or-3uhjvwuh
+// test org: or-3uhjvwuh (https://console.cloud.nabto.com/#/dashboard/organizations/or-3uhjvwuh)
 // test device source: nabto-embedded-sdk/examples/simple_coap
 
 class Device {
@@ -57,6 +57,8 @@ class NabtoEdgeClientTests: XCTestCase {
     let streamPort: UInt32 = 42
 
     var connection: Connection! = nil
+
+    private var client: NabtoEdgeClient!
 
     override func setUpWithError() throws {
     }
@@ -137,9 +139,9 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func connect(_ device: Device) throws -> Connection {
-        let client = NabtoEdgeClient()
-        try! client.setLogLevel(level: "info")
-        client.enableNsLogLogging()
+        self.client = NabtoEdgeClient()
+        try! self.client.setLogLevel(level: "info")
+        self.client.enableNsLogLogging()
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
@@ -161,7 +163,7 @@ class NabtoEdgeClientTests: XCTestCase {
     func testConnectAsync() {
         let device = coapDevice
         let client = NabtoEdgeClient()
-        try! client.setLogLevel(level: "trace")
+        try! client.setLogLevel(level: "info")
         client.enableNsLogLogging()
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
@@ -186,7 +188,7 @@ class NabtoEdgeClientTests: XCTestCase {
     func testConnectAsyncFail() {
         let device = coapDevice
         let client = NabtoEdgeClient()
-        try! client.setLogLevel(level: "trace")
+        try! client.setLogLevel(level: "info")
         client.enableNsLogLogging()
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
@@ -211,8 +213,6 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func testConnectFail() {
         let client = NabtoEdgeClient()
-        try! client.setLogLevel(level: "trace")
-        client.enableNsLogLogging()
         let connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
         try! connection.setPrivateKey(key: key)
@@ -295,8 +295,6 @@ class NabtoEdgeClientTests: XCTestCase {
     func testCoapRequestAsync() {
         let device = coapDevice
         let client = NabtoEdgeClient()
-        try! client.setLogLevel(level: "trace")
-        client.enableNsLogLogging()
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
@@ -312,7 +310,7 @@ class NabtoEdgeClientTests: XCTestCase {
         self.connection.connectAsync { ec in
             XCTAssertEqual(ec, .OK)
             let coap = try! self.connection.createCoapRequest(method: "GET", path: "/hello-world")
-            coap.executeAsync { ec, response in
+            coap.executeAsyncCoap { ec, response in
                 XCTAssertEqual(ec, .OK)
                 XCTAssertEqual(response!.status, 205)
                 XCTAssertEqual(response!.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
@@ -327,8 +325,6 @@ class NabtoEdgeClientTests: XCTestCase {
     func testCoapRequestSyncAfterAsyncConnect() {
         let device = coapDevice
         let client = NabtoEdgeClient()
-        try! client.setLogLevel(level: "trace")
-        client.enableNsLogLogging()
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
@@ -357,8 +353,6 @@ class NabtoEdgeClientTests: XCTestCase {
     func testCoapRequestAsyncCoap404() {
         let device = coapDevice
         let client = NabtoEdgeClient()
-        try! client.setLogLevel(level: "trace")
-        client.enableNsLogLogging()
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
@@ -374,7 +368,7 @@ class NabtoEdgeClientTests: XCTestCase {
         self.connection.connectAsync { ec in
             XCTAssertEqual(ec, .OK)
             let coap = try! self.connection.createCoapRequest(method: "GET", path: "/does-not-exist-trigger-404")
-            coap.executeAsync { ec, response in
+            coap.executeAsyncCoap { ec, response in
                 XCTAssertEqual(ec, .OK)
                 XCTAssertEqual(response!.status, 404)
                 exp.fulfill()
@@ -384,23 +378,21 @@ class NabtoEdgeClientTests: XCTestCase {
         wait(for: [exp], timeout: 2.0)
     }
 
-    // slow test due to timeout being only error to test - so skip until nabto-2245 is fixed (or another way of testing api fail is discovered)
-//    func testCoapRequestAsyncApiFail() {
-//        let device = coapDevice
-//        let client = NabtoEdgeClient()
-//        try! client.setLogLevel(level: "trace")
-//        client.enableNsLogLogging()
-//        self.connection = try! client.createConnection()
-//        let exp = XCTestExpectation(description: "expect early coap fail")
-//
-//        let coap = try! self.connection.createCoapRequest(method: "GET", path: "/does-not-exist-trigger-404")
-//        coap.executeAsync { ec, response in
-//            exp.fulfill()
-//            XCTAssertEqual(ec, NabtoEdgeClientError.TIMEOUT)
-//        }
-//
-//        wait(for: [exp], timeout: 12.0)
-//    }
+    func testCoapRequestAsyncApiFail() {
+        let client = NabtoEdgeClient()
+        try! client.setLogLevel(level: "trace")
+        client.enableNsLogLogging()
+        self.connection = try! client.createConnection()
+        let exp = XCTestExpectation(description: "expect early coap fail")
+
+        let coap = try! self.connection.createCoapRequest(method: "GET", path: "/does-not-exist-trigger-404")
+        coap.executeAsyncCoap { ec, response in
+            exp.fulfill()
+            XCTAssertEqual(ec, NabtoEdgeClientError.NOT_CONNECTED)
+        }
+
+        wait(for: [exp], timeout: 1.0)
+    }
 
     public class TestConnectionEventCallbackReceiver : ConnectionEventsCallbackReceiver {
         var events: [NabtoEdgeClientConnectionEvent] = []
@@ -418,7 +410,7 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func testConnectionEventListener() {
         let client = NabtoEdgeClient()
-        try! client.setLogLevel(level: "trace")
+        try! client.setLogLevel(level: "info")
         client.enableNsLogLogging()
         self.connection = try! client.createConnection()
         let exp = XCTestExpectation(description: "expect event callback")
@@ -440,19 +432,30 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testStreamWriteThenReadSome() {
-        try! self.connection = self.connect(self.streamDevice)
-
+        let connection = try! self.connect(self.streamDevice)
+        defer {
+            try! connection.close()
+        }
         let coap = try! self.connection.createCoapRequest(method: "GET", path: "/hello-world")
         let response = try! coap.execute()
         XCTAssertEqual(response.status, 404)
 
         let stream = try! self.connection.createStream()
+        defer {
+            try! stream.close()
+        }
         try! stream.open(streamPort: self.streamPort)
         let hello = "Hello"
         try! stream.write(data: hello.data(using: .utf8)!)
         let result = try! stream.readSome()
         XCTAssertGreaterThan(result.count, 0)
     }
+
+//    func testStreamResourceIssue() {
+//        while (true) {
+//           testStreamWriteThenReadSome()
+//        }
+//    }
 
     func testStreamWriteThenReadAll() {
         try! self.connection = self.connect(self.streamDevice)
@@ -466,15 +469,40 @@ class NabtoEdgeClientTests: XCTestCase {
         XCTAssertEqual(input, String(decoding: result, as: UTF8.self))
     }
 
-    // skipped due to NABTO-2228
+    func testStreamWriteThenReadSomeAsync() {
+        let connection = try! self.connect(self.streamDevice)
+        try! self.client.setLogLevel(level: "trace")
+        self.client.enableNsLogLogging()
+        let coap = try! self.connection.createCoapRequest(method: "GET", path: "/hello-world")
+        let response = try! coap.execute()
+        XCTAssertEqual(response.status, 404)
+
+        let stream = try! self.connection.createStream()
+        let exp = XCTestExpectation(description: "expect stream echo data read")
+        stream.openAsync(streamPort: self.streamPort) { ec in
+            let hello = "Hello"
+            stream.writeAsync(data: hello.data(using: .utf8)!) { ec in
+                stream.readSomeAsync { ec, data in
+                    XCTAssertEqual(ec, .OK)
+                    XCTAssertGreaterThan(data!.count, 0)
+                    XCTAssertEqual(hello, String(decoding: data!, as: UTF8.self))
+                    try! stream.close()
+                    try! connection.close()
+                    try! self.client.stop()
+                    exp.fulfill()
+                }
+            }
+        }
+        wait(for: [exp], timeout: 2.0)
+    }
+
+
     func testTunnelGetPortFail() throws {
-        // commented out due to OC-20532
-//        throw XCTSkip("Nabto-2228")
-//        try! self.connection = self.connect(self.tunnelDevice)
-//        let tunnel = try! self.connection.createTcpTunnel()
-//        XCTAssertThrowsError(try! tunnel.getLocalPort()) { error in
-//            XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.INVALID_STATE)
-//        }
+        try! self.connection = self.connect(self.tunnelDevice)
+        let tunnel = try! self.connection.createTcpTunnel()
+        XCTAssertThrowsError(try tunnel.getLocalPort()) { error in
+            XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.INVALID_STATE)
+        }
     }
 
     func testTunnelOpenClose() throws {
@@ -484,23 +512,28 @@ class NabtoEdgeClientTests: XCTestCase {
         let port = try! tunnel.getLocalPort()
         XCTAssertGreaterThan(port, 0)
 
+        // http client caches results pr default
+        let config = URLSessionConfiguration.ephemeral
+        config.requestCachePolicy = .reloadIgnoringLocalCacheData
+        config.urlCache = nil;
+
         let exp = XCTestExpectation(description: "expect http request finishes")
-        URLSession.shared.dataTask(with: URL(string: "http://127.0.0.1:\(port)/")!) {(data, response, error) in
+        let urlSession1 = URLSession(configuration: config)
+        urlSession1.dataTask(with: URL(string: "http://127.0.0.1:\(port)/")!) {(data, response, error) in
+            XCTAssertNil(error)
             let body = String(data: data!, encoding: String.Encoding.utf8) ?? ""
             XCTAssertTrue(body.contains("Debian"))
-            exp.fulfill()
 
-            // nabto_client_tcp_tunnel_close does not work (NABTO-2234)
-//            try! tunnel.close()
-//            URLSession.shared.dataTask(with: URL(string: "http://127.0.0.1:\(port)/")!) {(data, response, error) in
-//                let body = String(data: data!, encoding: String.Encoding.utf8) ?? ""
-//                XCTAssertFalse(body.contains("Debian"))
-//                exp.fulfill()
-//            }.resume()
+            try! tunnel.close()
+            let urlSession2 = URLSession(configuration: config)
+            urlSession2.dataTask(with: URL(string: "http://127.0.0.1:\(port)/")!) {(data, response, error) in
+                XCTAssertNotNil(error)
+                exp.fulfill()
+            }.resume()
 
         }.resume()
 
-        wait(for: [exp], timeout: 2.0)
+        wait(for: [exp], timeout: 3.0)
     }
 
     func testTunnelOpenError() throws {
