@@ -471,11 +471,8 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func testStreamWriteThenReadSomeAsync() {
         let connection = try! self.connect(self.streamDevice)
-        try! self.client.setLogLevel(level: "trace")
+        try! self.client.setLogLevel(level: "info")
         self.client.enableNsLogLogging()
-        let coap = try! self.connection.createCoapRequest(method: "GET", path: "/hello-world")
-        let response = try! coap.execute()
-        XCTAssertEqual(response.status, 404)
 
         let stream = try! self.connection.createStream()
         let exp = XCTestExpectation(description: "expect stream echo data read")
@@ -496,6 +493,30 @@ class NabtoEdgeClientTests: XCTestCase {
         wait(for: [exp], timeout: 2.0)
     }
 
+    func testStreamWriteThenReadAllAsync() {
+        let connection = try! self.connect(self.streamDevice)
+        try! self.client.setLogLevel(level: "info")
+        self.client.enableNsLogLogging()
+
+        let stream = try! self.connection.createStream()
+        let exp = XCTestExpectation(description: "expect stream echo data read")
+        stream.openAsync(streamPort: self.streamPort) { ec in
+            let len = 17 * 1024 + 87
+            let input = String(repeating: "X", count: len)
+            stream.writeAsync(data: input.data(using: .utf8)!) { ec in
+                stream.readAllAsync(length: len+42) { ec, data in
+                    XCTAssertEqual(ec, .OK)
+                    XCTAssertGreaterThan(data!.count, 0)
+                    XCTAssertEqual(input, String(decoding: data!, as: UTF8.self))
+                    try! stream.close()
+                    try! connection.close()
+                    self.client.stop()
+                    exp.fulfill()
+                }
+            }
+        }
+        wait(for: [exp], timeout: 2.0)
+    }
 
     func testTunnelGetPortFail() throws {
         try! self.connection = self.connect(self.tunnelDevice)
@@ -544,5 +565,39 @@ class NabtoEdgeClientTests: XCTestCase {
             XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.NOT_FOUND)
         }
     }
+
+    func testTunnelOpenCloseAsync() throws {
+        try! self.connection = self.connect(self.tunnelDevice)
+        let tunnel = try! self.connection.createTcpTunnel()
+        let exp = XCTestExpectation(description: "expect http request finishes")
+        tunnel.openAsync(service: "http", localPort: 0) { ec in
+            let port = try! tunnel.getLocalPort()
+            XCTAssertGreaterThan(port, 0)
+
+            // http client caches results pr default
+            let config = URLSessionConfiguration.ephemeral
+            config.requestCachePolicy = .reloadIgnoringLocalCacheData
+            config.urlCache = nil;
+
+            let urlSession1 = URLSession(configuration: config)
+
+            urlSession1.dataTask(with: URL(string: "http://127.0.0.1:\(port)/")!) { (data, response, error) in
+                XCTAssertNil(error)
+                let body = String(data: data!, encoding: String.Encoding.utf8) ?? ""
+                XCTAssertTrue(body.contains("Debian"))
+
+                try! tunnel.closeAsync() { ec in
+                    XCTAssertEqual(ec, .OK)
+                    let urlSession2 = URLSession(configuration: config)
+                    urlSession2.dataTask(with: URL(string: "http://127.0.0.1:\(port)/")!) { (data, response, error) in
+                        XCTAssertNotNil(error)
+                        exp.fulfill()
+                    }.resume()
+                }
+            }.resume()
+        }
+        wait(for: [exp], timeout: 3.0)
+    }
+
 
 }

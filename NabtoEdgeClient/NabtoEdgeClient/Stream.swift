@@ -64,25 +64,6 @@ public class Stream {
         }
     }
 
-    public func readSomeAsync(closure: @escaping AsyncDataReceiver) {
-        let future: OpaquePointer = nabto_client_future_new(self.client.nativeClient)
-        var buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: self.chunkSize)
-        var readSize: Int = 0
-        nabto_client_stream_read_some(self.stream, future, buffer, self.chunkSize, &readSize)
-        let w = CallbackWrapper(client: self.client, future: future, cb: { ec in
-            if (ec == .OK) {
-                closure(ec, Data(bytes: buffer, count: readSize))
-                buffer.deallocate()
-            } else {
-                closure(ec, nil)
-            }
-        })
-        w.setCleanupClosure(cleanupClosure: {
-            self.activeCallbacks.remove(w)
-        })
-        self.activeCallbacks.insert(w)
-    }
-
     public func readSome() throws -> Data {
         var buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: self.chunkSize)
         defer {
@@ -107,8 +88,52 @@ public class Stream {
         return Data(bytes: buffer, count: readSize)
     }
 
+    public func readSomeAsync(closure: @escaping AsyncDataReceiver) {
+        let future: OpaquePointer = nabto_client_future_new(self.client.nativeClient)
+        var buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: self.chunkSize)
+        var readSize: Int = 0
+        nabto_client_stream_read_some(self.stream, future, buffer, self.chunkSize, &readSize)
+        let w = CallbackWrapper(client: self.client, future: future, cb: { ec in
+            if (ec == .OK) {
+                closure(ec, Data(bytes: buffer, count: readSize))
+            } else {
+                closure(ec, nil)
+            }
+            buffer.deallocate()
+        })
+        w.setCleanupClosure(cleanupClosure: {
+            self.activeCallbacks.remove(w)
+        })
+        self.activeCallbacks.insert(w)
+    }
+
+    public func readAllAsync(length: Int, closure: @escaping AsyncDataReceiver) {
+        let future: OpaquePointer = nabto_client_future_new(self.client.nativeClient)
+        var buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: length)
+        var readSize: Int = 0
+        nabto_client_stream_read_all(self.stream, future, buffer, length, &readSize)
+        let w = CallbackWrapper(client: self.client, future: future, cb: { ec in
+            if (ec == .OK) {
+                closure(ec, Data(bytes: buffer, count: readSize))
+            } else {
+                closure(ec, nil)
+            }
+            buffer.deallocate()
+        })
+        w.setCleanupClosure(cleanupClosure: {
+            self.activeCallbacks.remove(w)
+        })
+        self.activeCallbacks.insert(w)
+    }
+
     public func close() throws {
         try self.helper.wait() { future in
+            nabto_client_stream_close(self.stream, future)
+        }
+    }
+
+    public func closeAsync(closure: @escaping AsyncStatusReceiver) {
+        self.helper.invokeAsync(userClosure: closure) { future in
             nabto_client_stream_close(self.stream, future)
         }
     }

@@ -35,35 +35,35 @@
 			<key>orderHint</key>
 			<integer>6</integer>
 		</dict>
-		<key>NabtoEdgeClientTests.testStreamResourceIssue.xcscheme</key>
+		<key>NabtoEdgeClientTests.testCoapRequestAsyncApiFail.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />
 			<key>orderHint</key>
 			<integer>7</integer>
 		</dict>
-		<key>NabtoEdgeClientTests.testTunnelOpenClose.xcscheme</key>
+		<key>NabtoEdgeClientTests.testTunnelGetPortFail.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />
 			<key>orderHint</key>
 			<integer>8</integer>
 		</dict>
-		<key>NabtoEdgeClientTests.testCoapRequestAsyncApiFail.xcscheme</key>
+		<key>NabtoEdgeClientTests.testStreamWriteThenReadSomeAsync.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />
 			<key>orderHint</key>
 			<integer>9</integer>
 		</dict>
-		<key>NabtoEdgeClientTests.testTunnelGetPortFail.xcscheme</key>
+		<key>NabtoEdgeClientTests.testStreamWriteThenReadAllAsync.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />
 			<key>orderHint</key>
 			<integer>10</integer>
 		</dict>
-		<key>NabtoEdgeClientTests.testStreamWriteThenReadSomeAsync.xcscheme</key>
+		<key>NabtoEdgeClientTests.testTunnelOpenCloseAsync.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />

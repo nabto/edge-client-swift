@@ -12,6 +12,7 @@ public class Tunnel {
     private let client: NativeClientWrapper
     private let tunnel: OpaquePointer
     private let helper: Helper
+    private var activeCallbacks: Set<CallbackWrapper> = Set<CallbackWrapper>()
 
     init(nabtoClient: NativeClientWrapper, nabtoConnection: NativeConnectionWrapper) throws {
         self.client = nabtoClient
@@ -35,8 +36,14 @@ public class Tunnel {
         }
     }
 
+    public func openAsync(service: String, localPort: UInt16, closure: @escaping AsyncStatusReceiver) {
+        self.helper.invokeAsync(userClosure: closure) { future in
+            nabto_client_tcp_tunnel_open(self.tunnel, future, service, localPort)
+        }
+    }
+
     public func getLocalPort() throws -> UInt16 {
-        var port: UInt16 = 87
+        var port: UInt16 = 0
         let status = nabto_client_tcp_tunnel_get_local_port(self.tunnel, &port)
         try Helper.throwIfNotOk(status)
         return port
@@ -44,6 +51,12 @@ public class Tunnel {
 
     public func close() throws {
         try self.helper.wait() { future in
+            nabto_client_tcp_tunnel_close(self.tunnel, future)
+        }
+    }
+
+    public func closeAsync(closure: @escaping AsyncStatusReceiver) {
+        self.helper.invokeAsync(userClosure: closure) { future in
             nabto_client_tcp_tunnel_close(self.tunnel, future)
         }
     }
