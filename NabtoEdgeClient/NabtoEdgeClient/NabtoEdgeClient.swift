@@ -11,32 +11,58 @@ import NabtoEdgeClientApi
 
 // useful read: https://www.uraimo.com/2016/04/07/swift-and-c-everything-you-need-to-know
 
-/* TODO nabtodoc
+/**
  * Error codes directly mapped from the underlying core SDK.
+```
+    OK
+    ABORTED
+    ALLOCATION_ERROR
+    EOF
+    FORBIDDEN
+    NOT_FOUND
+    INVALID_ARGUMENT
+    INVALID_STATE
+    NO_CHANNELS
+    NO_DATA
+    NOT_CONNECTED
+    OPERATION_IN_PROGRESS
+    TIMEOUT
+    UNEXPECTED_API_STATUS
+```
  */
-public enum NabtoEdgeClientError: Error {
+public indirect enum NabtoEdgeClientError: Error, Equatable {
     case OK
+
     case ABORTED
     case ALLOCATION_ERROR
+    case CONNECTION_REFUSED
+    case DNS
     case EOF
     case FORBIDDEN
-    case NOT_FOUND
     case INVALID_ARGUMENT
     case INVALID_STATE
-    case NO_CHANNELS
-    case NO_DATA
+    case NONE
+    case NOT_ATTACHED
     case NOT_CONNECTED
+    case NOT_FOUND
+    case NO_CHANNELS(localError: NabtoEdgeClientError, remoteError: NabtoEdgeClientError)
+    case NO_DATA
     case OPERATION_IN_PROGRESS
     case TIMEOUT
+    case TOKEN_REJECTED
+    case UNKNOWN_DEVICE_ID
+    case UNKNOWN_PRODUCT_ID
+    case UNKNOWN_SERVER_KEY
+
     case UNEXPECTED_API_STATUS
 }
 
-/* TODO nabtodoc
+/**
  * Callback function for receiving log messages from the core SDK.
  */
 public typealias LogCallBackReceiver = (NabtoEdgeClientLogMessage) -> Void
 
-/* TODO nabtodoc
+/**
  * Callback function for receiving API status codes asynchronously.
  */
 public typealias AsyncStatusReceiver = (NabtoEdgeClientError) -> Void
@@ -115,7 +141,7 @@ public class NabtoEdgeClient: NSObject, NativeClientWrapper {
      * Each severity level includes all the less severe levels.
      *
      * @param level: The log level: error, warn, info, debug or trace
-     * @return NABTO_CLIENT_EC_INVALID_ARGUMENT if invalid level, NABTO_CLIENT_EC_OK iff successfully set
+     * @throws NabtoEdgeClientError.INVALID_ARGUMENT if invalid level
      */
     public func setLogLevel(level: String) throws {
         let status: NabtoClientError = nabto_client_set_log_level(self.nativeClient, level)
@@ -143,6 +169,7 @@ public class NabtoEdgeClient: NSObject, NativeClientWrapper {
      *
      * The result is normally stored in a device specific secure location and retrieved whenever a new connection
      * is established, passed on to a Connection object using `setPrivateKey()`.
+     * @throws NabtoEdgeClientError.ALLOCATION_ERROR if key could not be created
      */
     public func createPrivateKey() throws -> String {
         var p: UnsafeMutablePointer<Int8>? = nil
@@ -150,6 +177,10 @@ public class NabtoEdgeClient: NSObject, NativeClientWrapper {
         return try Helper.handleStringResult(status: status, cstring: p)
     }
 
+    /**
+     * Stop a client for final cleanup, this function is blocking until no more callbacks
+     * are in progress or on the event or callback queues.
+     */
     public func stop() {
         nabto_client_stop(self.nativeClient)
     }

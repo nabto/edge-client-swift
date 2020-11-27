@@ -40,7 +40,7 @@ public class Stream {
     }
 
     public func openAsync(streamPort: UInt32, closure: @escaping AsyncStatusReceiver) {
-        self.helper.invokeAsync(userClosure: closure) { future in
+        self.helper.invokeAsync(userClosure: closure, connection: nil) { future in
             nabto_client_stream_open(self.stream, future, streamPort)
         }
     }
@@ -52,7 +52,7 @@ public class Stream {
     }
 
     public func writeAsync(data: Data, closure: @escaping AsyncStatusReceiver) {
-        self.helper.invokeAsync(userClosure: closure) { future in
+        self.helper.invokeAsync(userClosure: closure, connection: nil) { future in
             doWrite(data, future)
         }
     }
@@ -65,7 +65,7 @@ public class Stream {
     }
 
     public func readSome() throws -> Data {
-        var buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: self.chunkSize)
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: self.chunkSize)
         defer {
             buffer.deallocate()
         }
@@ -77,7 +77,7 @@ public class Stream {
     }
 
     public func readAll(length: Int) throws -> Data {
-        var buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: length)
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: length)
         defer {
             buffer.deallocate()
         }
@@ -90,10 +90,10 @@ public class Stream {
 
     public func readSomeAsync(closure: @escaping AsyncDataReceiver) {
         let future: OpaquePointer = nabto_client_future_new(self.client.nativeClient)
-        var buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: self.chunkSize)
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: self.chunkSize)
         var readSize: Int = 0
         nabto_client_stream_read_some(self.stream, future, buffer, self.chunkSize, &readSize)
-        let w = CallbackWrapper(client: self.client, future: future, cb: { ec in
+        let w = CallbackWrapper(client: self.client, connection: nil, future: future, cb: { ec in
             if (ec == .OK) {
                 closure(ec, Data(bytes: buffer, count: readSize))
             } else {
@@ -112,7 +112,7 @@ public class Stream {
         var buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: length)
         var readSize: Int = 0
         nabto_client_stream_read_all(self.stream, future, buffer, length, &readSize)
-        let w = CallbackWrapper(client: self.client, future: future, cb: { ec in
+        let w = CallbackWrapper(client: self.client, connection: nil, future: future, cb: { ec in
             if (ec == .OK) {
                 closure(ec, Data(bytes: buffer, count: readSize))
             } else {
@@ -133,7 +133,7 @@ public class Stream {
     }
 
     public func closeAsync(closure: @escaping AsyncStatusReceiver) {
-        self.helper.invokeAsync(userClosure: closure) { future in
+        self.helper.invokeAsync(userClosure: closure, connection: nil) { future in
             nabto_client_stream_close(self.stream, future)
         }
     }

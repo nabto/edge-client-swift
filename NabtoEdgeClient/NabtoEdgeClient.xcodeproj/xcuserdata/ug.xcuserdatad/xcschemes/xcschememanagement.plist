@@ -14,61 +14,54 @@
 			<key>orderHint</key>
 			<integer>1</integer>
 		</dict>
-		<key>NabtoEdgeClientTests.testConnectFail.xcscheme</key>
+		<key>NabtoEdgeClientTests.testConnectionEventListener.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />
 			<key>orderHint</key>
 			<integer>4</integer>
 		</dict>
-		<key>NabtoEdgeClientTests.testConnectionEventListener.xcscheme</key>
+		<key>NabtoEdgeClientTests.testCoapRequestAsync.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />
 			<key>orderHint</key>
 			<integer>5</integer>
 		</dict>
-		<key>NabtoEdgeClientTests.testCoapRequestAsync.xcscheme</key>
+		<key>NabtoEdgeClientTests.testDnsFail.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />
 			<key>orderHint</key>
 			<integer>6</integer>
 		</dict>
-		<key>NabtoEdgeClientTests.testCoapRequestAsyncApiFail.xcscheme</key>
+		<key>NabtoEdgeClientTests.testConnectAsyncFail.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />
 			<key>orderHint</key>
 			<integer>7</integer>
 		</dict>
-		<key>NabtoEdgeClientTests.testTunnelGetPortFail.xcscheme</key>
+		<key>NabtoEdgeClientTests (1).xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />
 			<key>orderHint</key>
 			<integer>8</integer>
 		</dict>
-		<key>NabtoEdgeClientTests.testStreamWriteThenReadSomeAsync.xcscheme</key>
+		<key>NabtoEdgeClientTests.testCoapRequest.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />
 			<key>orderHint</key>
 			<integer>9</integer>
 		</dict>
-		<key>NabtoEdgeClientTests.testStreamWriteThenReadAllAsync.xcscheme</key>
+		<key>NabtoEdgeClientTests.testConnectAsyncFailOffline.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false />
 			<key>orderHint</key>
 			<integer>10</integer>
-		</dict>
-		<key>NabtoEdgeClientTests.testTunnelOpenCloseAsync.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false />
-			<key>orderHint</key>
-			<integer>11</integer>
 		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>

@@ -6,6 +6,10 @@
 import Foundation
 import NabtoEdgeClientApi
 
+/**
+ * Often used CoAP content formats, see https://www.iana.org/assignments/core-parameters/core-parameters.xhtml for
+ * exhaustive list.
+ */
 public enum ContentFormat: UInt16 {
     case TEXT_PLAIN = 0
     case APPLICATION_XML = 41
@@ -15,6 +19,11 @@ public enum ContentFormat: UInt16 {
 
 public typealias CoapResponseReceiver = (NabtoEdgeClientError, CoapResponse?) -> Void
 
+/**
+ * This class represents a CoAP request on an open connection, ready to be executed.
+ *
+ * Instances are created using createCoapRequest() function on the Connection class.
+ */
 public class CoapRequest {
 
     private let client: NativeClientWrapper
@@ -45,6 +54,11 @@ public class CoapRequest {
         nabto_client_coap_free(self.coap)
     }
 
+    /**
+     * Set payload and content format for the payload.
+     * @param contentFormat See https://www.iana.org/assignments/core-parameters/core-parameters.xhtml, some often used values are defined in ContentFormat.
+     * @param data Data for the request encoded as specified in the `contentFormat` parameter.
+     */
     public func setRequestPayload(contentFormat: UInt16, data: Data) throws {
         var status: NabtoClientError?
         data.withUnsafeBytes { p in
@@ -54,11 +68,20 @@ public class CoapRequest {
         try Helper.throwIfNotOk(status)
     }
 
+    /**
+     * Convenience function for setting string payloads.
+     * @param contentFormat See https://www.iana.org/assignments/core-parameters/core-parameters.xhtml, some often used values are defined in ContentFormat.
+     * @param string String to set as payload.
+     */
     public func setRequestPayload(contentFormat: UInt16, string: String) throws {
         let status = nabto_client_coap_set_request_payload(self.coap, contentFormat, string, string.count)
         try Helper.throwIfNotOk(status)
     }
 
+    /**
+     * Execute a CoAP request synchronously. When the function returns, the CoapResponse object is populated with response data
+     * and ready to use. If an error occurs, an exception is thrown.
+     */
     public func execute() throws -> CoapResponse {
         try self.helper.wait() { future in
             nabto_client_coap_execute(self.coap, future)
@@ -66,10 +89,13 @@ public class CoapRequest {
         return try CoapResponse(self.coap)
     }
 
-    public func executeAsyncCoap(closure: @escaping CoapResponseReceiver) {
+    /**
+     * Execute a CoAP request asynchronously. The specified closure is invoked when the response is ready
+     */
+    public func executeAsync(closure: @escaping CoapResponseReceiver) {
         let future: OpaquePointer = nabto_client_future_new(self.client.nativeClient)
         nabto_client_coap_execute(self.coap, future)
-        let w = CallbackWrapper(client: self.client, future: future, cb: { ec in
+        let w = CallbackWrapper(client: self.client, connection: nil, future: future, cb: { ec in
             if (ec == .OK) {
                 do {
                     let coapResponse = try CoapResponse(self.coap)

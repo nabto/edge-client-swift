@@ -37,7 +37,7 @@ public class Tunnel {
     }
 
     public func openAsync(service: String, localPort: UInt16, closure: @escaping AsyncStatusReceiver) {
-        self.helper.invokeAsync(userClosure: closure) { future in
+        self.helper.invokeAsync(userClosure: closure, connection: nil) { future in
             nabto_client_tcp_tunnel_open(self.tunnel, future, service, localPort)
         }
     }
@@ -56,7 +56,7 @@ public class Tunnel {
     }
 
     public func closeAsync(closure: @escaping AsyncStatusReceiver) {
-        self.helper.invokeAsync(userClosure: closure) { future in
+        self.helper.invokeAsync(userClosure: closure, connection: nil) { future in
             nabto_client_tcp_tunnel_close(self.tunnel, future)
         }
     }

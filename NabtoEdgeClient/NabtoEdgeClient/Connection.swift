@@ -108,19 +108,24 @@ public class Connection: NSObject, NativeConnectionWrapper {
     }
 
     public func connect() throws {
-        try helper.wait() { future in
+        let status = self.helper.waitNoThrow { future in
             nabto_client_connection_connect(self.nativeConnection, future)
+        }
+        if (status == NABTO_CLIENT_EC_NO_CHANNELS) {
+            throw Helper.createConnectionError(connection: self)
+        } else {
+            try Helper.throwIfNotOk(status)
         }
     }
 
     public func connectAsync(closure: @escaping AsyncStatusReceiver) {
-        self.helper.invokeAsync(userClosure: closure) { future in
+        self.helper.invokeAsync(userClosure: closure, connection: self) { future in
             nabto_client_connection_connect(self.nativeConnection, future)
         }
     }
 
     public func closeAsync(closure: @escaping AsyncStatusReceiver) {
-        self.helper.invokeAsync(userClosure: closure) { future in
+        self.helper.invokeAsync(userClosure: closure, connection: nil) { future in
             nabto_client_connection_close(self.nativeConnection, future)
         }
     }
