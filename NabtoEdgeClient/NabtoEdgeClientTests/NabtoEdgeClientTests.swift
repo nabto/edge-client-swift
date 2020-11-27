@@ -260,7 +260,7 @@ class NabtoEdgeClientTests: XCTestCase {
         try! connection.updateOptions(json: device.asJson())
         let exp = XCTestExpectation(description: "expect errors thrown")
         do {
-            let connection = try connection.connect()
+            _ = try connection.connect()
         } catch NabtoEdgeClientError.NO_CHANNELS(let localError, let remoteError) {
             XCTAssertEqual(localError, .NONE)
             XCTAssertEqual(remoteError, .DNS)
@@ -358,7 +358,6 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testCoapRequestSyncAfterAsyncConnect() {
-        let device = coapDevice
         let client = NabtoEdgeClient()
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
@@ -602,7 +601,7 @@ class NabtoEdgeClientTests: XCTestCase {
                 let body = String(data: data!, encoding: String.Encoding.utf8) ?? ""
                 XCTAssertTrue(body.contains("Debian"))
 
-                try! tunnel.closeAsync() { ec in
+                tunnel.closeAsync() { ec in
                     XCTAssertEqual(ec, .OK)
                     let urlSession2 = URLSession(configuration: config)
                     urlSession2.dataTask(with: URL(string: "http://127.0.0.1:\(port)/")!) { (data, response, error) in
