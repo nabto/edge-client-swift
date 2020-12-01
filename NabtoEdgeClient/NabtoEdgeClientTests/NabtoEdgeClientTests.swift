@@ -313,7 +313,7 @@ class NabtoEdgeClientTests: XCTestCase {
         let coap = try! self.connection.createCoapRequest(method: "GET", path: "/hello-world")
         let response = try! coap.execute()
         XCTAssertEqual(response.status, 205)
-        XCTAssertEqual(response.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
+        XCTAssertEqual(response.contentFormat, CoapRequest.ContentFormat.TEXT_PLAIN.rawValue)
         XCTAssertEqual(String(decoding: response.payload, as: UTF8.self), "Hello world")
     }
 
@@ -348,7 +348,7 @@ class NabtoEdgeClientTests: XCTestCase {
             coap.executeAsync { ec, response in
                 XCTAssertEqual(ec, .OK)
                 XCTAssertEqual(response!.status, 205)
-                XCTAssertEqual(response!.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
+                XCTAssertEqual(response!.contentFormat, CoapRequest.ContentFormat.TEXT_PLAIN.rawValue)
                 XCTAssertEqual(String(decoding: response!.payload, as: UTF8.self), "Hello world")
                 exp.fulfill()
             }
@@ -370,7 +370,7 @@ class NabtoEdgeClientTests: XCTestCase {
             let coap = try! self.connection.createCoapRequest(method: "GET", path: "/hello-world")
             let response = try! coap.execute()
             XCTAssertEqual(response.status, 205)
-            XCTAssertEqual(response.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
+            XCTAssertEqual(response.contentFormat, CoapRequest.ContentFormat.TEXT_PLAIN.rawValue)
             XCTAssertEqual(String(decoding: response.payload, as: UTF8.self), "Hello world")
             exp.fulfill()
         }
@@ -500,7 +500,7 @@ class NabtoEdgeClientTests: XCTestCase {
                     XCTAssertEqual(hello, String(decoding: data!, as: UTF8.self))
                     try! stream.close()
                     try! connection.close()
-                    try! self.client.stop()
+                    self.client.stop()
                     exp.fulfill()
                 }
             }
