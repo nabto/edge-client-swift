@@ -11,7 +11,7 @@ import NabtoEdgeClientApi
 
 // useful read: https://www.uraimo.com/2016/04/07/swift-and-c-everything-you-need-to-know
 
-/**
+/* TODO nabtodoc
  * Error codes directly mapped from the underlying core SDK.
 ```
     OK
@@ -57,12 +57,12 @@ public indirect enum NabtoEdgeClientError: Error, Equatable {
     case UNEXPECTED_API_STATUS
 }
 
-/**
+/* TODO nabtodoc
  * Callback function for receiving log messages from the core SDK.
  */
 public typealias LogCallBackReceiver = (NabtoEdgeClientLogMessage) -> Void
 
-/**
+/* TODO nabtodoc
  * Callback function for receiving API status codes asynchronously.
  */
 public typealias AsyncStatusReceiver = (NabtoEdgeClientError) -> Void
@@ -85,8 +85,8 @@ internal protocol NativeClientWrapper {
 /**
  * This class is the main entry point for the Nabto Edge Client SDK Swift wrapper.
  *
- * It allows you to create private keys to use to open a connection. And to create the actual connection object
- * used to start interaction with a Nabto Edge embedded device.
+ * It enables you to create a connection object, used to connect to a Nabto Edge Embedded device. And it provides misc
+ * support functions: Create a private key (mandatory to later connect to a device), control logging, get SDK version.
  */
 public class NabtoEdgeClient: NSObject, NativeClientWrapper {
 
@@ -117,6 +117,19 @@ public class NabtoEdgeClient: NSObject, NativeClientWrapper {
      */
     public func createConnection() throws -> Connection {
         return try Connection(client: self)
+    }
+
+    /**
+     * Create a private key and return the private key as a pem encoded string.
+     *
+     * The result is normally stored in a device specific secure location and retrieved whenever a new connection
+     * is established, passed on to a Connection object using `setPrivateKey()`.
+     * @throws NabtoEdgeClientError.ALLOCATION_ERROR if key could not be created
+     */
+    public func createPrivateKey() throws -> String {
+        var p: UnsafeMutablePointer<Int8>? = nil
+        let status = nabto_client_create_private_key(self.nativeClient, &p)
+        return try Helper.handleStringResult(status: status, cstring: p)
     }
 
     /**
@@ -162,19 +175,6 @@ public class NabtoEdgeClient: NSObject, NativeClientWrapper {
         } else {
             // nabto_client_set_log_callback seems to always succeed
         }
-    }
-
-    /**
-     * Create a private key and return the private key as a pem encoded string.
-     *
-     * The result is normally stored in a device specific secure location and retrieved whenever a new connection
-     * is established, passed on to a Connection object using `setPrivateKey()`.
-     * @throws NabtoEdgeClientError.ALLOCATION_ERROR if key could not be created
-     */
-    public func createPrivateKey() throws -> String {
-        var p: UnsafeMutablePointer<Int8>? = nil
-        let status = nabto_client_create_private_key(self.nativeClient, &p)
-        return try Helper.handleStringResult(status: status, cstring: p)
     }
 
     /**

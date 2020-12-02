@@ -6,7 +6,7 @@
 import Foundation
 import NabtoEdgeClientApi
 
-/**
+/* TODO nabtodoc
  * Connection events.
  *
  * Listen for these using `addConnectionEventsListener()` on a Connection object.
@@ -18,7 +18,7 @@ import NabtoEdgeClientApi
     case UNEXPECTED_EVENT
 }
 
-/**
+/* TODO nabtodoc
  * Callback function to receive Connection events.
  */
 @objc public protocol ConnectionEventsCallbackReceiver {
@@ -32,7 +32,7 @@ internal protocol NativeConnectionWrapper {
 /**
  * This class represents a connection to a specific Nabto Edge device.
  *
- * Instances are created using `NabtoEdgeClient::createConnection()`.
+ * Instances are created using `NabtoEdgeClient.createConnection()`.
  */
 public class Connection: NSObject, NativeConnectionWrapper {
     internal let nativeConnection: OpaquePointer
@@ -56,6 +56,35 @@ public class Connection: NSObject, NativeConnectionWrapper {
 
     deinit {
         nabto_client_connection_free(self.nativeConnection)
+    }
+
+    public func connect() throws {
+        let status = self.helper.waitNoThrow { future in
+            nabto_client_connection_connect(self.nativeConnection, future)
+        }
+        if (status == NABTO_CLIENT_EC_NO_CHANNELS) {
+            throw Helper.createConnectionError(connection: self)
+        } else {
+            try Helper.throwIfNotOk(status)
+        }
+    }
+
+    public func connectAsync(closure: @escaping AsyncStatusReceiver) {
+        self.helper.invokeAsync(userClosure: closure, connection: self) { future in
+            nabto_client_connection_connect(self.nativeConnection, future)
+        }
+    }
+
+    public func closeAsync(closure: @escaping AsyncStatusReceiver) {
+        self.helper.invokeAsync(userClosure: closure, connection: nil) { future in
+            nabto_client_connection_close(self.nativeConnection, future)
+        }
+    }
+
+    public func close() throws {
+        try helper.wait() { future in
+            nabto_client_connection_close(self.nativeConnection, future)
+        }
     }
 
     /**
@@ -100,36 +129,6 @@ public class Connection: NSObject, NativeConnectionWrapper {
     public func createTcpTunnel() throws -> Tunnel {
         return try Tunnel(nabtoClient: self.client, nabtoConnection: self)
     }
-
-    public func close() throws {
-        try helper.wait() { future in
-            nabto_client_connection_close(self.nativeConnection, future)
-        }
-    }
-
-    public func connect() throws {
-        let status = self.helper.waitNoThrow { future in
-            nabto_client_connection_connect(self.nativeConnection, future)
-        }
-        if (status == NABTO_CLIENT_EC_NO_CHANNELS) {
-            throw Helper.createConnectionError(connection: self)
-        } else {
-            try Helper.throwIfNotOk(status)
-        }
-    }
-
-    public func connectAsync(closure: @escaping AsyncStatusReceiver) {
-        self.helper.invokeAsync(userClosure: closure, connection: self) { future in
-            nabto_client_connection_connect(self.nativeConnection, future)
-        }
-    }
-
-    public func closeAsync(closure: @escaping AsyncStatusReceiver) {
-        self.helper.invokeAsync(userClosure: closure, connection: nil) { future in
-            nabto_client_connection_close(self.nativeConnection, future)
-        }
-    }
-
 
     // may throw NabtoEdgeClientError.INVALID_STATE
     public func addConnectionEventsListener(cb: ConnectionEventsCallbackReceiver) throws {
