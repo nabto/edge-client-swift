@@ -11,6 +11,7 @@ import NabtoEdgeClient
 
 // test org: or-3uhjvwuh (https://console.cloud.nabto.com/#/dashboard/organizations/or-3uhjvwuh)
 // test device source: nabto-embedded-sdk/examples/simple_coap
+// if unauthorized errors: check auth type is set to sct in console and device sets the sct
 
 struct Device {
     var productId: String
@@ -49,7 +50,7 @@ class NabtoEdgeClientTests: XCTestCase {
             deviceId: "de-avmqjaje", // in device, change from "avmqjaxe..." in public example source
             url: "https://pr-fatqcwj9.clients.nabto.net",
             key: "sk-5f3ab4bea7cc2585091539fb950084ce",
-            fp: "3bab7ad3a583ad31b291e0c298d1e0966cba5ff31bdd422a01341c32d3894871",
+            fp: "8f1a9c9e591cebd67437a7b6dcf00d964971ce33f76a7435eb0d685789ae992a",
             sct: "WzwjoTabnvux"
     )
 
@@ -76,6 +77,10 @@ class NabtoEdgeClientTests: XCTestCase {
     var connection: Connection! = nil
 
     private var client: NabtoEdgeClient!
+
+    override static func setUp() {
+        print(NabtoEdgeClient.versionString())
+    }
 
     override func setUpWithError() throws {
         continueAfterFailure = false

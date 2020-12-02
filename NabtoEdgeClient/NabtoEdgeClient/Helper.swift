@@ -85,6 +85,7 @@ internal class Helper {
         case NABTO_CLIENT_EC_OPERATION_IN_PROGRESS: return NabtoEdgeClientError.OPERATION_IN_PROGRESS
         case NABTO_CLIENT_EC_TIMEOUT: return NabtoEdgeClientError.TIMEOUT
         case NABTO_CLIENT_EC_TOKEN_REJECTED: return NabtoEdgeClientError.TOKEN_REJECTED
+        case NABTO_CLIENT_EC_UNAUTHORIZED: return NabtoEdgeClientError.UNAUTHORIZED
         case NABTO_CLIENT_EC_UNKNOWN_DEVICE_ID: return NabtoEdgeClientError.UNKNOWN_DEVICE_ID
         case NABTO_CLIENT_EC_UNKNOWN_PRODUCT_ID: return NabtoEdgeClientError.UNKNOWN_PRODUCT_ID
         case NABTO_CLIENT_EC_UNKNOWN_SERVER_KEY: return NabtoEdgeClientError.UNKNOWN_SERVER_KEY

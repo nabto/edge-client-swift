@@ -50,6 +50,7 @@ public indirect enum NabtoEdgeClientError: Error, Equatable {
     case OPERATION_IN_PROGRESS
     case TIMEOUT
     case TOKEN_REJECTED
+    case UNAUTHORIZED
     case UNKNOWN_DEVICE_ID
     case UNKNOWN_PRODUCT_ID
     case UNKNOWN_SERVER_KEY
