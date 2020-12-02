@@ -24,7 +24,7 @@ public class Stream {
     private let chunkSize: Int = 1024
     private var activeCallbacks: Set<CallbackWrapper> = Set<CallbackWrapper>()
 
-    init(nabtoClient: NativeClientWrapper, nabtoConnection: NativeConnectionWrapper) throws {
+    internal init(nabtoClient: NativeClientWrapper, nabtoConnection: NativeConnectionWrapper) throws {
         self.client = nabtoClient
         self.connection = nabtoConnection
         self.helper = Helper(nabtoClient: self.client)
@@ -68,11 +68,11 @@ public class Stream {
     /**
      * Write data on a stream. Blocks until all data is written.
      *
-     * When the call returns, the data is only written to the stream, but not neccessary
+     * When the call returns, the data is only written to the stream, but not necessarily
      * acknowledged by the receiver. This is why it does not make sense to return a number of actual
      * bytes written in case of error since it says nothing about the number of acked bytes. To
-     * ensure that written bytes have been acked, a succesful call to `Stream.close()` is
-     * neccessary after last call to this `Stream.write()`.
+     * ensure that written bytes have been acked, a successful call to `Stream.close()` is
+     * necessary after last call to this `Stream.write()`.
      */
     public func write(data: Data) throws {
         try self.helper.wait() { future in
@@ -83,11 +83,11 @@ public class Stream {
     /**
      * Write data on a stream asynchronously.
      *
-     * When the closure is invoked with an , the data is only written to the stream, but not neccessary
-     * acknowledged by the receiver. This is why it does not make sense to return a number of actual
-     * bytes written in case of error since it says nothing about the number of acked bytes. To
-     * ensure that written bytes have been acked, a succesful call to `Stream.close()` is
-     * neccessary after last call to this `Stream.write()`.
+     * When the closure is invoked with an indication of success, the data is only written to the
+     * stream, but not necessarily acknowledged by the receiver. This is why it does not make sense
+     * to return a number of actual bytes written in case of error since it says nothing about the
+     * number of acked bytes. To ensure that written bytes have been acked, a successful call to
+     * `Stream.close()` is necessary after last call to this `Stream.write()`.
      */
     public func writeAsync(data: Data, closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, connection: nil) { future in
@@ -95,13 +95,12 @@ public class Stream {
         }
     }
 
-    private func doWrite(_ data: Data, _ future: OpaquePointer?) {
-        data.withUnsafeBytes { p in
-            let rawPtr = p.baseAddress!
-            nabto_client_stream_write(self.stream, future, rawPtr, data.count)
-        }
-    }
-
+    /**
+     * Read some bytes from a stream. Blocks until at least 1 byte is read or the stream is
+     * closed or end of file is reached.
+     *
+     * If end of file is reached or the stream is aborted an error is thrown.
+     */
     public func readSome() throws -> Data {
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: self.chunkSize)
         defer {
@@ -114,18 +113,12 @@ public class Stream {
         return Data(bytes: buffer, count: readSize)
     }
 
-    public func readAll(length: Int) throws -> Data {
-        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: length)
-        defer {
-            buffer.deallocate()
-        }
-        var readSize: Int = 0
-        try self.helper.wait() { future in
-            nabto_client_stream_read_all(self.stream, future, buffer, length, &readSize)
-        }
-        return Data(bytes: buffer, count: readSize)
-    }
-
+    /**
+     * Read some bytes from a stream asynchronously.
+     *
+     * Closure is invoked when at least 1 byte is read or the stream is closed or end of file is
+     * reached.
+     */
     public func readSomeAsync(closure: @escaping AsyncDataReceiver) {
         let future: OpaquePointer = nabto_client_future_new(self.client.nativeClient)
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: self.chunkSize)
@@ -145,9 +138,34 @@ public class Stream {
         self.activeCallbacks.insert(w)
     }
 
+
+    /**
+     * Read exactly the specified amount of bytes. Blocks until all bytes read.
+     *
+     * If all bytes could not be read (EOF or an error occurs or stream is aborted), an error is
+     * thrown.
+     */
+    public func readAll(length: Int) throws -> Data {
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: length)
+        defer {
+            buffer.deallocate()
+        }
+        var readSize: Int = 0
+        try self.helper.wait() { future in
+            nabto_client_stream_read_all(self.stream, future, buffer, length, &readSize)
+        }
+        return Data(bytes: buffer, count: readSize)
+    }
+
+    /**
+     * Read exactly the specified amount of bytes asynchronously.
+     *
+     * Closure is invoked with a success indication when all bytes are read. Or an error if all
+     * bytes could not be read (EOF or an error occurs or stream is aborted).  thrown.
+     */
     public func readAllAsync(length: Int, closure: @escaping AsyncDataReceiver) {
         let future: OpaquePointer = nabto_client_future_new(self.client.nativeClient)
-        var buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: length)
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: length)
         var readSize: Int = 0
         nabto_client_stream_read_all(self.stream, future, buffer, length, &readSize)
         let w = CallbackWrapper(client: self.client, connection: nil, future: future, cb: { ec in
@@ -164,20 +182,46 @@ public class Stream {
         self.activeCallbacks.insert(w)
     }
 
+    /**
+     * Close the write direction of the stream. Blocks until the close is complete.
+     *
+     * This will make the other end reach end of file when reading from a stream when all sent data
+     * has been received and acknowledged. A call to close does not affect the read direction of
+     * the stream.
+     */
     public func close() throws {
         try self.helper.wait() { future in
             nabto_client_stream_close(self.stream, future)
         }
     }
 
+    /**
+     * Close the write direction of the stream asynchronously.
+     *
+     * This will make the other end reach end of file when reading from a stream when all sent data
+     * has been received and acknowledged. A call to close does not affect the read direction of
+     * the stream.
+     */
     public func closeAsync(closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, connection: nil) { future in
             nabto_client_stream_close(self.stream, future)
         }
     }
 
+    /**
+     * Abort a stream.
+     *
+     * All pending read operations are aborted. The write direction is also closed.
+     */
     public func abort() {
         nabto_client_stream_abort(self.stream)
+    }
+
+    private func doWrite(_ data: Data, _ future: OpaquePointer?) {
+        data.withUnsafeBytes { p in
+            let rawPtr = p.baseAddress!
+            nabto_client_stream_write(self.stream, future, rawPtr, data.count)
+        }
     }
 
 
