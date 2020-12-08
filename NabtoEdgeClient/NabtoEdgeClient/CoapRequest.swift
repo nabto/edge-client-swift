@@ -24,6 +24,9 @@ public class CoapRequest {
         case APPLICATION_CBOR = 60
     }
 
+    /*
+     * TODO nabtodoc
+     */
     public typealias CoapResponseReceiver = (NabtoEdgeClientError, CoapResponse?) -> Void
 
     private let client: NativeClientWrapper
@@ -58,6 +61,7 @@ public class CoapRequest {
      * Set payload and content format for the payload.
      * @param contentFormat See https://www.iana.org/assignments/core-parameters/core-parameters.xhtml, some often used values are defined in ContentFormat.
      * @param data Data for the request encoded as specified in the `contentFormat` parameter.
+     * @throws NabtoEdgeClientError.FAILED if payload could not be set
      */
     public func setRequestPayload(contentFormat: UInt16, data: Data) throws {
         var status: NabtoClientError?
@@ -72,6 +76,7 @@ public class CoapRequest {
      * Convenience function for setting string payloads.
      * @param contentFormat See https://www.iana.org/assignments/core-parameters/core-parameters.xhtml, some often used values are defined in ContentFormat.
      * @param string String to set as payload.
+     * @throws NabtoEdgeClientError.FAILED if payload could not be set
      */
     public func setRequestPayload(contentFormat: UInt16, string: String) throws {
         let status = nabto_client_coap_set_request_payload(self.coap, contentFormat, string, string.count)
@@ -79,8 +84,13 @@ public class CoapRequest {
     }
 
     /**
-     * Execute a CoAP request synchronously. When the function returns, the CoapResponse object is populated with response data
-     * and ready to use. If an error occurs, an exception is thrown.
+     * Execute a CoAP request synchronously.
+     *
+     * When the function returns, the CoapResponse object is populated with response data and ready
+     * to use. If an error occurs that prevents creating a response with a status code, an exception is
+     * thrown.
+     *
+     * @throws NabtoEdgeClientError if a response could not be created
      */
     public func execute() throws -> CoapResponse {
         try self.helper.wait() { future in
@@ -90,7 +100,17 @@ public class CoapRequest {
     }
 
     /**
-     * Execute a CoAP request asynchronously. The specified closure is invoked when the response is ready
+     * Execute a CoAP request asynchronously.
+     *
+     * The specified closure is invoked when the response is ready or an early error occurs.
+     *
+     * If a response is available, the first parameter in the CoapResponseReceiver closure
+     * invocation is OK and the second parameter is set to the created CoapResponse.
+     *
+     * If an early error occurs, the first parameter is set to an appropriate NabtoEdgeClientError
+     * and the second parameter is nil.
+     *
+     * @param closure invoked when async operation completes
      */
     public func executeAsync(closure: @escaping CoapResponseReceiver) {
         let future: OpaquePointer = nabto_client_future_new(self.client.nativeClient)

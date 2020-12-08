@@ -89,6 +89,7 @@ internal class Helper {
         case NABTO_CLIENT_EC_UNKNOWN_DEVICE_ID: return NabtoEdgeClientError.UNKNOWN_DEVICE_ID
         case NABTO_CLIENT_EC_UNKNOWN_PRODUCT_ID: return NabtoEdgeClientError.UNKNOWN_PRODUCT_ID
         case NABTO_CLIENT_EC_UNKNOWN_SERVER_KEY: return NabtoEdgeClientError.UNKNOWN_SERVER_KEY
+        case NABTO_CLIENT_EC_UNKNOWN: return NabtoEdgeClientError.FAILED
 
         default:
             let str = String(cString: nabto_client_error_get_string(status))
@@ -116,7 +117,7 @@ internal class Helper {
     internal static func handleStringResult(status: NabtoClientError, cstring: UnsafeMutablePointer<Int8>?) throws -> String {
         try throwIfNotOk(status)
         if (cstring == nil) {
-            throw NabtoEdgeClientError.ALLOCATION_ERROR
+            throw NabtoEdgeClientError.FAILED
         }
         let result = String(cString: cstring!)
         nabto_client_string_free(cstring)

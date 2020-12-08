@@ -13,22 +13,6 @@ import NabtoEdgeClientApi
 
 /* TODO nabtodoc
  * Error codes directly mapped from the underlying core SDK.
-```
-    OK
-    ABORTED
-    ALLOCATION_ERROR
-    EOF
-    FORBIDDEN
-    NOT_FOUND
-    INVALID_ARGUMENT
-    INVALID_STATE
-    NO_CHANNELS
-    NO_DATA
-    NOT_CONNECTED
-    OPERATION_IN_PROGRESS
-    TIMEOUT
-    UNEXPECTED_API_STATUS
-```
  */
 public indirect enum NabtoEdgeClientError: Error, Equatable {
     case OK
@@ -54,6 +38,8 @@ public indirect enum NabtoEdgeClientError: Error, Equatable {
     case UNKNOWN_DEVICE_ID
     case UNKNOWN_PRODUCT_ID
     case UNKNOWN_SERVER_KEY
+
+    case FAILED
 
     case UNEXPECTED_API_STATUS
 }
@@ -108,6 +94,7 @@ public class NabtoEdgeClient: NSObject, NativeClientWrapper {
 
     /**
      * Get the underlying SDK version.
+     * @return the SDK version, e.g. 5.2.0-rc.1024+290f2fa
      */
     static public func versionString() -> String {
         return String(cString: nabto_client_version())
@@ -115,6 +102,10 @@ public class NabtoEdgeClient: NSObject, NativeClientWrapper {
 
     /**
      * Create a connection object.
+     *
+     * The created connection can then be configured and opened.
+     *
+     * @throws NabtoEdgeClientError.ALLOCATION_ERROR if the underlying SDK fails creating a connection object
      */
     public func createConnection() throws -> Connection {
         return try Connection(client: self)
@@ -125,7 +116,8 @@ public class NabtoEdgeClient: NSObject, NativeClientWrapper {
      *
      * The result is normally stored in a device specific secure location and retrieved whenever a new connection
      * is established, passed on to a Connection object using `setPrivateKey()`.
-     * @throws NabtoEdgeClientError.ALLOCATION_ERROR if key could not be created
+     * @throws NabtoEdgeClientError.FAILED if key could not be created
+     * @return the private key as a pem encoded string.
      */
     public func createPrivateKey() throws -> String {
         var p: UnsafeMutablePointer<Int8>? = nil
@@ -134,7 +126,7 @@ public class NabtoEdgeClient: NSObject, NativeClientWrapper {
     }
 
     /**
-     * Log messages from the underlying SDK using NSLog.
+     * Enable logging messages from the underlying SDK using NSLog.
      */
     public func enableNsLogLogging() {
         self.setLogCallBack(cb: nslogLogCallback)

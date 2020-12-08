@@ -43,7 +43,7 @@ public class Stream {
     /**
      * Open this stream towards the target device. Blocks until the stream is opened.
      *
-     * @parameter streamPort: The listening id/port to use for the stream. This is used to
+     * @param streamPort: The listening id/port to use for the stream. This is used to
      * distinguish streams in the other end, like a port number.
      */
     public func open(streamPort: UInt32) throws {
@@ -55,9 +55,9 @@ public class Stream {
     /**
      * Open this stream asynchronously towards the target device.
      *
-     * @parameter streamPort: The listening id/port to use for the stream. This is used to
+     * @param streamPort: The listening id/port to use for the stream. This is used to
      * distinguish streams in the other end, like a port number.
-     * @parameter closure: Invoked when the stream is opened or an error occurs.
+     * @param closure: Invoked when the stream is opened or an error occurs.
      */
     public func openAsync(streamPort: UInt32, closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, connection: nil) { future in
@@ -73,6 +73,8 @@ public class Stream {
      * bytes written in case of error since it says nothing about the number of acked bytes. To
      * ensure that written bytes have been acked, a successful call to `Stream.close()` is
      * necessary after last call to this `Stream.write()`.
+     *
+     * @param data the data to write
      */
     public func write(data: Data) throws {
         try self.helper.wait() { future in
@@ -88,6 +90,8 @@ public class Stream {
      * to return a number of actual bytes written in case of error since it says nothing about the
      * number of acked bytes. To ensure that written bytes have been acked, a successful call to
      * `Stream.close()` is necessary after last call to this `Stream.write()`.
+     *
+     *
      */
     public func writeAsync(data: Data, closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, connection: nil) { future in

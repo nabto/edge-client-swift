@@ -72,6 +72,16 @@ class NabtoEdgeClientTests: XCTestCase {
             sct: "WzwjoTabnvux"
     )
 
+    let forbiddenDevice = Device(
+            productId: "pr-t4qwmuba",
+            deviceId: "de-fociuotx",
+            url: "https://pr-ttp4phzp.clients.nabto.net",
+            key: "sk-9c826d2ebb4343a789b280fe22b98305", // tunnel app with sk-9c826d2ebb4343a789b280fe22b98305 configured for product
+            //key: "sk-5f3ab4bea7cc2585091539fb950084ce", // tunnel app with sk-9c826d2ebb4343a789b280fe22b98305 configured for product
+            fp: "d731bc1f41deecafd8368fa865e430339148c16335c5f17d0f7e25025901e182",
+            sct: "WzwjoTabnvux"
+    )
+
     let streamPort: UInt32 = 42
 
     var connection: Connection! = nil
@@ -169,7 +179,7 @@ class NabtoEdgeClientTests: XCTestCase {
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
         try! self.connection.updateOptions(json: device.asJson())
-        try! self.connection.connect()
+        try self.connection.connect()
         return self.connection
     }
 
@@ -185,14 +195,17 @@ class NabtoEdgeClientTests: XCTestCase {
         var device = self.tunnelDevice
         device.sct = "invalid"
         try! self.connection.updateOptions(json: device.asJson())
+        let exp = XCTestExpectation(description: "error thrown")
         do {
             _ = try self.connection.connect()
         } catch NabtoEdgeClientError.NO_CHANNELS(let localError, let remoteError) {
             XCTAssertEqual(localError, .NONE)
             XCTAssertEqual(remoteError, .TOKEN_REJECTED)
+            exp.fulfill()
         } catch {
             XCTFail("\(error)")
         }
+        wait(for: [exp], timeout: 0.0)
     }
 
     func testConnectAsync() {
@@ -321,6 +334,21 @@ class NabtoEdgeClientTests: XCTestCase {
         XCTAssertEqual(response.contentFormat, CoapRequest.ContentFormat.TEXT_PLAIN.rawValue)
         XCTAssertEqual(String(decoding: response.payload, as: UTF8.self), "Hello world")
     }
+
+    func testForbiddenError() {
+        let exp = XCTestExpectation(description: "expect error")
+        do {
+            _ = try self.connect(self.forbiddenDevice)
+        } catch NabtoEdgeClientError.NO_CHANNELS(let localError, let remoteError) {
+            XCTAssertEqual(localError, .NONE)
+            XCTAssertEqual(remoteError, .FORBIDDEN)
+            exp.fulfill()
+        } catch {
+            XCTFail("\(error)")
+        }
+        wait(for: [exp], timeout: 0.0)
+    }
+
 
     func testCoapRequestInvalidMethod() {
         self.connection = try! self.connect(self.coapDevice)

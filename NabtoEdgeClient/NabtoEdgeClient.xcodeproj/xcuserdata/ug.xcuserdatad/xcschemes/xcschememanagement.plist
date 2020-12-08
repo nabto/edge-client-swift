@@ -63,6 +63,20 @@
 			<key>orderHint</key>
 			<integer>8</integer>
 		</dict>
+		<key>NabtoEdgeClientTests.testForbiddenError.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false />
+			<key>orderHint</key>
+			<integer>11</integer>
+		</dict>
+		<key>NabtoEdgeClientTests.testConnectInvalidToken.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false />
+			<key>orderHint</key>
+			<integer>12</integer>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>

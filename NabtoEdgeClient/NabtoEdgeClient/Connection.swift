@@ -58,6 +58,23 @@ public class Connection: NSObject, NativeConnectionWrapper {
         nabto_client_connection_free(self.nativeConnection)
     }
 
+    /**
+     * Establish a connection synchronously.
+     *
+     * When the function returns, the connection is established and can be used with CoAP requests,
+     * streams and tunnels.
+     *
+     * @throws NabtoEdgeClientError.UNAUTHORIZED if the authentication options do not match the basestation configuration
+     * for this app/product
+     * @throws NabtoEdgeClientError.TOKEN_REJECTED if the basestation could not validate the specified token
+     * @throws NabtoEdgeClientError.NO_CHANNELS if all parameters input were accepted but a connection could not be
+     * established to the target device. Details about what went wrong are available as the
+     * associated values localError and remoteError.
+     * @throws NabtoEdgeClientError.NO_CHANNELS.remoteError.NOT_ATTACHED if the target remote device is not attached to the basestation
+     * @throws NabtoEdgeClientError.NO_CHANNELS.remoteError.FORBIDDEN if the basestation request is reject
+     * @throws NabtoEdgeClientError.NO_CHANNELS.remoteError.NONE if remote relay was not enabled
+     * @throws NabtoEdgeClientError.NO_CHANNELS.localError.NONE if mDNS discovery was not enabled
+     */
     public func connect() throws {
         let status = self.helper.waitNoThrow { future in
             nabto_client_connection_connect(self.nativeConnection, future)
@@ -69,20 +86,43 @@ public class Connection: NSObject, NativeConnectionWrapper {
         }
     }
 
+    /**
+     * Close this connection gracefully. TBD elaborate gracefully.
+     *
+     * @throws
+     *
+    public func close() throws {
+        try helper.wait() { future in
+            nabto_client_connection_close(self.nativeConnection, future)
+        }
+    }
+
+    /**
+     * Establish this connection asynchronously.
+     *
+     * The specified AsyncStatusReceiver closure is
+     * invoked with an error if an error occurs, see the `connect()` function for details about
+     * error codes.
+     *
+     * @param closure Invoked when the connect attempt succeeds or fails.
+     */
     public func connectAsync(closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, connection: self) { future in
             nabto_client_connection_connect(self.nativeConnection, future)
         }
     }
 
+    /**
+     * Close this connection asynchronously.
+     *
+     * The specified AsyncStatusReceiver closure is
+     * invoked with an error if an error occurs, see the `close()` function for details about
+     * error codes.
+     *
+     * @param closure Invoked when the connect attempt succeeds or fails.
+     */
     public func closeAsync(closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, connection: nil) { future in
-            nabto_client_connection_close(self.nativeConnection, future)
-        }
-    }
-
-    public func close() throws {
-        try helper.wait() { future in
             nabto_client_connection_close(self.nativeConnection, future)
         }
     }
