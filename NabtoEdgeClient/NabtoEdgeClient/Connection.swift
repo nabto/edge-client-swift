@@ -90,7 +90,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * Close this connection gracefully. TBD elaborate gracefully.
      *
      * @throws
-     *
+     */
     public func close() throws {
         try helper.wait() { future in
             nabto_client_connection_close(self.nativeConnection, future)

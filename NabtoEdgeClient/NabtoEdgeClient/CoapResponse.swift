@@ -6,19 +6,35 @@
 import Foundation
 import NabtoEdgeClientApi
 
+/**
+ * This class encapsulates a CoAP response, resulting from executing a CoapRequest.
+ */
 public class CoapResponse {
 
+    /**
+     * The CoAP response status, e.g. 205 for GET success and 404 for resource not found.
+     */
     public let status: UInt16
-    public var contentFormat: UInt16!
-    public var payload: Data!
 
-    init(_ coap: OpaquePointer) throws {
+    /**
+     * The CoAP response content format.
+     */
+    public let contentFormat: UInt16!
+
+    /**
+     * The CoAP payload, set if the status indicates such.
+     */
+    public let payload: Data!
+
+    internal init(_ coap: OpaquePointer) throws {
         var uint16Result: UInt16 = 0
         var ec = nabto_client_coap_get_response_status_code(coap, &uint16Result)
         try Helper.throwIfNotOk(ec)
         self.status = uint16Result
 
-        guard (self.status >= 200 && self.status < 300) else {
+        guard (uint16Result >= 200 && uint16Result < 300) else {
+            self.contentFormat = nil
+            self.payload = nil
             return
         }
 

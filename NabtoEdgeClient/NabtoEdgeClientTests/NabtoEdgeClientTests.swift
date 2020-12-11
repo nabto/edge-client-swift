@@ -75,9 +75,8 @@ class NabtoEdgeClientTests: XCTestCase {
     let forbiddenDevice = Device(
             productId: "pr-t4qwmuba",
             deviceId: "de-fociuotx",
-            url: "https://pr-ttp4phzp.clients.nabto.net",
-            key: "sk-9c826d2ebb4343a789b280fe22b98305", // tunnel app with sk-9c826d2ebb4343a789b280fe22b98305 configured for product
-            //key: "sk-5f3ab4bea7cc2585091539fb950084ce", // tunnel app with sk-9c826d2ebb4343a789b280fe22b98305 configured for product
+            url: "https://pr-t4qwmuba.clients.nabto.net",
+            key: "sk-5f3ab4bea7cc2585091539fb950084ce", // product only configured with tunnel app with sk-9c826d2ebb4343a789b280fe22b98305
             fp: "d731bc1f41deecafd8368fa865e430339148c16335c5f17d0f7e25025901e182",
             sct: "WzwjoTabnvux"
     )
@@ -331,7 +330,7 @@ class NabtoEdgeClientTests: XCTestCase {
         let coap = try! self.connection.createCoapRequest(method: "GET", path: "/hello-world")
         let response = try! coap.execute()
         XCTAssertEqual(response.status, 205)
-        XCTAssertEqual(response.contentFormat, CoapRequest.ContentFormat.TEXT_PLAIN.rawValue)
+        XCTAssertEqual(response.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
         XCTAssertEqual(String(decoding: response.payload, as: UTF8.self), "Hello world")
     }
 
@@ -381,7 +380,7 @@ class NabtoEdgeClientTests: XCTestCase {
             coap.executeAsync { ec, response in
                 XCTAssertEqual(ec, .OK)
                 XCTAssertEqual(response!.status, 205)
-                XCTAssertEqual(response!.contentFormat, CoapRequest.ContentFormat.TEXT_PLAIN.rawValue)
+                XCTAssertEqual(response!.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
                 XCTAssertEqual(String(decoding: response!.payload, as: UTF8.self), "Hello world")
                 exp.fulfill()
             }
@@ -403,7 +402,7 @@ class NabtoEdgeClientTests: XCTestCase {
             let coap = try! self.connection.createCoapRequest(method: "GET", path: "/hello-world")
             let response = try! coap.execute()
             XCTAssertEqual(response.status, 205)
-            XCTAssertEqual(response.contentFormat, CoapRequest.ContentFormat.TEXT_PLAIN.rawValue)
+            XCTAssertEqual(response.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
             XCTAssertEqual(String(decoding: response.payload, as: UTF8.self), "Hello world")
             exp.fulfill()
         }

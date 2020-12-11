@@ -6,28 +6,28 @@
 import Foundation
 import NabtoEdgeClientApi
 
+/* TODO nabtodoc
+ * Often used CoAP content formats, see https://www.iana.org/assignments/core-parameters/core-parameters.xhtml for
+ * exhaustive list.
+ */
+public enum ContentFormat: UInt16 {
+    case TEXT_PLAIN = 0
+    case APPLICATION_XML = 41
+    case APPLICATION_OCTET_STREAM = 42
+    case APPLICATION_CBOR = 60
+}
+
+/*
+ * TODO nabtodoc
+ */
+public typealias CoapResponseReceiver = (NabtoEdgeClientError, CoapResponse?) -> Void
+
 /**
  * This class represents a CoAP request on an open connection, ready to be executed.
  *
  * Instances are created using createCoapRequest() function on the Connection class.
  */
 public class CoapRequest {
-
-    /**
-     * Often used CoAP content formats, see https://www.iana.org/assignments/core-parameters/core-parameters.xhtml for
-     * exhaustive list.
-     */
-    public enum ContentFormat: UInt16 {
-        case TEXT_PLAIN = 0
-        case APPLICATION_XML = 41
-        case APPLICATION_OCTET_STREAM = 42
-        case APPLICATION_CBOR = 60
-    }
-
-    /*
-     * TODO nabtodoc
-     */
-    public typealias CoapResponseReceiver = (NabtoEdgeClientError, CoapResponse?) -> Void
 
     private let client: NativeClientWrapper
     private let connection: NativeConnectionWrapper
