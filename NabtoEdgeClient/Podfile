@@ -9,5 +9,5 @@ source 'https://github.com/CocoaPods/Specs.git'
 platform :ios, '11.0'
 
 target 'NabtoEdgeClient' do
-  pod 'NabtoEdgeClientApi'
+  pod 'NabtoEdgeClientApi', '1.0.5'
 end
