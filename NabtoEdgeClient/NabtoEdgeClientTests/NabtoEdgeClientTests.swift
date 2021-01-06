@@ -85,10 +85,10 @@ class NabtoEdgeClientTests: XCTestCase {
 
     var connection: Connection! = nil
 
-    private var client: NabtoEdgeClient!
+    private var client: Client!
 
     override static func setUp() {
-        print(NabtoEdgeClient.versionString())
+        print(Client.versionString())
     }
 
     override func setUpWithError() throws {
@@ -104,22 +104,22 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testVersionString() throws {
-        XCTAssertEqual("5.", NabtoEdgeClient.versionString().prefix(2))
+        XCTAssertEqual("5.", Client.versionString().prefix(2))
     }
 
     func testCreateClientConnection() throws {
-        let client = NabtoEdgeClient()
+        let client = Client()
         let _ = try client.createConnection()
     }
 
     func testDefaultLog() {
-        let client = NabtoEdgeClient()
+        let client = Client()
         client.enableNsLogLogging()
         let _ = try! client.createConnection()
     }
 
     func testSetLogLevelValid() {
-        let client = NabtoEdgeClient()
+        let client = Client()
         try! client.setLogLevel(level: "trace")
         client.enableNsLogLogging()
         let connection = try! client.createConnection()
@@ -127,20 +127,20 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testSetLogLevelInvalid() {
-        let client = NabtoEdgeClient()
+        let client = Client()
         XCTAssertThrowsError(try client.setLogLevel(level: "foo")) { error in
             XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.INVALID_ARGUMENT)
         }
     }
 
     func testCreatePrivateKey() {
-        let client = NabtoEdgeClient()
+        let client = Client()
         let key = try! client.createPrivateKey()
         XCTAssertTrue(key.contains("BEGIN EC PRIVATE KEY"))
     }
 
     func testSetOptionsBadJson() {
-        let client = NabtoEdgeClient()
+        let client = Client()
         let connection = try! client.createConnection()
         XCTAssertThrowsError(try connection.updateOptions(json: "foo")) { error in
             XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.INVALID_ARGUMENT)
@@ -148,7 +148,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testSetOptionsInvalidParameter() {
-        let client = NabtoEdgeClient()
+        let client = Client()
         let connection = try! client.createConnection()
         XCTAssertThrowsError(try connection.updateOptions(json: "{\n\"ProductFoo\": \"...\"}")) { error in
             XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.INVALID_ARGUMENT)
@@ -156,13 +156,13 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testSetOptionsValid() {
-        let client = NabtoEdgeClient()
+        let client = Client()
         let connection = try! client.createConnection()
         try! connection.updateOptions(json: "{\n\"ProductId\": \"pr-12345678\",\n\"DeviceId\": \"de-12345678\",\n\"ServerUrl\": \"https://pr-12345678.clients.nabto.net\",\n\"ServerKey\": \"sk-12345678123456781234567812345678\"\n}")
     }
 
     func testGetOptions() {
-        let client = NabtoEdgeClient()
+        let client = Client()
         let connection = try! client.createConnection()
         try! connection.updateOptions(json: "{\n\"ProductId\": \"pr-12345678\"}")
         let allOptions = try! connection.getOptions()
@@ -171,7 +171,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func connect(_ device: Device) throws -> Connection {
-        self.client = NabtoEdgeClient()
+        self.client = Client()
         try! self.client.setLogLevel(level: "trace")
         self.client.enableNsLogLogging()
         self.connection = try! client.createConnection()
@@ -187,7 +187,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testConnectInvalidToken() {
-        self.client = NabtoEdgeClient()
+        self.client = Client()
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
@@ -208,7 +208,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testConnectAsync() {
-        let client = NabtoEdgeClient()
+        let client = Client()
         try! client.setLogLevel(level: "info")
         client.enableNsLogLogging()
         self.connection = try! client.createConnection()
@@ -226,7 +226,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testConnectAsyncFailUnknown() {
-        let client = NabtoEdgeClient()
+        let client = Client()
         try! client.setLogLevel(level: "info")
         client.enableNsLogLogging()
         self.connection = try! client.createConnection()
@@ -247,7 +247,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testConnectAsyncFailOffline() {
-        let client = NabtoEdgeClient()
+        let client = Client()
         try! client.setLogLevel(level: "info")
         client.enableNsLogLogging()
         self.connection = try! client.createConnection()
@@ -268,7 +268,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testDnsFail() {
-        let client = NabtoEdgeClient()
+        let client = Client()
         let connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
         try! connection.setPrivateKey(key: key)
@@ -295,7 +295,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testGetDeviceFingerprintHexFail() {
-        let client = NabtoEdgeClient()
+        let client = Client()
         let connection = try! client.createConnection()
         XCTAssertThrowsError(try connection.getDeviceFingerprintHex()) { error in
             XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.INVALID_STATE)
@@ -303,7 +303,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testGetClientFingerprintHex() {
-        let client = NabtoEdgeClient()
+        let client = Client()
         let connection: Connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
         try! connection.setPrivateKey(key: key)
@@ -312,7 +312,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testGetClientFingerprintHexFail() {
-        let client = NabtoEdgeClient()
+        let client = Client()
         let connection = try! client.createConnection()
         XCTAssertThrowsError(try connection.getClientFingerprintHex()) { error in
             XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.INVALID_STATE)
@@ -367,7 +367,7 @@ class NabtoEdgeClientTests: XCTestCase {
 
 
     func testCoapRequestAsync() {
-        let client = NabtoEdgeClient()
+        let client = Client()
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
@@ -390,7 +390,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testCoapRequestSyncAfterAsyncConnect() {
-        let client = NabtoEdgeClient()
+        let client = Client()
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
@@ -411,7 +411,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testCoapRequestAsyncCoap404() {
-        let client = NabtoEdgeClient()
+        let client = Client()
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
@@ -432,7 +432,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testCoapRequestAsyncApiFail() {
-        let client = NabtoEdgeClient()
+        let client = Client()
         try! client.setLogLevel(level: "trace")
         client.enableNsLogLogging()
         self.connection = try! client.createConnection()
@@ -462,7 +462,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testConnectionEventListener() {
-        let client = NabtoEdgeClient()
+        let client = Client()
         try! client.setLogLevel(level: "info")
         client.enableNsLogLogging()
         self.connection = try! client.createConnection()

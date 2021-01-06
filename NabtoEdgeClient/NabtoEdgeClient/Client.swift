@@ -42,7 +42,7 @@ internal protocol NativeClientWrapper {
  * It enables you to create a connection object, used to connect to a Nabto Edge Embedded device. And it provides misc
  * support functions: Create a private key (mandatory to later connect to a device), control logging, get SDK version.
  */
-public class NabtoEdgeClient: NSObject, NativeClientWrapper {
+public class Client: NSObject, NativeClientWrapper {
 
     internal let nativeClient: OpaquePointer
     private var userLogCallBack: LogCallBackReceiver?
@@ -169,7 +169,7 @@ public class NabtoEdgeClient: NSObject, NativeClientWrapper {
                 return
             }
             let msg: NabtoClientLogMessage = pmsg!.pointee
-            let mySelf = Unmanaged<NabtoEdgeClient>.fromOpaque(data!).takeUnretainedValue()
+            let mySelf = Unmanaged<Client>.fromOpaque(data!).takeUnretainedValue()
             mySelf.apiLogCallback(msg: msg)
         }, rawSelf)
         if (res == NABTO_CLIENT_EC_OK) {

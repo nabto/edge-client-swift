@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		11D8263B8FC3ADF66A8F4CAA /* libPods-NabtoEdgeClient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AF5DA28303002BD40A3D11DE /* libPods-NabtoEdgeClient.a */; };
-		D42A03BC24CEE19E008E4B2D /* NabtoEdgeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D42A03BB24CEE19E008E4B2D /* NabtoEdgeClient.swift */; };
+		D42A03BC24CEE19E008E4B2D /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = D42A03BB24CEE19E008E4B2D /* Client.swift */; };
 		D484CF1025A60DC3009DCC1C /* NabtoEdgeClientError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D484CF0F25A60DC3009DCC1C /* NabtoEdgeClientError.swift */; };
 		D4B54C3924D045D500BBC161 /* NabtoEdgeClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B54C3824D045D500BBC161 /* NabtoEdgeClientTests.swift */; };
 		D4B54C3B24D045D500BBC161 /* NabtoEdgeClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42A03B024CEE12D008E4B2D /* NabtoEdgeClient.framework */; };
@@ -39,7 +39,7 @@
 		CEC53AAFB10E3162AE46F79E /* Pods-NabtoEdgeClient.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClient.release.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClient/Pods-NabtoEdgeClient.release.xcconfig"; sourceTree = "<group>"; };
 		D42A03B024CEE12D008E4B2D /* NabtoEdgeClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = NabtoEdgeClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D42A03B424CEE12D008E4B2D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		D42A03BB24CEE19E008E4B2D /* NabtoEdgeClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NabtoEdgeClient.swift; sourceTree = "<group>"; };
+		D42A03BB24CEE19E008E4B2D /* Client.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
 		D484CF0F25A60DC3009DCC1C /* NabtoEdgeClientError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NabtoEdgeClientError.swift; sourceTree = "<group>"; };
 		D4B54C3624D045D500BBC161 /* NabtoEdgeClientTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NabtoEdgeClientTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4B54C3824D045D500BBC161 /* NabtoEdgeClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NabtoEdgeClientTests.swift; sourceTree = "<group>"; };
@@ -117,7 +117,7 @@
 			isa = PBXGroup;
 			children = (
 				D42A03B424CEE12D008E4B2D /* Info.plist */,
-				D42A03BB24CEE19E008E4B2D /* NabtoEdgeClient.swift */,
+				D42A03BB24CEE19E008E4B2D /* Client.swift */,
 				E926B7741A2C63A0353F530E /* module.map */,
 				E923BA86B8DCE94DF9DFF0E0 /* Connection.swift */,
 				E92C442D4196F3F94E893327 /* Helper.swift */,
@@ -279,7 +279,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D42A03BC24CEE19E008E4B2D /* NabtoEdgeClient.swift in Sources */,
+				D42A03BC24CEE19E008E4B2D /* Client.swift in Sources */,
 				E92EF12F25F8DF3116CB8B2B /* module.map in Sources */,
 				E925D05C1F5E162B0381020C /* Connection.swift in Sources */,
 				E9270FECE2194BD901532109 /* Helper.swift in Sources */,
