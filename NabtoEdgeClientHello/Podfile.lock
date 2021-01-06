@@ -1,0 +1,16 @@
+PODS:
+  - NabtoEdgeClientSwift (0.9.0)
+
+DEPENDENCIES:
+  - NabtoEdgeClientSwift (= 0.9.0)
+
+SPEC REPOS:
+  "/Users/ug/git/local-cocoapods-repo.git":
+    - NabtoEdgeClientSwift
+
+SPEC CHECKSUMS:
+  NabtoEdgeClientSwift: d5918de95a27c845fde1aaefc8fbcc8340d600b2
+
+PODFILE CHECKSUM: e5d25337aba0549162b8f7053376965f59ea603f
+
+COCOAPODS: 1.10.0

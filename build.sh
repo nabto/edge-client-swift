@@ -44,5 +44,8 @@ xcodebuild -create-xcframework \
            -output "$ARTIFACTS/$PROJECT_NAME.xcframework"
 
 cd $ARTIFACTS
-zip -r ${PROJECT_NAME}.xcframework.zip ${PROJECT_NAME}.xcframework
 
+cd $ARTIFACTS
+cp ../LICENSE ${PROJECT_NAME}.xcframework
+
+zip -r ${PROJECT_NAME}.xcframework.zip ${PROJECT_NAME}.xcframework
