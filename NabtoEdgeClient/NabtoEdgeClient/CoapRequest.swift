@@ -4,7 +4,7 @@
 //
 
 import Foundation
-import NabtoEdgeClientApi
+@_implementationOnly import NabtoEdgeClientApi
 
 /* TODO nabtodoc
  * Often used CoAP content formats, see https://www.iana.org/assignments/core-parameters/core-parameters.xhtml for

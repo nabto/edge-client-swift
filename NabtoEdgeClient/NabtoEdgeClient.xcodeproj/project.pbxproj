@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		11D8263B8FC3ADF66A8F4CAA /* libPods-NabtoEdgeClient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AF5DA28303002BD40A3D11DE /* libPods-NabtoEdgeClient.a */; };
 		D42A03BC24CEE19E008E4B2D /* NabtoEdgeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D42A03BB24CEE19E008E4B2D /* NabtoEdgeClient.swift */; };
+		D484CF1025A60DC3009DCC1C /* NabtoEdgeClientError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D484CF0F25A60DC3009DCC1C /* NabtoEdgeClientError.swift */; };
 		D4B54C3924D045D500BBC161 /* NabtoEdgeClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B54C3824D045D500BBC161 /* NabtoEdgeClientTests.swift */; };
 		D4B54C3B24D045D500BBC161 /* NabtoEdgeClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42A03B024CEE12D008E4B2D /* NabtoEdgeClient.framework */; };
 		E925D05C1F5E162B0381020C /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E923BA86B8DCE94DF9DFF0E0 /* Connection.swift */; };
@@ -39,6 +40,7 @@
 		D42A03B024CEE12D008E4B2D /* NabtoEdgeClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = NabtoEdgeClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D42A03B424CEE12D008E4B2D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D42A03BB24CEE19E008E4B2D /* NabtoEdgeClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NabtoEdgeClient.swift; sourceTree = "<group>"; };
+		D484CF0F25A60DC3009DCC1C /* NabtoEdgeClientError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NabtoEdgeClientError.swift; sourceTree = "<group>"; };
 		D4B54C3624D045D500BBC161 /* NabtoEdgeClientTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NabtoEdgeClientTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4B54C3824D045D500BBC161 /* NabtoEdgeClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NabtoEdgeClientTests.swift; sourceTree = "<group>"; };
 		D4B54C3A24D045D500BBC161 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -125,6 +127,7 @@
 				E92AB75FB3AD3FC3E011C088 /* Tunnel.swift */,
 				E92C825D705048F208FC54FD /* CoapResponse.swift */,
 				E92FA199DFA2FC4908ECA3EA /* Podfile */,
+				D484CF0F25A60DC3009DCC1C /* NabtoEdgeClientError.swift */,
 			);
 			path = NabtoEdgeClient;
 			sourceTree = "<group>";
@@ -281,6 +284,7 @@
 				E925D05C1F5E162B0381020C /* Connection.swift in Sources */,
 				E9270FECE2194BD901532109 /* Helper.swift in Sources */,
 				E92B785CFDB4C73F3E30EA72 /* CoapRequest.swift in Sources */,
+				D484CF1025A60DC3009DCC1C /* NabtoEdgeClientError.swift in Sources */,
 				E929285096AB3B80BF5C1A38 /* ConnectionEventListener.swift in Sources */,
 				E928741B07E1D63977D35060 /* Stream.swift in Sources */,
 				E9284313828DF404FCB833CC /* Tunnel.swift in Sources */,
@@ -364,7 +368,9 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -420,7 +426,9 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -431,6 +439,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8D31C02DF246E014AD48D0F7 /* Pods-NabtoEdgeClient.debug.xcconfig */;
 			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
@@ -460,6 +469,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = CEC53AAFB10E3162AE46F79E /* Pods-NabtoEdgeClient.release.xcconfig */;
 			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;

@@ -4,7 +4,7 @@
 //
 
 import Foundation
-import NabtoEdgeClientApi
+@_implementationOnly import NabtoEdgeClientApi
 
 /**
  * This class encapsulates a CoAP response, resulting from executing a CoapRequest.

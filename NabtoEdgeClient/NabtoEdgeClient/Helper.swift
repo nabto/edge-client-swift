@@ -4,7 +4,7 @@
 //
 
 import Foundation
-import NabtoEdgeClientApi
+@_implementationOnly import NabtoEdgeClientApi
 
 // ensures client is kept alive until future is resolved
 internal class CallbackWrapper : NSObject {

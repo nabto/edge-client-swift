@@ -4,7 +4,7 @@
 //
 
 import Foundation
-import NabtoEdgeClientApi
+@_implementationOnly import NabtoEdgeClientApi
 
 internal class ConnectionEventListener {
     private let connection: NativeConnectionWrapper
