@@ -13,8 +13,8 @@ The Nabto Edge platform supersedes the Nabto Micro platform with many new featur
 DESC
   s.homepage         = 'https://docs.nabto.com'
   s.license      = { :type => 'Commercial', :file => 'NabtoEdgeClient.xcframework/LICENSE' }
-  #  s.source           = { :http => "https://downloads.nabto.com/assets/edge/ios/nabto-client-swift/#{s.version}/NabtoEdgeClient.xcframework.zip"}
-  s.source           = { :http => "http://localhost:8081/pods/NabtoEdgeClient.xcframework.zip"}
+  s.source           = { :http => "https://downloads.nabto.com/assets/edge/ios/nabto-client-swift/#{s.version}/NabtoEdgeClient.xcframework.zip"}
+  #s.source           = { :http => "http://localhost:8081/pods/NabtoEdgeClient.xcframework.zip"}
   s.author           = { 'nabto' => 'apps@nabto.com' }
   s.vendored_frameworks = 'NabtoEdgeClient.xcframework'
   s.platform = :ios
