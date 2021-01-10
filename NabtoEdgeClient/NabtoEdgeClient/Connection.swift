@@ -64,16 +64,16 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * When the function returns, the connection is established and can be used with CoAP requests,
      * streams and tunnels.
      *
-     * @throws NabtoEdgeClientError.UNAUTHORIZED if the authentication options do not match the basestation configuration
-     * for this app/product
-     * @throws NabtoEdgeClientError.TOKEN_REJECTED if the basestation could not validate the specified token
-     * @throws NabtoEdgeClientError.NO_CHANNELS if all parameters input were accepted but a connection could not be
-     * established to the target device. Details about what went wrong are available as the
-     * associated values localError and remoteError.
-     * @throws NabtoEdgeClientError.NO_CHANNELS.remoteError.NOT_ATTACHED if the target remote device is not attached to the basestation
-     * @throws NabtoEdgeClientError.NO_CHANNELS.remoteError.FORBIDDEN if the basestation request is reject
-     * @throws NabtoEdgeClientError.NO_CHANNELS.remoteError.NONE if remote relay was not enabled
-     * @throws NabtoEdgeClientError.NO_CHANNELS.localError.NONE if mDNS discovery was not enabled
+     * @throws UNAUTHORIZED if the authentication options do not match the basestation configuration
+     * for this
+     * @throws TOKEN_REJECTED if the basestation could not validate the specified token
+     * @throws NO_CHANNELS if all parameters input were accepted but a connection could not be
+     * establisice. Details about what went wrong are available as the
+     * associatand remoteError.
+     * @throws NO_CHANNELS.remoteError.NOT_ATTACHED if the target remote device is not attached to the basestation
+     * @throws NO_CHANNELS.remoteError.FORBIDDEN if the basestation request is reject
+     * @throws NO_CHANNELS.remoteError.NONE if remote relay was not enabled
+     * @throws NO_CHANNELS.localError.NONE if mDNS discovery was not enabled
      */
     public func connect() throws {
         let status = self.helper.waitNoThrow { future in
@@ -87,28 +87,28 @@ public class Connection: NSObject, NativeConnectionWrapper {
     }
 
     /**
-     * Close this connection gracefully. TBD elaborate gracefully.
-     *
-     * @throws
-     */
-    public func close() throws {
-        try helper.wait() { future in
-            nabto_client_connection_close(self.nativeConnection, future)
-        }
-    }
-
-    /**
      * Establish this connection asynchronously.
      *
-     * The specified AsyncStatusReceiver closure is
-     * invoked with an error if an error occurs, see the `connect()` function for details about
-     * error codes.
+     * The specified AsyncStatusReceiver closure is invoked with an error if an error occurs, see
+     * the `connect()` function for details about error codes.
      *
      * @param closure Invoked when the connect attempt succeeds or fails.
      */
     public func connectAsync(closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, connection: self) { future in
             nabto_client_connection_connect(self.nativeConnection, future)
+        }
+    }
+
+    /**
+     * Close this connection gracefully, ie send explicit close to the other peer. Blocks until the
+     * connection is closed.
+     *
+     * @throws a NabtoEdgeClientError if an error occurs during close.
+     */
+    public func close() throws {
+        try helper.wait() { future in
+            nabto_client_connection_close(self.nativeConnection, future)
         }
     }
 
@@ -129,18 +129,28 @@ public class Connection: NSObject, NativeConnectionWrapper {
 
     /**
      * Set connection options. Options must be set prior to invoking `connect()`.
+     * @param json The JSON document with options to set
+     * @throws NABTO_CLIENT_EC_INVALID_ARGUMENT if input is invalid
      */
     public func updateOptions(json: String) throws {
         let status: NabtoClientError = nabto_client_connection_set_options(self.nativeConnection, json)
         try Helper.throwIfNotOk(status)
     }
 
+    /**
+     * Get current representation of connection options.
+     *
+     * This is generally the same set of options as `updateOptions()` takes,
+     * except that the private key is not exposed.
+     */
     public func getOptions() throws -> String {
         var p: UnsafeMutablePointer<Int8>? = nil
         let status = nabto_client_connection_get_options(self.nativeConnection, &p)
         return try Helper.handleStringResult(status: status, cstring: p)
     }
 
+    /**
+     */
     public func setPrivateKey(key: String) throws {
         let status = nabto_client_connection_set_private_key(self.nativeConnection, key)
         return try Helper.throwIfNotOk(status)

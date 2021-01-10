@@ -41,7 +41,8 @@ public class Stream {
     }
 
     /**
-     * Open this stream towards the target device. Blocks until the stream is opened.
+     * Open this stream towards the target device. Blocks until the stream is opened or an error
+     * occurs.
      *
      * @param streamPort: The listening id/port to use for the stream. This is used to
      * distinguish streams in the other end, like a port number.
