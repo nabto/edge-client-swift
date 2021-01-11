@@ -447,7 +447,7 @@ class NabtoEdgeClientTests: XCTestCase {
         wait(for: [exp], timeout: 1.0)
     }
 
-    public class TestConnectionEventCallbackReceiver : ConnectionEventsCallbackReceiver {
+    public class TestConnectionEventCallbackReceiver : ConnectionEventReceiver {
         var events: [NabtoEdgeClientConnectionEvent] = []
         let exp: XCTestExpectation
 

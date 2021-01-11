@@ -87,8 +87,8 @@ public class CoapRequest {
      * Execute a CoAP request synchronously.
      *
      * When the function returns, the CoapResponse object is populated with response data and ready
-     * to use. If an error occurs that prevents creating a response with a status code, an exception is
-     * thrown.
+     * to use. The response can indicate a remote error. If an error occurs that prevents creating a
+     * response with a status code, an exception is thrown.
      *
      * @throws NabtoEdgeClientError if a response could not be created
      */

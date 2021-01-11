@@ -18,10 +18,22 @@ import Foundation
     case UNEXPECTED_EVENT
 }
 
-/* TODO nabtodoc
- * Callback function to receive Connection events.
+/**
+ * This protocol specifies a callback function to receive Connection events.
  */
-@objc public protocol ConnectionEventsCallbackReceiver {
+@objc public protocol ConnectionEventReceiver {
+    /*
+     * The implementation is invoked when a connection event occurs.
+     *
+     * Supported events:
+     * ```
+     *  .CONNECTED          // connection established
+     *  .CLOSED             // connection closed
+     *  .CHANNEL_CHANGED    // connection type changed, e.g. upgrade from relay to p2p
+     *  .UNEXPECTED_EVENT   // unexpected
+     * ```
+     * @param event The callback event.
+     */
     func onEvent(event: NabtoEdgeClientConnectionEvent)
 }
 
@@ -71,7 +83,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * establisice. Details about what went wrong are available as the
      * associatand remoteError.
      * @throws NO_CHANNELS.remoteError.NOT_ATTACHED if the target remote device is not attached to the basestation
-     * @throws NO_CHANNELS.remoteError.FORBIDDEN if the basestation request is reject
+     * @throws NO_CHANNELS.remoteError.FORBIDDEN if the basestation request is rejected
      * @throws NO_CHANNELS.remoteError.NONE if remote relay was not enabled
      * @throws NO_CHANNELS.localError.NONE if mDNS discovery was not enabled
      */
@@ -130,7 +142,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
     /**
      * Set connection options. Options must be set prior to invoking `connect()`.
      * @param json The JSON document with options to set
-     * @throws NABTO_CLIENT_EC_INVALID_ARGUMENT if input is invalid
+     * @throws INVALID_ARGUMENT if input is invalid
      */
     public func updateOptions(json: String) throws {
         let status: NabtoClientError = nabto_client_connection_set_options(self.nativeConnection, json)
@@ -142,6 +154,8 @@ public class Connection: NSObject, NativeConnectionWrapper {
      *
      * This is generally the same set of options as `updateOptions()` takes,
      * except that the private key is not exposed.
+     * @throws FAILED if options could not be retrieved
+     * @return the current options as a JSON string
      */
     public func getOptions() throws -> String {
         var p: UnsafeMutablePointer<Int8>? = nil
@@ -150,45 +164,88 @@ public class Connection: NSObject, NativeConnectionWrapper {
     }
 
     /**
+     * Set the private key to be used on this connection.
+     *
+     * The private key is a PEM encoded string, it can be created by using the
+     * `Client.createPrivateKey()` function or using another tool which can make an appropriate
+     * private key (see https://docs.nabto.com/developer/guides/security/public_key_auth.html for
+     * more info)
+     *
+     * @param key The PEM encoded private key to set.
+     * @throws INVALID_STATE if the connection is not in the setup phase
      */
     public func setPrivateKey(key: String) throws {
         let status = nabto_client_connection_set_private_key(self.nativeConnection, key)
         return try Helper.throwIfNotOk(status)
     }
 
+    /**
+     * Get the full fingerprint of the remote device public key. The fingerprint is used to validate
+     * the identity of the remote device.
+     *
+     * @throws INVALID_STATE if the connection is not established.
+     * @return The fingerprint encoded as hex.
+     */
     public func getDeviceFingerprintHex() throws -> String {
         var p: UnsafeMutablePointer<Int8>? = nil
         let status = nabto_client_connection_get_device_fingerprint_full_hex(self.nativeConnection, &p)
         return try Helper.handleStringResult(status: status, cstring: p)
     }
 
+    /**
+     * Get the fingerprint of the client public key used for this connection.
+     * @throws INVALID_STATE if the connection is not established.
+     * @return The fingerprint encoded as hex.
+     */
     public func getClientFingerprintHex() throws -> String {
         var p: UnsafeMutablePointer<Int8>? = nil
         let status = nabto_client_connection_get_client_fingerprint_full_hex(self.nativeConnection, &p)
         return try Helper.handleStringResult(status: status, cstring: p)
     }
 
+    /**
+     * Create a new stream on this connection. Stream must subsequently be opened.
+     * @throw ALLOCATION_ERROR if the stream could not be created.
+     */
     public func createStream() throws -> Stream {
         return try Stream(nabtoClient: self.client, nabtoConnection: self)
     }
 
+    /**
+     * Create a new CoAP request on this connection. Request must subsequently be executed.
+     * @param method   The CoAP method (either `GET`. `POST`, `PUT` or `DELETE`)
+     * @param path   The CoAP path (e.g., `/heatpump/temperature`)
+     * @throw ALLOCATION_ERROR if the request could not be created.
+     */
     public func createCoapRequest(method: String, path: String) throws -> CoapRequest {
         return try CoapRequest(nabtoClient: self.client, nabtoConnection: self, method: method, path: path)
     }
 
-    public func createTcpTunnel() throws -> Tunnel {
-        return try Tunnel(nabtoClient: self.client, nabtoConnection: self)
+    /**
+     * Create a new tunnel on this connection. Tunnel must subsequently be opened.
+     * @throw ALLOCATION_ERROR if the stream could not be created.
+     */
+    public func createTcpTunnel() throws -> TcpTunnel {
+        return try TcpTunnel(nabtoClient: self.client, nabtoConnection: self)
     }
 
-    // may throw NabtoEdgeClientError.INVALID_STATE
-    public func addConnectionEventsListener(cb: ConnectionEventsCallbackReceiver) throws {
+    /**
+     * Create a new connection event listener on this connection to track connection events.
+     * @param cb An implementation of the ConnectionEventReceiver protocol
+     * @throw INVALID_STATE if listener could not be added
+     */
+    public func addConnectionEventsListener(cb: ConnectionEventReceiver) throws {
         if (self.connectionEventListener == nil) {
             self.connectionEventListener = try ConnectionEventListener(nabtoConnection: self, nabtoClient: self.client)
         }
         self.connectionEventListener!.addUserCb(cb)
     }
 
-    public func removeConnectionEventsListener(cb: ConnectionEventsCallbackReceiver) throws {
+    /**
+     * Remove a connection event listener.
+     * @param cb An implementation of the ConnectionEventReceiver protocol
+     */
+    public func removeConnectionEventsListener(cb: ConnectionEventReceiver) {
         guard let listener = self.connectionEventListener else {
             return
         }
