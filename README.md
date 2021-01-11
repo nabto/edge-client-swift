@@ -15,7 +15,7 @@ end
 
 ## Development of wrapper
 
-To build the wrapper:
+To build the wrapper, retrieving dependencies through CocoaPods:
 
 ```
 git clone git@github.com:nabto/edge-client-swift.git
@@ -24,7 +24,9 @@ pod install
 open NabtoEdgeClient.xcworkspace
 ```
 
-## Testing pod
+Alternatively, obtain the Nabto Edge Client SDK binary library directly from the [artifacts repo](https://github.com/nabto/nabto5-releases) instead of using CocoaPods.
+
+## Testing the resulting pod for Swift
 
 Add local repo:
 
