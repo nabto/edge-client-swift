@@ -15,7 +15,7 @@ internal class ConnectionEventListener {
 
     // simple set<> is a mess due to massive swift protocol quirks and an "abstract" class is not possible as it is not possible
     // to override api methods - so a simple objc hashtable seems best (see https://stackoverflow.com/questions/29278624/pure-swift-set-with-protocol-objects)
-    private var userCbs: NSHashTable<ConnectionEventsCallbackReceiver> = NSHashTable<ConnectionEventsCallbackReceiver>()
+    private var userCbs: NSHashTable<ConnectionEventReceiver> = NSHashTable<ConnectionEventReceiver>()
     private var event: NabtoClientConnectionEvent = -1
 
     init(nabtoConnection: NativeConnectionWrapper, nabtoClient: NativeClientWrapper) throws {
@@ -46,7 +46,7 @@ internal class ConnectionEventListener {
         let enumerator = self.userCbs.objectEnumerator()
         while let cb = enumerator.nextObject() {
             let mappedEvent: NabtoEdgeClientConnectionEvent = lastEdgeClientConnectionEvent()
-            (cb as! ConnectionEventsCallbackReceiver).onEvent(event: mappedEvent)
+            (cb as! ConnectionEventReceiver).onEvent(event: mappedEvent)
         }
     }
 
@@ -60,11 +60,11 @@ internal class ConnectionEventListener {
         }
     }
 
-    internal func addUserCb(_ cb: ConnectionEventsCallbackReceiver) {
+    internal func addUserCb(_ cb: ConnectionEventReceiver) {
         self.userCbs.add(cb)
     }
 
-    internal func removeUserCb(_ cb: ConnectionEventsCallbackReceiver) {
+    internal func removeUserCb(_ cb: ConnectionEventReceiver) {
         self.userCbs.remove(cb)
     }
 

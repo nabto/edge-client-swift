@@ -15,7 +15,7 @@
 		E925D05C1F5E162B0381020C /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E923BA86B8DCE94DF9DFF0E0 /* Connection.swift */; };
 		E925FDACA374ED7D03E4995C /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = E92FA199DFA2FC4908ECA3EA /* Podfile */; };
 		E9270FECE2194BD901532109 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92C442D4196F3F94E893327 /* Helper.swift */; };
-		E9284313828DF404FCB833CC /* Tunnel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92AB75FB3AD3FC3E011C088 /* Tunnel.swift */; };
+		E9284313828DF404FCB833CC /* TcpTunnel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92AB75FB3AD3FC3E011C088 /* TcpTunnel.swift */; };
 		E928741B07E1D63977D35060 /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9285E9171B6D17274076A7E /* Stream.swift */; };
 		E929285096AB3B80BF5C1A38 /* ConnectionEventListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921D0ADFA95E0D7B453F106 /* ConnectionEventListener.swift */; };
 		E92B785CFDB4C73F3E30EA72 /* CoapRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92365CF645619AA908C6A8B /* CoapRequest.swift */; };
@@ -50,7 +50,7 @@
 		E923BA86B8DCE94DF9DFF0E0 /* Connection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Connection.swift; sourceTree = "<group>"; };
 		E926B7741A2C63A0353F530E /* module.map */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = module.map; sourceTree = SOURCE_ROOT; };
 		E9285E9171B6D17274076A7E /* Stream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
-		E92AB75FB3AD3FC3E011C088 /* Tunnel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tunnel.swift; sourceTree = "<group>"; };
+		E92AB75FB3AD3FC3E011C088 /* TcpTunnel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TcpTunnel.swift; sourceTree = "<group>"; };
 		E92C442D4196F3F94E893327 /* Helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		E92C825D705048F208FC54FD /* CoapResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoapResponse.swift; sourceTree = "<group>"; };
 		E92FA199DFA2FC4908ECA3EA /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = SOURCE_ROOT; };
@@ -124,7 +124,7 @@
 				E92365CF645619AA908C6A8B /* CoapRequest.swift */,
 				E921D0ADFA95E0D7B453F106 /* ConnectionEventListener.swift */,
 				E9285E9171B6D17274076A7E /* Stream.swift */,
-				E92AB75FB3AD3FC3E011C088 /* Tunnel.swift */,
+				E92AB75FB3AD3FC3E011C088 /* TcpTunnel.swift */,
 				E92C825D705048F208FC54FD /* CoapResponse.swift */,
 				E92FA199DFA2FC4908ECA3EA /* Podfile */,
 				D484CF0F25A60DC3009DCC1C /* NabtoEdgeClientError.swift */,
@@ -287,7 +287,7 @@
 				D484CF1025A60DC3009DCC1C /* NabtoEdgeClientError.swift in Sources */,
 				E929285096AB3B80BF5C1A38 /* ConnectionEventListener.swift in Sources */,
 				E928741B07E1D63977D35060 /* Stream.swift in Sources */,
-				E9284313828DF404FCB833CC /* Tunnel.swift in Sources */,
+				E9284313828DF404FCB833CC /* TcpTunnel.swift in Sources */,
 				E92C76DCF3126FE20550B9EF /* CoapResponse.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

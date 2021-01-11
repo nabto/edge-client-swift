@@ -8,7 +8,7 @@
 
 import Foundation
 
-/* TODO nabtodoc
+/*
  * Error codes directly mapped from the underlying core SDK.
  */
 public indirect enum NabtoEdgeClientError: Error, Equatable {
@@ -29,6 +29,7 @@ public indirect enum NabtoEdgeClientError: Error, Equatable {
     case NO_CHANNELS(localError: NabtoEdgeClientError, remoteError: NabtoEdgeClientError)
     case NO_DATA
     case OPERATION_IN_PROGRESS
+    case STOPPED
     case TIMEOUT
     case TOKEN_REJECTED
     case UNAUTHORIZED

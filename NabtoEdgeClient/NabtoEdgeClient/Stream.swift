@@ -10,8 +10,8 @@ public typealias AsyncDataReceiver = (NabtoEdgeClientError, Data?) -> Void
 
 /**
  * A Nabto Edge stream enables socket-like communication between client and device. The stream is
- * reliable and ensures data is received ordered and complete. If either of these conditions cannot be
- * met, the stream will be closed in such a way that it is detectable.
+ * reliable and ensures data is received ordered and complete. If either of these conditions cannot
+ * be met, the stream will be closed in such a way that it is detectable.
  *
  * Stream instances are created using `Connection.createStream()`.
  */
@@ -41,11 +41,12 @@ public class Stream {
     }
 
     /**
-     * Open this stream towards the target device. Blocks until the stream is opened or an error
+     * Open this stream. Blocks until the stream is opened or an error
      * occurs.
      *
      * @param streamPort: The listening id/port to use for the stream. This is used to
      * distinguish streams in the other end, like a port number.
+     * @throws ABORTED: the stream could not be opened as the handshake was aborted - this includes  an invalid port specified and access denied due to insufficient permissions
      */
     public func open(streamPort: UInt32) throws {
         try self.helper.wait() { future in
@@ -54,11 +55,11 @@ public class Stream {
     }
 
     /**
-     * Open this stream asynchronously towards the target device.
+     * Open this stream asynchronously.
      *
      * @param streamPort: The listening id/port to use for the stream. This is used to
      * distinguish streams in the other end, like a port number.
-     * @param closure: Invoked when the stream is opened or an error occurs.
+     * @param closure: Invoked when the stream is opened or an error occurs, see synchronous open() for possible errors.
      */
     public func openAsync(streamPort: UInt32, closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, connection: nil) { future in
@@ -76,6 +77,8 @@ public class Stream {
      * necessary after last call to this `Stream.write()`.
      *
      * @param data the data to write
+     * @throws STOPPED if the stream has been closed
+     * @throws OPERATION_IN_PROGRESS if another write operation is already in progress
      */
     public func write(data: Data) throws {
         try self.helper.wait() { future in
@@ -92,6 +95,9 @@ public class Stream {
      * number of acked bytes. To ensure that written bytes have been acked, a successful call to
      * `Stream.close()` is necessary after last call to this `Stream.write()`.
      *
+     * @param data: the data to write
+     * @param closure: Invoked when the operation completes, see synchronous write()
+     * for possible errors.
      *
      */
     public func writeAsync(data: Data, closure: @escaping AsyncStatusReceiver) {
@@ -103,8 +109,10 @@ public class Stream {
     /**
      * Read some bytes from a stream. Blocks until at least 1 byte is read or the stream is
      * closed or end of file is reached.
-     *
-     * If end of file is reached or the stream is aborted an error is thrown.
+     * @throws EOF if end of file is reached
+     * @throws ABORTED if the stream is aborted
+     * @throws OPERATION_IN_PROGRESS if another read is in progress
+     * @return the data read
      */
     public func readSome() throws -> Data {
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: self.chunkSize)
@@ -123,6 +131,9 @@ public class Stream {
      *
      * Closure is invoked when at least 1 byte is read or the stream is closed or end of file is
      * reached.
+     *
+     * @param closure: Invoked when the operation completes, see synchronous readSome()
+     * for possible errors.
      */
     public func readSomeAsync(closure: @escaping AsyncDataReceiver) {
         let future: OpaquePointer = nabto_client_future_new(self.client.nativeClient)
@@ -143,12 +154,17 @@ public class Stream {
         self.activeCallbacks.insert(w)
     }
 
-
     /**
      * Read exactly the specified amount of bytes. Blocks until all bytes read.
      *
      * If all bytes could not be read (EOF or an error occurs or stream is aborted), an error is
      * thrown.
+     *
+     * @param length: The number of bytes to read
+     * @throws EOF if end of file is reached
+     * @throws ABORTED if the stream is aborted
+     * @throws OPERATION_IN_PROGRESS if another read is in progress
+     * @return the data read
      */
     public func readAll(length: Int) throws -> Data {
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: length)
@@ -166,7 +182,10 @@ public class Stream {
      * Read exactly the specified amount of bytes asynchronously.
      *
      * Closure is invoked with a success indication when all bytes are read. Or an error if all
-     * bytes could not be read (EOF or an error occurs or stream is aborted).  thrown.
+     * bytes could not be read (EOF or an error occurs or stream is aborted).
+     * @param length: The number of bytes to read
+     * @param closure: Invoked when the operation completes, see synchronous readAll()
+     * for possible errors.
      */
     public func readAllAsync(length: Int, closure: @escaping AsyncDataReceiver) {
         let future: OpaquePointer = nabto_client_future_new(self.client.nativeClient)
@@ -193,6 +212,8 @@ public class Stream {
      * This will make the other end reach end of file when reading from a stream when all sent data
      * has been received and acknowledged. A call to close does not affect the read direction of
      * the stream.
+     * @throws ABORTED if the stream is closed
+     * @throws OPERATION_IN_PROGRESS if a stream write is in progress
      */
     public func close() throws {
         try self.helper.wait() { future in
@@ -206,6 +227,9 @@ public class Stream {
      * This will make the other end reach end of file when reading from a stream when all sent data
      * has been received and acknowledged. A call to close does not affect the read direction of
      * the stream.
+     *
+     * @param closure: Invoked when the operation completes, see synchronous close()
+     * for possible errors.
      */
     public func closeAsync(closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, connection: nil) { future in
@@ -228,6 +252,5 @@ public class Stream {
             nabto_client_stream_write(self.stream, future, rawPtr, data.count)
         }
     }
-
 
 }
