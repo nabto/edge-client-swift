@@ -23,10 +23,9 @@ internal class MdnsResultListener {
     private let listener: OpaquePointer
     private let helper: Helper
 
-    // see comment on set vs hashtable and protocol/delegate vs closure on similar property in ConnectionEventListener
-    // class
+    // see comment on set vs hashtable and protocol/delegate vs closure on similar property in
+    // ConnectionEventListener class
     private var userCbs: NSHashTable<MdnsResultReceiver> = NSHashTable<MdnsResultReceiver>()
-    private var event: NabtoClientConnectionEvent = -1
 
     private var result: OpaquePointer? = nil
 

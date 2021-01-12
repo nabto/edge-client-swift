@@ -98,7 +98,7 @@ class NabtoEdgeClientTests: XCTestCase {
     // $ ./examples/simple_coap/simple_coap_device pr-localonly de-localonly
     let localDevice = Device(
             productId: "pr-localonly",
-            deviceId: "de-localonly", // in device, change from "avmqjaxe..." in public example source
+            deviceId: "de-localonly",
             url: "https://pr-fatqcwj9.clients.nabto.net",
             key: "sk-5f3ab4bea7cc2585091539fb950084ce",
             fp: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
