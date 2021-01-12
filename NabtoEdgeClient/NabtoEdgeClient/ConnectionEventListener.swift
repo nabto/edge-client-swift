@@ -13,8 +13,11 @@ internal class ConnectionEventListener {
     private let listener: OpaquePointer
     private let helper: Helper
 
-    // simple set<> is a mess due to massive swift protocol quirks and an "abstract" class is not possible as it is not possible
-    // to override api methods - so a simple objc hashtable seems best (see https://stackoverflow.com/questions/29278624/pure-swift-set-with-protocol-objects)
+    // Simple set<> is a mess due to massive swift protocol quirks and an "abstract" class is not
+    // possible as it is not possible to override api methods - so a simple objc hashtable seems best
+    // (see https://stackoverflow.com/questions/29278624/pure-swift-set-with-protocol-objects).
+    // Protocol is used instead of closure callbacks as it is currently not possible to check for
+    // equality of closures in swift, hence messing up removing a specific added receiver.
     private var userCbs: NSHashTable<ConnectionEventReceiver> = NSHashTable<ConnectionEventReceiver>()
     private var event: NabtoClientConnectionEvent = -1
 

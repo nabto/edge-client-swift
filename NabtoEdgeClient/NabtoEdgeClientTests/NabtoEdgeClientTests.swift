@@ -20,20 +20,22 @@ struct Device {
     var key: String
     var fp: String
     var sct: String
+    var local: Bool
 
-    init(productId: String, deviceId: String, url: String, key: String, fp: String, sct: String) {
+    init(productId: String, deviceId: String, url: String, key: String, fp: String, sct: String, local: Bool=false) {
         self.productId = productId
         self.deviceId = deviceId
         self.url = url
         self.key = key
         self.fp = fp
         self.sct = sct
+        self.local = local
     }
 
     func asJson() -> String {
         return """
         {\n
-        \"Local\": false,\n
+        \"Local\": \(self.local),\n
         \"ProductId\": \"\(self.productId)\",\n
         \"DeviceId\": \"\(self.deviceId)\",\n
         \"ServerUrl\": \"\(self.url)\",\n
@@ -80,6 +82,32 @@ class NabtoEdgeClientTests: XCTestCase {
             fp: "d731bc1f41deecafd8368fa865e430339148c16335c5f17d0f7e25025901e182",
             sct: "WzwjoTabnvux"
     )
+
+    #if true
+    // build a device for local testing:
+    //
+    // $ git clone --recursive git@github.com:nabto/nabto-embedded-sdk.git
+    // $ cd nabto-embedded-sdk
+    // $ mkdir _build
+    // $ cd _build
+    // $ cmake -j ..
+    //
+    // run device (invalid ids as shown are ok):
+    //
+    // $ cd _build
+    // $ ./examples/simple_coap/simple_coap_device pr-localonly de-localonly
+    let localDevice = Device(
+            productId: "pr-localonly",
+            deviceId: "de-localonly", // in device, change from "avmqjaxe..." in public example source
+            url: "https://pr-fatqcwj9.clients.nabto.net",
+            key: "sk-5f3ab4bea7cc2585091539fb950084ce",
+            fp: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            sct: "WzwjoTabnvux",
+            local: true
+    )
+    #else
+    let localDevice: Device! = nil
+    #endif
 
     let streamPort: UInt32 = 42
 
@@ -326,6 +354,20 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func testCoapRequest() {
         self.connection = try! self.connect(self.coapDevice)
+        defer { try! self.connection.close() }
+        let coap = try! self.connection.createCoapRequest(method: "GET", path: "/hello-world")
+        let response = try! coap.execute()
+        XCTAssertEqual(response.status, 205)
+        XCTAssertEqual(response.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
+        XCTAssertEqual(String(decoding: response.payload, as: UTF8.self), "Hello world")
+    }
+
+
+    func testCoapLocal() throws {
+        if (self.localDevice == nil) {
+            throw XCTSkip("Local device not configured: Uncomment localDevice definition and start local device stub")
+        }
+        self.connection = try! self.connect(self.localDevice)
         defer { try! self.connection.close() }
         let coap = try! self.connection.createCoapRequest(method: "GET", path: "/hello-world")
         let response = try! coap.execute()
