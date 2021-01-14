@@ -230,11 +230,11 @@ public class Connection: NSObject, NativeConnectionWrapper {
     }
 
     /**
-     * Create a new connection event listener on this connection to track connection events.
+     * Add a callback function to receive connection events.
      * @param cb An implementation of the ConnectionEventReceiver protocol
      * @throw INVALID_STATE if listener could not be added
      */
-    public func addConnectionEventsListener(cb: ConnectionEventReceiver) throws {
+    public func addConnectionEventsReceiver(cb: ConnectionEventReceiver) throws {
         if (self.connectionEventListener == nil) {
             self.connectionEventListener = try ConnectionEventListener(nabtoConnection: self, nabtoClient: self.client)
         }
@@ -242,10 +242,10 @@ public class Connection: NSObject, NativeConnectionWrapper {
     }
 
     /**
-     * Remove a connection event listener.
+     * Remove a callback function to receive connection events.
      * @param cb An implementation of the ConnectionEventReceiver protocol
      */
-    public func removeConnectionEventsListener(cb: ConnectionEventReceiver) {
+    public func removeConnectionEventsReceiver(cb: ConnectionEventReceiver) {
         guard let listener = self.connectionEventListener else {
             return
         }

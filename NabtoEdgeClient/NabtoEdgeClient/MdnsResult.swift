@@ -25,27 +25,27 @@ public class MdnsResult : NSObject {
      * service and used for maintaining a service cache in the client, identifying each entry. The
      * provided action in the reult specifies how the cache should be updated for this service.
      */
-    let serviceInstanceName: String
+    public let serviceInstanceName: String
 
     /**
      * The action indicating how this result should be used for updating the client's service cache.
      */
-    let action: Action
+    public let action: Action
 
     /**
      * Device id, nil if not set in the received result.
      */
-    let deviceId: String!
+    public let deviceId: String!
 
     /**
      * Product id, nil if not set in received result.
      */
-    let productId: String!
+    public let productId: String!
 
     /**
      * A map of txt records from received result.
      */
-    let txtItems: [String:String]
+    public let txtItems: [String:String]
 
     init(serviceInstanceName: String, action: Action, deviceId: String?, productId: String?, txtItems: [String: String]?) {
         self.serviceInstanceName = serviceInstanceName

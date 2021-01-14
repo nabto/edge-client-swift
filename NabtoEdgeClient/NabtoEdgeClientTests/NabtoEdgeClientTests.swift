@@ -376,6 +376,37 @@ class NabtoEdgeClientTests: XCTestCase {
         XCTAssertEqual(String(decoding: response.payload, as: UTF8.self), "Hello world")
     }
 
+    public class TestMdnsResultReceiver : MdnsResultReceiver {
+        var results: [MdnsResult] = []
+        let exp: XCTestExpectation
+
+        public init(_ exp: XCTestExpectation) {
+            self.exp = exp
+        }
+
+        public func onResultReady(result: MdnsResult) {
+            results.append(result)
+            exp.fulfill()
+        }
+    }
+
+
+    func testMdnsDiscovery() throws {
+        if (self.localDevice == nil) {
+            throw XCTSkip("Local device not configured: Uncomment localDevice definition and start local device stub")
+        }
+        let client = Client()
+        try! client.setLogLevel(level: "trace")
+        client.enableNsLogLogging()
+        let scanner = try! client.createMdnsScanner(subType: "")
+        let exp = XCTestExpectation()
+        let stub = TestMdnsResultReceiver(exp)
+        scanner.addMdnsResultReceiver(cb: stub)
+        try! scanner.start()
+        wait(for: [exp], timeout: 2.0)
+        print (stub.results[0].deviceId)
+    }
+
     func testForbiddenError() {
         let exp = XCTestExpectation(description: "expect error")
         do {
@@ -510,7 +541,7 @@ class NabtoEdgeClientTests: XCTestCase {
         self.connection = try! client.createConnection()
         let exp = XCTestExpectation(description: "expect event callback")
         let listener = TestConnectionEventCallbackReceiver(exp)
-        try! connection.addConnectionEventsListener(cb: listener)
+        try! connection.addConnectionEventsReceiver(cb: listener)
         let key = try! client.createPrivateKey()
         try! connection.setPrivateKey(key: key)
         try! connection.updateOptions(json: self.coapDevice.asJson())

@@ -47,6 +47,7 @@ public class Client: NSObject, NativeClientWrapper {
     internal let nativeClient: OpaquePointer
     private var userLogCallBack: LogCallBackReceiver?
     private var apiLogCallBackRegistered: Bool = false
+    private var mdnsResultListener: MdnsResultListener?
 
     /**
      * Create a new instance of the Nabto Edge client.
@@ -91,6 +92,19 @@ public class Client: NSObject, NativeClientWrapper {
         let status = nabto_client_create_private_key(self.nativeClient, &p)
         return try Helper.handleStringResult(status: status, cstring: p)
     }
+
+    /**
+     * Create an mDNS scanner to discover local devices.
+     *
+     * @param subType the mDNS subtype to scan for: If nil or the empty string, the mDNS subtype
+     * `_nabto._udp.local is located`; if subtype is specified, `<subtype>._sub._nabto._udp.local` is located.
+     * @throws NabtoEdgeClientError
+     * @return the MdnsScanner
+     */
+    public func createMdnsScanner(subType: String?=nil) throws -> MdnsScanner {
+        return try MdnsScanner(client: self, subType: subType)
+    }
+
 
     /**
      * Enable logging messages from the underlying SDK using NSLog.

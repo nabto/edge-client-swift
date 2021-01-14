@@ -41,6 +41,7 @@ internal class ConnectionEventListener {
     }
 
     deinit {
+        nabto_client_listener_stop(self.listener)
         nabto_client_listener_free(self.listener)
         nabto_client_future_free(self.future)
     }

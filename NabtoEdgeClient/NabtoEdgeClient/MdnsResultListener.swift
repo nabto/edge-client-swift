@@ -20,8 +20,10 @@ import Foundation
 internal class MdnsResultListener {
     private let client: NativeClientWrapper
     private let future: OpaquePointer
-    private let listener: OpaquePointer
+    private var listener: OpaquePointer?
     private let helper: Helper
+    private let subType: String?
+    private let serialQueue = DispatchQueue(label: "MdnsResultListener.serialQueue")
 
     // see comment on set vs hashtable and protocol/delegate vs closure on similar property in
     // ConnectionEventListener class
@@ -29,27 +31,54 @@ internal class MdnsResultListener {
 
     private var result: OpaquePointer? = nil
 
-    init(nabtoClient: NativeClientWrapper, subType: String) throws {
+    init(nabtoClient: NativeClientWrapper, subType: String?) {
         self.client = nabtoClient
         self.helper = Helper(nabtoClient: self.client)
         self.future = nabto_client_future_new(self.client.nativeClient)
-        self.listener = nabto_client_listener_new(self.client.nativeClient)
-
-        let ec = nabto_client_mdns_resolver_init_listener(self.client.nativeClient, self.listener, subType)
-        try Helper.throwIfNotOk(ec)
-
-        nabto_client_listener_new_mdns_result(self.listener, self.future, &self.result)
-
-        let rawSelf = Unmanaged.passUnretained(self).toOpaque()
-        nabto_client_future_set_callback(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
-            let mySelf = Unmanaged<MdnsResultListener>.fromOpaque(data!).takeUnretainedValue()
-            mySelf.apiEventCallback(ec: ec)
-        }, rawSelf)
+        self.subType = subType
     }
 
     deinit {
-        nabto_client_listener_free(self.listener)
+        if (self.isStarted()) {
+            self.stop()
+        }
         nabto_client_future_free(self.future)
+    }
+
+    internal func start() throws {
+        try self.serialQueue.sync {
+            guard self.listener == nil else {
+                return
+            }
+            self.listener = nabto_client_listener_new(self.client.nativeClient)
+            let ec = nabto_client_mdns_resolver_init_listener(self.client.nativeClient, self.listener, self.subType)
+            try Helper.throwIfNotOk(ec)
+
+            nabto_client_listener_new_mdns_result(self.listener, self.future, &self.result)
+
+            let rawSelf = Unmanaged.passUnretained(self).toOpaque()
+            nabto_client_future_set_callback(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
+                let mySelf = Unmanaged<MdnsResultListener>.fromOpaque(data!).takeUnretainedValue()
+                mySelf.apiEventCallback(ec: ec)
+            }, rawSelf)
+        }
+    }
+
+    internal func stop() {
+        self.serialQueue.sync {
+            guard self.listener != nil else {
+                return
+            }
+            nabto_client_listener_stop(self.listener)
+            nabto_client_listener_free(self.listener)
+            self.listener = nil
+        }
+    }
+
+    internal func isStarted() -> Bool {
+        self.serialQueue.sync {
+            return self.listener != nil
+        }
     }
 
     private func apiEventCallback(ec: NabtoClientError) {
