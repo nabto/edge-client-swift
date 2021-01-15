@@ -386,10 +386,12 @@ class NabtoEdgeClientTests: XCTestCase {
 
         public func onResultReady(result: MdnsResult) {
             results.append(result)
-            exp.fulfill()
+            NSLog("*** action: \(result.action.rawValue)")
+            if (results.count == 20) {
+                exp.fulfill()
+            }
         }
     }
-
 
     func testMdnsDiscovery() throws {
         if (self.localDevice == nil) {
@@ -398,13 +400,18 @@ class NabtoEdgeClientTests: XCTestCase {
         let client = Client()
         try! client.setLogLevel(level: "trace")
         client.enableNsLogLogging()
-        let scanner = try! client.createMdnsScanner(subType: "")
+        let scanner = try! client.createMdnsScanner(subType: "foo")
         let exp = XCTestExpectation()
         let stub = TestMdnsResultReceiver(exp)
         scanner.addMdnsResultReceiver(cb: stub)
         try! scanner.start()
-        wait(for: [exp], timeout: 2.0)
-        print (stub.results[0].deviceId)
+        wait(for: [exp], timeout: 1000.0)
+        XCTAssertEqual(stub.results.count, 1)
+        XCTAssertEqual(stub.results[0].deviceId, self.localDevice.deviceId)
+        XCTAssertEqual(stub.results[0].productId, self.localDevice.productId)
+        XCTAssertEqual(stub.results[0].txtItems["bar"], "baz")
+        print(stub.results[0].action.rawValue)
+        try! scanner.stop()
     }
 
     func testForbiddenError() {

@@ -88,6 +88,12 @@ internal class MdnsResultListener {
                 (cb as! MdnsResultReceiver).onResultReady(result: self.createFromResult(res))
             }
         }
+        nabto_client_listener_new_mdns_result(self.listener, self.future, &self.result)
+        let rawSelf = Unmanaged.passUnretained(self).toOpaque()
+        nabto_client_future_set_callback(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
+            let mySelf = Unmanaged<MdnsResultListener>.fromOpaque(data!).takeUnretainedValue()
+            mySelf.apiEventCallback(ec: ec)
+        }, rawSelf)
     }
 
     private func createFromResult(_ res: OpaquePointer) -> MdnsResult {
