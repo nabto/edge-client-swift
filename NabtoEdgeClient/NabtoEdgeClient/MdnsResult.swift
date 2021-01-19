@@ -54,4 +54,8 @@ public class MdnsResult : NSObject {
         self.productId = productId
         self.txtItems = txtItems ?? [:]
     }
+
+    public override var description: String {
+        "MdnsResult(serviceInstanceName: \(serviceInstanceName), action: \(action), deviceId: \(deviceId), productId: \(productId), txtItems: \(txtItems))"
+    }
 }

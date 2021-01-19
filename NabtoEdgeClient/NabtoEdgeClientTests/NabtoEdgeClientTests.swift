@@ -84,7 +84,7 @@ class NabtoEdgeClientTests: XCTestCase {
     )
 
     #if true
-    // build a device for local testing:
+    // build a device for mDNS discovery testing
     //
     // $ git clone --recursive git@github.com:nabto/nabto-embedded-sdk.git
     // $ cd nabto-embedded-sdk
@@ -92,21 +92,28 @@ class NabtoEdgeClientTests: XCTestCase {
     // $ cd _build
     // $ cmake -j ..
     //
-    // run device (invalid ids as shown are ok):
+    // run device as follows:
     //
     // $ cd _build
-    // $ ./examples/simple_coap/simple_coap_device pr-localonly de-localonly
-    let localDevice = Device(
-            productId: "pr-localonly",
-            deviceId: "de-localonly",
+    // $ ./examples/simple_mdns/simple_mdns_device pr-mdns de-mdns swift-test-subtype swift-txt-key swift-txt-val
+    static let mdnsProductId = "pr-mdns"
+    static let mdnsDeviceId = "de-mdns"
+    let mdnsSubtype = "swift-test-subtype"
+    let mdnsTxtKey = "swift-txt-key"
+    let mdnsTxtVal = "swift-txt-val"
+    let mdnsDevice = Device(
+            productId: "pr-mdns",
+            deviceId: mdnsDeviceId,
             url: "https://pr-fatqcwj9.clients.nabto.net",
-            key: "sk-5f3ab4bea7cc2585091539fb950084ce",
+            key: "none",
             fp: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-            sct: "WzwjoTabnvux",
+            sct: "none",
             local: true
     )
+
     #else
     let localDevice: Device! = nil
+    let mdnsDevice: Device! = nil
     #endif
 
     let streamPort: UInt32 = 42
@@ -354,26 +361,17 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func testCoapRequest() {
         self.connection = try! self.connect(self.coapDevice)
-        defer { try! self.connection.close() }
-        let coap = try! self.connection.createCoapRequest(method: "GET", path: "/hello-world")
-        let response = try! coap.execute()
-        XCTAssertEqual(response.status, 205)
-        XCTAssertEqual(response.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
-        XCTAssertEqual(String(decoding: response.payload, as: UTF8.self), "Hello world")
-    }
-
-
-    func testCoapLocal() throws {
-        if (self.localDevice == nil) {
-            throw XCTSkip("Local device not configured: Uncomment localDevice definition and start local device stub")
+        defer {
+//            try! self.connection.close()
         }
-        self.connection = try! self.connect(self.localDevice)
-        defer { try! self.connection.close() }
         let coap = try! self.connection.createCoapRequest(method: "GET", path: "/hello-world")
         let response = try! coap.execute()
         XCTAssertEqual(response.status, 205)
         XCTAssertEqual(response.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
         XCTAssertEqual(String(decoding: response.payload, as: UTF8.self), "Hello world")
+        try! self.connection.close()
+        NSLog("*** testCoapRequest - self.client.refcount=\(CFGetRetainCount(self.client))")
+        NSLog("*** testCoapRequest - self.connection.refcount=\(CFGetRetainCount(self.connection))")
     }
 
     public class TestMdnsResultReceiver : MdnsResultReceiver {
@@ -386,31 +384,40 @@ class NabtoEdgeClientTests: XCTestCase {
 
         public func onResultReady(result: MdnsResult) {
             results.append(result)
-            NSLog("*** action: \(result.action.rawValue)")
-            if (results.count == 20) {
+            NSLog("*** got mDNS result: \(result)")
+            if (results.count == 1) {
                 exp.fulfill()
             }
         }
     }
 
+    // reproduce segfault
+    func testCreateManyClientsWithLoggingEnabled() {
+        for _ in 1...1000 {
+            let client = Client()
+            client.enableNsLogLogging()
+        }
+    }
+
     func testMdnsDiscovery() throws {
-        if (self.localDevice == nil) {
-            throw XCTSkip("Local device not configured: Uncomment localDevice definition and start local device stub")
+        if (self.mdnsDevice == nil) {
+            throw XCTSkip("Local device not configured: Uncomment mdnsDevice definition and start local device stub")
         }
         let client = Client()
-        try! client.setLogLevel(level: "trace")
+        try! client.setLogLevel(level: "info")
         client.enableNsLogLogging()
-        let scanner = try! client.createMdnsScanner(subType: "foo")
+        let scanner = try! client.createMdnsScanner(subType: self.mdnsSubtype)
         let exp = XCTestExpectation()
         let stub = TestMdnsResultReceiver(exp)
-        scanner.addMdnsResultReceiver(cb: stub)
+        scanner.addMdnsResultReceiver(stub)
         try! scanner.start()
-        wait(for: [exp], timeout: 1000.0)
+        wait(for: [exp], timeout: 1)
         XCTAssertEqual(stub.results.count, 1)
-        XCTAssertEqual(stub.results[0].deviceId, self.localDevice.deviceId)
-        XCTAssertEqual(stub.results[0].productId, self.localDevice.productId)
-        XCTAssertEqual(stub.results[0].txtItems["bar"], "baz")
-        print(stub.results[0].action.rawValue)
+        XCTAssertEqual(stub.results[0].deviceId, self.mdnsDevice.deviceId)
+        XCTAssertEqual(stub.results[0].productId, self.mdnsDevice.productId)
+        XCTAssertEqual(stub.results[0].txtItems["nabto_version"]!.prefix(2), "5.")
+        XCTAssertEqual(stub.results[0].txtItems[self.mdnsTxtKey], self.mdnsTxtVal)
+        XCTAssertEqual(stub.results[0].action, .ADD)
         try! scanner.stop()
     }
 
@@ -488,6 +495,8 @@ class NabtoEdgeClientTests: XCTestCase {
         }
 
         wait(for: [exp], timeout: 2.0)
+        NSLog("*** testCoapRequest - client.refcount=\(CFGetRetainCount(client))")
+        NSLog("*** testCoapRequest - self.connection.refcount=\(CFGetRetainCount(self.connection))")
     }
 
     func testCoapRequestAsyncCoap404() {

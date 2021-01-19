@@ -47,16 +47,18 @@ public class Client: NSObject, NativeClientWrapper {
     internal let nativeClient: OpaquePointer
     private var userLogCallBack: LogCallBackReceiver?
     private var apiLogCallBackRegistered: Bool = false
-    private var mdnsResultListener: MdnsResultListener?
 
     /**
      * Create a new instance of the Nabto Edge client.
      */
     override public init() {
         self.nativeClient = nabto_client_new()
+        super.init()
+        NSLog("*** client init, id=\(String(UInt(bitPattern: ObjectIdentifier(self))))")
     }
 
     deinit {
+        NSLog("*** client deinit, id=\(String(UInt(bitPattern: ObjectIdentifier(self))))")
         nabto_client_free(self.nativeClient)
     }
 
@@ -110,7 +112,7 @@ public class Client: NSObject, NativeClientWrapper {
      * Enable logging messages from the underlying SDK using NSLog.
      */
     public func enableNsLogLogging() {
-        self.setLogCallBack(cb: nslogLogCallback)
+        self.setLogCallBack(cb: Client.nslogLogCallback)
     }
 
     /**
@@ -159,7 +161,7 @@ public class Client: NSObject, NativeClientWrapper {
         nabto_client_stop(self.nativeClient)
     }
 
-    private func nslogLogCallback(msg: NabtoEdgeClientLogMessage) {
+    private static func nslogLogCallback(msg: NabtoEdgeClientLogMessage) {
         NSLog("Nabto log: \(msg.file):\(msg.line) [\(msg.severity)/\(msg.severityString)]: \(msg.message)")
     }
 
@@ -177,6 +179,7 @@ public class Client: NSObject, NativeClientWrapper {
     }
 
     private func registerApiLogCallback() {
+        //NSLog("*** registerApiLogCallback - self.refcount=\(CFGetRetainCount(self))")
         let rawSelf = Unmanaged.passUnretained(self).toOpaque()
         let res = nabto_client_set_log_callback(self.nativeClient, { (pmsg: Optional<UnsafePointer<NabtoClientLogMessage>>, data: Optional<UnsafeMutableRawPointer>) -> Void in
             if (pmsg == nil || data == nil) {
