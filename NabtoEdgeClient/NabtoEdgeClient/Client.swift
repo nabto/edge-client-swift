@@ -58,8 +58,12 @@ public class Client: NSObject, NativeClientWrapper {
     }
 
     deinit {
-        NSLog("*** client deinit, id=\(String(UInt(bitPattern: ObjectIdentifier(self))))")
+        NSLog("*** client deinit begin, id=\(String(UInt(bitPattern: ObjectIdentifier(self))))")
+        if (self.apiLogCallBackRegistered) {
+            nabto_client_set_log_callback(self.nativeClient, nil, nil)
+        }
         nabto_client_free(self.nativeClient)
+        NSLog("*** client deinit end, id=\(String(UInt(bitPattern: ObjectIdentifier(self))))")
     }
 
     /**
