@@ -133,9 +133,19 @@ class NabtoEdgeClientTests: XCTestCase {
     override func tearDownWithError() throws {
         do {
             try connection?.close()
+            assertNoRefs(connection)
+            assertNoRefs(client)
         } catch (NabtoEdgeClientError.INVALID_STATE) {
             // connection probably not opened yet
         }
+    }
+
+    func assertNoRefs(_ obj: AnyObject?) {
+        if (obj != nil) {
+            // refcount should be 3: reference from property + ref passed to this func + ref passed to CFGetRetainCount
+            XCTAssertEqual(CFGetRetainCount(obj), 3)
+        }
+
     }
 
     func testVersionString() throws {
@@ -521,8 +531,8 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testCoapRequestAsyncApiFail() {
-        let client = Client()
-        try! client.setLogLevel(level: "trace")
+        self.client = Client()
+        try! self.client.setLogLevel(level: "trace")
         client.enableNsLogLogging()
         self.connection = try! client.createConnection()
         let exp = XCTestExpectation(description: "expect early coap fail")
