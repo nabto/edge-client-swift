@@ -26,6 +26,29 @@ open NabtoEdgeClient.xcworkspace
 
 Alternatively, obtain the Nabto Edge Client SDK binary library directly from the [artifacts repo](https://github.com/nabto/nabto5-releases) instead of using CocoaPods.
 
+## Running integration tests
+
+Remote tests are run towards some central test devices.
+
+To enable testing of mDNS discovery, run a local test device as follows:
+
+```
+git clone --recursive git@github.com:nabto/nabto-embedded-sdk.git
+cd nabto-embedded-sdk
+mkdir _build
+cd _build
+cmake -j ..
+cd _build
+./examples/simple_mdns/simple_mdns_device pr-mdns de-mdns swift-test-subtype swift-txt-key swift-txt-val
+```
+
+Execute test from xcode or commandline:
+
+```
+xcodebuild test -workspace "NabtoEdgeClient/NabtoEdgeClient.xcworkspace" -scheme NabtoEdgeClientTests \
+  -destination 'platform=iOS Simulator,name=iPhone 8'
+```
+
 ## Testing the resulting pod for Swift
 
 Add local repo:

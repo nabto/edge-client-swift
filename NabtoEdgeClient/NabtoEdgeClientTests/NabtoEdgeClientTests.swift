@@ -84,7 +84,6 @@ class NabtoEdgeClientTests: XCTestCase {
             sct: "WzwjoTabnvux"
     )
 
-    #if true
     // build a device for mDNS discovery testing
     //
     // $ git clone --recursive git@github.com:nabto/nabto-embedded-sdk.git
@@ -111,11 +110,6 @@ class NabtoEdgeClientTests: XCTestCase {
             sct: "none",
             local: true
     )
-
-    #else
-    let localDevice: Device! = nil
-    let mdnsDevice: Device! = nil
-    #endif
 
     let streamPort: UInt32 = 42
 
@@ -406,14 +400,11 @@ class NabtoEdgeClientTests: XCTestCase {
 
     // ./examples/simple_mdns/simple_mdns_device pr-mdns de-mdns swift-test-subtype swift-txt-key swift-txt-val
     func testMdnsDiscovery() throws {
-        if (self.mdnsDevice == nil) {
-            throw XCTSkip("Local device not configured: Uncomment mdnsDevice definition and start local device stub")
-        }
         self.client = Client()
         try! client.setLogLevel(level: "info")
         client.enableNsLogLogging()
         let scanner = client.createMdnsScanner(subType: self.mdnsSubtype)
-        let exp = XCTestExpectation()
+        let exp = XCTestExpectation(description: "Expected to find local device for discovery, see instructions on how to run simple_mdns_device stub")
         let stub = TestMdnsResultReceiver(exp)
         scanner.addMdnsResultReceiver(stub)
         try! scanner.start()
