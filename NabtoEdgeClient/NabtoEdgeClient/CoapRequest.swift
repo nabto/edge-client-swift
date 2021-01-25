@@ -29,13 +29,13 @@ public typealias CoapResponseReceiver = (NabtoEdgeClientError, CoapResponse?) ->
  */
 public class CoapRequest {
 
-    private let client: NativeClientWrapper
-    private let connection: NativeConnectionWrapper
+    private let client: Client
+    private let connection: Connection
     private let coap: OpaquePointer
     private let helper: Helper
     private var activeCallbacks: Set<CallbackWrapper> = Set<CallbackWrapper>()
 
-    internal init(nabtoClient: NativeClientWrapper, nabtoConnection: NativeConnectionWrapper, method: String, path: String) throws {
+    internal init(nabtoClient: Client, nabtoConnection: Connection, method: String, path: String) throws {
         let validMethods = ["GET", "POST", "PUT", "DELETE"]
         if (validMethods.firstIndex(of: method) == nil) {
             throw NabtoEdgeClientError.INVALID_ARGUMENT
@@ -46,7 +46,7 @@ public class CoapRequest {
         } else {
             throw NabtoEdgeClientError.ALLOCATION_ERROR
         }
-        // keep a swift level reference to client and connection (ie to Native{Client|Connecton}Wrapper instance vs
+        // keep a swift level reference to client and connection (ie to Native{Client|Connection}Wrapper instance vs
         // raw OpaquePointer) to prevent them from being freed by ARC if owning app only keeps reference to coap obj
         self.client = nabtoClient
         self.connection = nabtoConnection
@@ -93,7 +93,7 @@ public class CoapRequest {
      * @throws NabtoEdgeClientError if a response could not be created
      */
     public func execute() throws -> CoapResponse {
-        try self.helper.wait() { future in
+        try self.helper.wait { future in
             nabto_client_coap_execute(self.coap, future)
         }
         return try CoapResponse(self.coap)
@@ -115,7 +115,14 @@ public class CoapRequest {
     public func executeAsync(closure: @escaping CoapResponseReceiver) {
         let future: OpaquePointer = nabto_client_future_new(self.client.nativeClient)
         nabto_client_coap_execute(self.coap, future)
-        let w = CallbackWrapper(client: self.client, connection: nil, future: future, cb: { ec in
+        let w = CallbackWrapper(client: self.client, connection: nil, future: future)
+        self.activeCallbacks.insert(w)
+        w.setCleanupClosure(cleanupClosure: { [weak w] in
+            if let w = w {
+                self.activeCallbacks.remove(w)
+            }
+        })
+        w.registerCallback { ec in
             if (ec == .OK) {
                 do {
                     let coapResponse = try CoapResponse(self.coap)
@@ -127,11 +134,7 @@ public class CoapRequest {
             } else {
                 closure(ec, nil)
             }
-        })
-        w.setCleanupClosure(cleanupClosure: {
-            self.activeCallbacks.remove(w)
-        })
-        self.activeCallbacks.insert(w)
+        }
     }
 
 }

@@ -21,12 +21,12 @@ import Foundation
 public class TcpTunnel {
 
     private let connection: NativeConnectionWrapper
-    private let client: NativeClientWrapper
+    private let client: Client
     private let tunnel: OpaquePointer
     private let helper: Helper
     private var activeCallbacks: Set<CallbackWrapper> = Set<CallbackWrapper>()
 
-    internal init(nabtoClient: NativeClientWrapper, nabtoConnection: NativeConnectionWrapper) throws {
+    internal init(nabtoClient: Client, nabtoConnection: Connection) throws {
         self.client = nabtoClient
         self.connection = nabtoConnection
         self.helper = Helper(nabtoClient: self.client)
@@ -53,7 +53,7 @@ public class TcpTunnel {
      * @throws NABTO_CLIENT_EC_FORBIDDEN if target device did not allow opening a tunnel to specified service for the current client
      */
     public func open(service: String, localPort: UInt16) throws {
-        try self.helper.wait() { future in
+        try self.helper.wait { future in
             nabto_client_tcp_tunnel_open(self.tunnel, future, service, localPort)
         }
     }
@@ -91,7 +91,7 @@ public class TcpTunnel {
      * @throws INVALID_STATE if the tunnel is not open.
      */
     public func close() throws {
-        try self.helper.wait() { future in
+        try self.helper.wait { future in
             nabto_client_tcp_tunnel_close(self.tunnel, future)
         }
     }

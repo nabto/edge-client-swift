@@ -18,13 +18,13 @@ public typealias AsyncDataReceiver = (NabtoEdgeClientError, Data?) -> Void
 public class Stream {
 
     private let connection: NativeConnectionWrapper
-    private let client: NativeClientWrapper
+    private let client: Client
     private let stream: OpaquePointer
     private let helper: Helper
     private let chunkSize: Int = 1024
     private var activeCallbacks: Set<CallbackWrapper> = Set<CallbackWrapper>()
 
-    internal init(nabtoClient: NativeClientWrapper, nabtoConnection: NativeConnectionWrapper) throws {
+    internal init(nabtoClient: Client, nabtoConnection: Connection) throws {
         self.client = nabtoClient
         self.connection = nabtoConnection
         self.helper = Helper(nabtoClient: self.client)
@@ -49,7 +49,7 @@ public class Stream {
      * @throws ABORTED: the stream could not be opened as the handshake was aborted - this includes  an invalid port specified and access denied due to insufficient permissions
      */
     public func open(streamPort: UInt32) throws {
-        try self.helper.wait() { future in
+        try self.helper.wait { future in
             nabto_client_stream_open(self.stream, future, streamPort)
         }
     }
@@ -81,7 +81,7 @@ public class Stream {
      * @throws OPERATION_IN_PROGRESS if another write operation is already in progress
      */
     public func write(data: Data) throws {
-        try self.helper.wait() { future in
+        try self.helper.wait { future in
             doWrite(data, future)
         }
     }
@@ -120,7 +120,7 @@ public class Stream {
             buffer.deallocate()
         }
         var readSize: Int = 0
-        try self.helper.wait() { future in
+        try self.helper.wait { future in
             nabto_client_stream_read_some(self.stream, future, buffer, self.chunkSize, &readSize)
         }
         return Data(bytes: buffer, count: readSize)
@@ -140,16 +140,19 @@ public class Stream {
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: self.chunkSize)
         var readSize: Int = 0
         nabto_client_stream_read_some(self.stream, future, buffer, self.chunkSize, &readSize)
-        let w = CallbackWrapper(client: self.client, connection: nil, future: future, cb: { ec in
+        let w = CallbackWrapper(client: self.client, connection: nil, future: future)
+        w.registerCallback{ ec in
             if (ec == .OK) {
                 closure(ec, Data(bytes: buffer, count: readSize))
             } else {
                 closure(ec, nil)
             }
             buffer.deallocate()
-        })
-        w.setCleanupClosure(cleanupClosure: {
-            self.activeCallbacks.remove(w)
+        }
+        w.setCleanupClosure(cleanupClosure: { [weak w] in
+            if let w = w {
+                self.activeCallbacks.remove(w)
+            }
         })
         self.activeCallbacks.insert(w)
     }
@@ -172,7 +175,7 @@ public class Stream {
             buffer.deallocate()
         }
         var readSize: Int = 0
-        try self.helper.wait() { future in
+        try self.helper.wait { future in
             nabto_client_stream_read_all(self.stream, future, buffer, length, &readSize)
         }
         return Data(bytes: buffer, count: readSize)
@@ -192,18 +195,21 @@ public class Stream {
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: length)
         var readSize: Int = 0
         nabto_client_stream_read_all(self.stream, future, buffer, length, &readSize)
-        let w = CallbackWrapper(client: self.client, connection: nil, future: future, cb: { ec in
+        let w = CallbackWrapper(client: self.client, connection: nil, future: future)
+        self.activeCallbacks.insert(w)
+        w.setCleanupClosure(cleanupClosure: { [weak w] in
+            if let w = w {
+                self.activeCallbacks.remove(w)
+            }
+        })
+        w.registerCallback { ec in
             if (ec == .OK) {
                 closure(ec, Data(bytes: buffer, count: readSize))
             } else {
                 closure(ec, nil)
             }
             buffer.deallocate()
-        })
-        w.setCleanupClosure(cleanupClosure: {
-            self.activeCallbacks.remove(w)
-        })
-        self.activeCallbacks.insert(w)
+        }
     }
 
     /**
@@ -216,7 +222,7 @@ public class Stream {
      * @throws OPERATION_IN_PROGRESS if a stream write is in progress
      */
     public func close() throws {
-        try self.helper.wait() { future in
+        try self.helper.wait { future in
             nabto_client_stream_close(self.stream, future)
         }
     }

@@ -53,9 +53,11 @@ public class Client: NSObject, NativeClientWrapper {
      */
     override public init() {
         self.nativeClient = nabto_client_new()
+        super.init()
     }
 
     deinit {
+        self.stop()
         nabto_client_free(self.nativeClient)
     }
 
@@ -93,10 +95,23 @@ public class Client: NSObject, NativeClientWrapper {
     }
 
     /**
+     * Create an mDNS scanner to discover local devices.
+     *
+     * @param subType the mDNS subtype to scan for: If nil or the empty string, the mDNS subtype
+     * `_nabto._udp.local` is located; if subtype is specified, `<subtype>._sub._nabto._udp.local` is located.
+     * @throws NabtoEdgeClientError
+     * @return the MdnsScanner
+     */
+    public func createMdnsScanner(subType: String?=nil) -> MdnsScanner {
+        return MdnsScanner(client: self, subType: subType)
+    }
+
+
+    /**
      * Enable logging messages from the underlying SDK using NSLog.
      */
     public func enableNsLogLogging() {
-        self.setLogCallBack(cb: nslogLogCallback)
+        self.setLogCallBack(cb: Client.nslogLogCallback)
     }
 
     /**
@@ -142,10 +157,13 @@ public class Client: NSObject, NativeClientWrapper {
      * are in progress or on the event or callback queues.
      */
     public func stop() {
+        if (self.apiLogCallBackRegistered) {
+            nabto_client_set_log_callback(self.nativeClient, nil, nil)
+        }
         nabto_client_stop(self.nativeClient)
     }
 
-    private func nslogLogCallback(msg: NabtoEdgeClientLogMessage) {
+    private static func nslogLogCallback(msg: NabtoEdgeClientLogMessage) {
         NSLog("Nabto log: \(msg.file):\(msg.line) [\(msg.severity)/\(msg.severityString)]: \(msg.message)")
     }
 

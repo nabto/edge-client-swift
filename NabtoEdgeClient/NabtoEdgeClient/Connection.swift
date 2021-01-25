@@ -48,12 +48,12 @@ internal protocol NativeConnectionWrapper {
  */
 public class Connection: NSObject, NativeConnectionWrapper {
     internal let nativeConnection: OpaquePointer
-    private let client: NativeClientWrapper
+    private let client: Client
     private let helper: Helper
     private var apiEventCallBackRegistered: Bool = false
     private var connectionEventListener: ConnectionEventListener? = nil
 
-    internal init(client: NativeClientWrapper) throws {
+    internal init(client: Client) throws {
         let p = nabto_client_connection_new(client.nativeClient)
         if (p != nil) {
             self.nativeConnection = p!
@@ -64,6 +64,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
         // from being freed by ARC if owning app only keeps reference to connection
         self.client = client
         self.helper = Helper(nabtoClient: self.client)
+        super.init()
     }
 
     deinit {
@@ -80,8 +81,8 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * for this
      * @throws TOKEN_REJECTED if the basestation could not validate the specified token
      * @throws NO_CHANNELS if all parameters input were accepted but a connection could not be
-     * establisice. Details about what went wrong are available as the
-     * associatand remoteError.
+     * established. Details about what went wrong are available as the
+     * associated remoteError.
      * @throws NO_CHANNELS.remoteError.NOT_ATTACHED if the target remote device is not attached to the basestation
      * @throws NO_CHANNELS.remoteError.FORBIDDEN if the basestation request is rejected
      * @throws NO_CHANNELS.remoteError.NONE if remote relay was not enabled
@@ -119,7 +120,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * @throws a NabtoEdgeClientError if an error occurs during close.
      */
     public func close() throws {
-        try helper.wait() { future in
+        try helper.wait { future in
             nabto_client_connection_close(self.nativeConnection, future)
         }
     }
@@ -230,11 +231,11 @@ public class Connection: NSObject, NativeConnectionWrapper {
     }
 
     /**
-     * Create a new connection event listener on this connection to track connection events.
+     * Add a callback function to receive connection events.
      * @param cb An implementation of the ConnectionEventReceiver protocol
      * @throw INVALID_STATE if listener could not be added
      */
-    public func addConnectionEventsListener(cb: ConnectionEventReceiver) throws {
+    public func addConnectionEventsReceiver(cb: ConnectionEventReceiver) throws {
         if (self.connectionEventListener == nil) {
             self.connectionEventListener = try ConnectionEventListener(nabtoConnection: self, nabtoClient: self.client)
         }
@@ -242,10 +243,10 @@ public class Connection: NSObject, NativeConnectionWrapper {
     }
 
     /**
-     * Remove a connection event listener.
+     * Remove a callback function to receive connection events.
      * @param cb An implementation of the ConnectionEventReceiver protocol
      */
-    public func removeConnectionEventsListener(cb: ConnectionEventReceiver) {
+    public func removeConnectionEventsReceiver(cb: ConnectionEventReceiver) {
         guard let listener = self.connectionEventListener else {
             return
         }

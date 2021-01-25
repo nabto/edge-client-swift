@@ -8,6 +8,7 @@
 
 import XCTest
 import NabtoEdgeClient
+import Foundation
 
 // test org: or-3uhjvwuh (https://console.cloud.nabto.com/#/dashboard/organizations/or-3uhjvwuh)
 // test device source: nabto-embedded-sdk/examples/simple_coap
@@ -20,20 +21,22 @@ struct Device {
     var key: String
     var fp: String
     var sct: String
+    var local: Bool
 
-    init(productId: String, deviceId: String, url: String, key: String, fp: String, sct: String) {
+    init(productId: String, deviceId: String, url: String, key: String, fp: String, sct: String, local: Bool=false) {
         self.productId = productId
         self.deviceId = deviceId
         self.url = url
         self.key = key
         self.fp = fp
         self.sct = sct
+        self.local = local
     }
 
     func asJson() -> String {
         return """
         {\n
-        \"Local\": false,\n
+        \"Local\": \(self.local),\n
         \"ProductId\": \"\(self.productId)\",\n
         \"DeviceId\": \"\(self.deviceId)\",\n
         \"ServerUrl\": \"\(self.url)\",\n
@@ -81,6 +84,39 @@ class NabtoEdgeClientTests: XCTestCase {
             sct: "WzwjoTabnvux"
     )
 
+    #if true
+    // build a device for mDNS discovery testing
+    //
+    // $ git clone --recursive git@github.com:nabto/nabto-embedded-sdk.git
+    // $ cd nabto-embedded-sdk
+    // $ mkdir _build
+    // $ cd _build
+    // $ cmake -j ..
+    //
+    // run device as follows:
+    //
+    // $ cd _build
+    // $ ./examples/simple_mdns/simple_mdns_device pr-mdns de-mdns swift-test-subtype swift-txt-key swift-txt-val
+    static let mdnsProductId = "pr-mdns"
+    static let mdnsDeviceId = "de-mdns"
+    let mdnsSubtype = "swift-test-subtype"
+    let mdnsTxtKey = "swift-txt-key"
+    let mdnsTxtVal = "swift-txt-val"
+    let mdnsDevice = Device(
+            productId: "pr-mdns",
+            deviceId: mdnsDeviceId,
+            url: "https://pr-fatqcwj9.clients.nabto.net",
+            key: "none",
+            fp: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            sct: "none",
+            local: true
+    )
+
+    #else
+    let localDevice: Device! = nil
+    let mdnsDevice: Device! = nil
+    #endif
+
     let streamPort: UInt32 = 42
 
     var connection: Connection! = nil
@@ -97,10 +133,23 @@ class NabtoEdgeClientTests: XCTestCase {
 
     override func tearDownWithError() throws {
         do {
-            try connection?.close()
+            try self.connection?.close()
         } catch (NabtoEdgeClientError.INVALID_STATE) {
             // connection probably not opened yet
         }
+        assertNoLeaks(connection)
+        self.connection = nil
+        self.client?.stop()
+        assertNoLeaks(client)
+        self.client = nil
+    }
+
+    func assertNoLeaks(_ obj: AnyObject?) {
+        if (obj != nil) {
+            // refcount should be 3: reference from property + ref passed to this func + ref passed to CFGetRetainCount
+            XCTAssertEqual(CFGetRetainCount(obj), 3)
+        }
+
     }
 
     func testVersionString() throws {
@@ -108,18 +157,18 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testCreateClientConnection() throws {
-        let client = Client()
+        self.client = Client()
         let _ = try client.createConnection()
     }
 
     func testDefaultLog() {
-        let client = Client()
+        self.client = Client()
         client.enableNsLogLogging()
         let _ = try! client.createConnection()
     }
 
     func testSetLogLevelValid() {
-        let client = Client()
+        self.client = Client()
         try! client.setLogLevel(level: "trace")
         client.enableNsLogLogging()
         let connection = try! client.createConnection()
@@ -127,20 +176,20 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testSetLogLevelInvalid() {
-        let client = Client()
+        self.client = Client()
         XCTAssertThrowsError(try client.setLogLevel(level: "foo")) { error in
             XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.INVALID_ARGUMENT)
         }
     }
 
     func testCreatePrivateKey() {
-        let client = Client()
+        self.client = Client()
         let key = try! client.createPrivateKey()
         XCTAssertTrue(key.contains("BEGIN EC PRIVATE KEY"))
     }
 
     func testSetOptionsBadJson() {
-        let client = Client()
+        self.client = Client()
         let connection = try! client.createConnection()
         XCTAssertThrowsError(try connection.updateOptions(json: "foo")) { error in
             XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.INVALID_ARGUMENT)
@@ -148,7 +197,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testSetOptionsInvalidParameter() {
-        let client = Client()
+        self.client = Client()
         let connection = try! client.createConnection()
         XCTAssertThrowsError(try connection.updateOptions(json: "{\n\"ProductFoo\": \"...\"}")) { error in
             XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.INVALID_ARGUMENT)
@@ -156,13 +205,13 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testSetOptionsValid() {
-        let client = Client()
+        self.client = Client()
         let connection = try! client.createConnection()
         try! connection.updateOptions(json: "{\n\"ProductId\": \"pr-12345678\",\n\"DeviceId\": \"de-12345678\",\n\"ServerUrl\": \"https://pr-12345678.clients.nabto.net\",\n\"ServerKey\": \"sk-12345678123456781234567812345678\"\n}")
     }
 
     func testGetOptions() {
-        let client = Client()
+        self.client = Client()
         let connection = try! client.createConnection()
         try! connection.updateOptions(json: "{\n\"ProductId\": \"pr-12345678\"}")
         let allOptions = try! connection.getOptions()
@@ -172,7 +221,7 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func connect(_ device: Device) throws -> Connection {
         self.client = Client()
-        try! self.client.setLogLevel(level: "trace")
+        try! self.client.setLogLevel(level: "info")
         self.client.enableNsLogLogging()
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
@@ -208,9 +257,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testConnectAsync() {
-        let client = Client()
-        try! client.setLogLevel(level: "info")
-        client.enableNsLogLogging()
+        self.client = Client()
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
@@ -222,20 +269,20 @@ class NabtoEdgeClientTests: XCTestCase {
             exp.fulfill()
         }
 
-        wait(for: [exp], timeout: 2.0)
+        wait(for: [exp], timeout: 5.0)
     }
 
     func testConnectAsyncFailUnknown() {
-        let client = Client()
+        self.client = Client()
         try! client.setLogLevel(level: "info")
         client.enableNsLogLogging()
         self.connection = try! client.createConnection()
+        let exp = XCTestExpectation(description: "expect connect callback")
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
         var device = coapDevice
         device.deviceId = "blah"
         try! self.connection.updateOptions(json: device.asJson())
-        let exp = XCTestExpectation(description: "expect connect callback")
         self.connection.connectAsync { ec in
             if case .NO_CHANNELS(let localError, let remoteError) = ec {
                 XCTAssertEqual(localError, .NONE)
@@ -247,7 +294,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testConnectAsyncFailOffline() {
-        let client = Client()
+        self.client = Client()
         try! client.setLogLevel(level: "info")
         client.enableNsLogLogging()
         self.connection = try! client.createConnection()
@@ -268,7 +315,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testDnsFail() {
-        let client = Client()
+        self.client = Client()
         let connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
         try! connection.setPrivateKey(key: key)
@@ -295,7 +342,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testGetDeviceFingerprintHexFail() {
-        let client = Client()
+        self.client = Client()
         let connection = try! client.createConnection()
         XCTAssertThrowsError(try connection.getDeviceFingerprintHex()) { error in
             XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.INVALID_STATE)
@@ -303,7 +350,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testGetClientFingerprintHex() {
-        let client = Client()
+        self.client = Client()
         let connection: Connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
         try! connection.setPrivateKey(key: key)
@@ -312,7 +359,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testGetClientFingerprintHexFail() {
-        let client = Client()
+        self.client = Client()
         let connection = try! client.createConnection()
         XCTAssertThrowsError(try connection.getClientFingerprintHex()) { error in
             XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.INVALID_STATE)
@@ -326,12 +373,58 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func testCoapRequest() {
         self.connection = try! self.connect(self.coapDevice)
-        defer { try! self.connection.close() }
         let coap = try! self.connection.createCoapRequest(method: "GET", path: "/hello-world")
         let response = try! coap.execute()
         XCTAssertEqual(response.status, 205)
         XCTAssertEqual(response.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
         XCTAssertEqual(String(decoding: response.payload, as: UTF8.self), "Hello world")
+    }
+
+    public class TestMdnsResultReceiver : MdnsResultReceiver {
+        var results: [MdnsResult] = []
+        let exp: XCTestExpectation
+
+        public init(_ exp: XCTestExpectation) {
+            self.exp = exp
+        }
+
+        public func onResultReady(result: MdnsResult) {
+            results.append(result)
+            if (results.count == 1) {
+                exp.fulfill()
+            }
+        }
+    }
+
+    // reproduce segfault
+    func testCreateManyClientsWithLoggingEnabled() {
+        for _ in 1...1000 {
+            let client = Client()
+            client.enableNsLogLogging()
+        }
+    }
+
+    // ./examples/simple_mdns/simple_mdns_device pr-mdns de-mdns swift-test-subtype swift-txt-key swift-txt-val
+    func testMdnsDiscovery() throws {
+        if (self.mdnsDevice == nil) {
+            throw XCTSkip("Local device not configured: Uncomment mdnsDevice definition and start local device stub")
+        }
+        self.client = Client()
+        try! client.setLogLevel(level: "info")
+        client.enableNsLogLogging()
+        let scanner = client.createMdnsScanner(subType: self.mdnsSubtype)
+        let exp = XCTestExpectation()
+        let stub = TestMdnsResultReceiver(exp)
+        scanner.addMdnsResultReceiver(stub)
+        try! scanner.start()
+        wait(for: [exp], timeout: 1)
+        XCTAssertEqual(stub.results.count, 1)
+        XCTAssertEqual(stub.results[0].deviceId, self.mdnsDevice.deviceId)
+        XCTAssertEqual(stub.results[0].productId, self.mdnsDevice.productId)
+        XCTAssertEqual(stub.results[0].txtItems["nabto_version"]!.prefix(2), "5.")
+        XCTAssertEqual(stub.results[0].txtItems[self.mdnsTxtKey], self.mdnsTxtVal)
+        XCTAssertEqual(stub.results[0].action, .ADD)
+        scanner.stop()
     }
 
     func testForbiddenError() {
@@ -367,7 +460,7 @@ class NabtoEdgeClientTests: XCTestCase {
 
 
     func testCoapRequestAsync() {
-        let client = Client()
+        self.client = Client()
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
@@ -390,7 +483,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testCoapRequestSyncAfterAsyncConnect() {
-        let client = Client()
+        self.client = Client()
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
@@ -411,7 +504,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testCoapRequestAsyncCoap404() {
-        let client = Client()
+        self.client = Client()
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
@@ -432,9 +525,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testCoapRequestAsyncApiFail() {
-        let client = Client()
-        try! client.setLogLevel(level: "trace")
-        client.enableNsLogLogging()
+        self.client = Client()
         self.connection = try! client.createConnection()
         let exp = XCTestExpectation(description: "expect early coap fail")
 
@@ -462,13 +553,13 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testConnectionEventListener() {
-        let client = Client()
+        self.client = Client()
         try! client.setLogLevel(level: "info")
         client.enableNsLogLogging()
         self.connection = try! client.createConnection()
         let exp = XCTestExpectation(description: "expect event callback")
         let listener = TestConnectionEventCallbackReceiver(exp)
-        try! connection.addConnectionEventsListener(cb: listener)
+        try! connection.addConnectionEventsReceiver(cb: listener)
         let key = try! client.createPrivateKey()
         try! connection.setPrivateKey(key: key)
         try! connection.updateOptions(json: self.coapDevice.asJson())
@@ -530,8 +621,12 @@ class NabtoEdgeClientTests: XCTestCase {
                     XCTAssertEqual(ec, .OK)
                     XCTAssertGreaterThan(data!.count, 0)
                     XCTAssertEqual(hello, String(decoding: data!, as: UTF8.self))
-                    try! stream.close()
-                    try! connection.close()
+                    do {
+                        try stream.close()
+                        try connection.close()
+                    } catch {
+                        XCTFail("Test failed due to unexpected exception: \(error)")
+                    }
                     self.client.stop()
                     exp.fulfill()
                 }
@@ -617,8 +712,9 @@ class NabtoEdgeClientTests: XCTestCase {
         try! self.connection = self.connect(self.tunnelDevice)
         let tunnel = try! self.connection.createTcpTunnel()
         let exp = XCTestExpectation(description: "expect http request finishes")
-        tunnel.openAsync(service: "http", localPort: 0) { ec in
-            let port = try! tunnel.getLocalPort()
+        tunnel.openAsync(service: "http", localPort: 0) { [weak tunnel] ec in
+            XCTAssertEqual(ec, .OK)
+            let port = try! tunnel!.getLocalPort()
             XCTAssertGreaterThan(port, 0)
 
             // http client caches results pr default
@@ -628,12 +724,12 @@ class NabtoEdgeClientTests: XCTestCase {
 
             let urlSession1 = URLSession(configuration: config)
 
-            urlSession1.dataTask(with: URL(string: "http://127.0.0.1:\(port)/")!) { (data, response, error) in
+            urlSession1.dataTask(with: URL(string: "http://127.0.0.1:\(port)/")!) { [weak tunnel] (data, response, error) in
                 XCTAssertNil(error)
                 let body = String(data: data!, encoding: String.Encoding.utf8) ?? ""
                 XCTAssertTrue(body.contains("Debian"))
 
-                tunnel.closeAsync() { ec in
+                tunnel?.closeAsync { ec in
                     XCTAssertEqual(ec, .OK)
                     let urlSession2 = URLSession(configuration: config)
                     urlSession2.dataTask(with: URL(string: "http://127.0.0.1:\(port)/")!) { (data, response, error) in
@@ -646,5 +742,79 @@ class NabtoEdgeClientTests: XCTestCase {
         wait(for: [exp], timeout: 3.0)
     }
 
+    func testTunnelOpenCloseAsyncSimple() throws {
+        try! self.connection = self.connect(self.tunnelDevice)
+        let tunnel = try! self.connection.createTcpTunnel()
+        let exp = XCTestExpectation()
+        tunnel.openAsync(service: "http", localPort: 0) { [weak tunnel] ec in
+            XCTAssertEqual(ec, .OK)
+            tunnel!.closeAsync { ec in
+                XCTAssertEqual(ec, .OK)
+                exp.fulfill()
+            }
+        }
+        wait(for: [exp], timeout: 3.0)
+    }
+
+    class K1 {
+        var other: K2?
+        init() {
+            NSLog("K1 init")
+        }
+        deinit {
+            NSLog("K1 deinit")
+        }
+    }
+    
+    class K2 {
+        var other: K1?
+        init() {
+            NSLog("K2 init")
+        }
+        deinit {
+            NSLog("K2 deinit")
+        }
+    }
+
+    func testLeakDetectionTools() {
+        let k1 = K1()
+        let k2 = K2()
+        k1.other = k2
+        k2.other = k1
+        NSLog("we just leaked")
+    }
+    
+    func testTunnelOpenCloseAsyncSomewhatSimple() throws {
+        try! self.connection = self.connect(self.tunnelDevice)
+        let tunnel = try! self.connection.createTcpTunnel()
+        let exp1 = XCTestExpectation(description: "expect tunnel open done")
+        let exp2 = XCTestExpectation(description: "expect tunnel closed done")
+        tunnel.openAsync(service: "http", localPort: 0) { [weak tunnel] ec in
+            XCTAssertEqual(ec, .OK)
+            let port = try! tunnel!.getLocalPort()
+            XCTAssertGreaterThan(port, 0)
+
+            // http client caches results pr default
+            let config = URLSessionConfiguration.ephemeral
+            config.requestCachePolicy = .reloadIgnoringLocalCacheData
+            config.urlCache = nil;
+
+            let urlSession1 = URLSession(configuration: config)
+
+            urlSession1.dataTask(with: URL(string: "http://127.0.0.1:\(port)/")!) { [weak tunnel] (data, response, error) in
+                XCTAssertNil(error)
+                let body = String(data: data!, encoding: String.Encoding.utf8) ?? ""
+                XCTAssertTrue(body.contains("Debian"))
+
+                tunnel!.closeAsync { ec in
+                    XCTAssertEqual(ec, .OK)
+                    exp2.fulfill()
+                }
+            }.resume()
+
+            exp1.fulfill()
+        }
+        wait(for: [exp1, exp2], timeout: 10.0)
+    }
 
 }
