@@ -8,21 +8,22 @@ import Foundation
 
 // ensures client is kept alive until future is resolved
 internal class CallbackWrapper : NSObject {
-    let client: NativeClientWrapper
-    let connection: NativeConnectionWrapper?
+    var client: Client
+    var connection: Connection?
     let future: OpaquePointer
-    let cb: AsyncStatusReceiver
+    var cb: AsyncStatusReceiver?
     var cleanupClosure: (() -> Void)?
 
-    init(client: NativeClientWrapper,
-         connection: NativeConnectionWrapper?,
-         future: OpaquePointer,
-         cb: @escaping AsyncStatusReceiver) {
+    init(client: Client,
+         connection: Connection?,
+         future: OpaquePointer) {
         self.client = client
         self.connection = connection
         self.future = future
+    }
+
+    public func registerCallback(_ cb: @escaping AsyncStatusReceiver) {
         self.cb = cb
-        super.init()
         let rawSelf = Unmanaged.passUnretained(self).toOpaque()
         nabto_client_future_set_callback(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
             let mySelf = Unmanaged<CallbackWrapper>.fromOpaque(data!).takeUnretainedValue()
@@ -51,7 +52,7 @@ internal class CallbackWrapper : NSObject {
     }
 
     func invokeUserCallback(_ wrapperError: NabtoEdgeClientError) {
-        self.cb(wrapperError)
+        self.cb?(wrapperError)
         nabto_client_future_free(self.future)
         self.cleanupClosure?()
     }
@@ -59,11 +60,14 @@ internal class CallbackWrapper : NSObject {
 
 internal class Helper {
 
-    private let client: NativeClientWrapper
+    private weak var client: Client?
     private var activeCallbacks: Set<CallbackWrapper> = Set<CallbackWrapper>()
 
-    init(nabtoClient: NativeClientWrapper) {
+    init(nabtoClient: Client) {
         self.client = nabtoClient
+    }
+
+    deinit {
     }
 
     internal static func mapSimpleApiStatusToErrorCode(_ status: NabtoClientError) -> NabtoEdgeClientError {
@@ -126,40 +130,54 @@ internal class Helper {
     }
 
     internal func waitNoThrow(closure: (OpaquePointer?) -> Void) -> NabtoClientError {
-        let future = nabto_client_future_new(self.client.nativeClient)
-        closure(future)
-        nabto_client_future_wait(future)
-        let status = nabto_client_future_error_code(future)
-        nabto_client_future_free(future)
-        return status
+        if let client = self.client {
+            let future = nabto_client_future_new(client.nativeClient)
+            closure(future)
+            nabto_client_future_wait(future)
+            let status = nabto_client_future_error_code(future)
+            nabto_client_future_free(future)
+            return status
+        } else {
+            return NABTO_CLIENT_EC_ABORTED
+        }
     }
 
     internal func wait(closure: (OpaquePointer?) -> Void) throws {
         try Helper.throwIfNotOk(self.waitNoThrow(closure: closure))
     }
 
-    internal func futureCallback(closure: (OpaquePointer?) -> Void) throws {
-        let future = nabto_client_future_new(self.client.nativeClient)
-        closure(future)
-        nabto_client_future_wait(future)
-        let status = nabto_client_future_error_code(future)
-        nabto_client_future_free(future)
-        try Helper.throwIfNotOk(status)
+
+    func invokeAsync(userClosure: @escaping AsyncStatusReceiver, connection: Connection?, implClosure: (OpaquePointer) -> ()) {
+        if let client = self.client {
+            let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
+
+            // invoke actual api function specified by caller (e.g. nabto_client_connection_connect)
+            implClosure(future)
+
+            // keep client and connection swift objects alive until future resolves
+            let w = CallbackWrapper(client: client, connection: connection, future: future)
+            self.activeCallbacks.insert(w)
+
+            // when future resolves, remove reference to client and connection and allow them to be reclaimed
+            w.setCleanupClosure(cleanupClosure: {  [weak w] in
+                if let w = w {
+                    self.activeCallbacks.remove(w)
+                }
+            })
+
+            // set callback on future (nabto_client_future_set_callback)
+            w.registerCallback(userClosure)
+        } else {
+            abort(userClosure)
+        }
     }
 
-    internal func invokeAsync(userClosure: @escaping AsyncStatusReceiver,
-                              connection: NativeConnectionWrapper?,
-                              implClosure: (OpaquePointer) -> Void) {
-        let future: OpaquePointer = nabto_client_future_new(self.client.nativeClient)
-        implClosure(future)
-        let w = CallbackWrapper(client: self.client, connection: connection, future: future, cb: userClosure)
-        w.setCleanupClosure(cleanupClosure: {
-            self.activeCallbacks.remove(w)}
-        )
-        self.activeCallbacks.insert(w)
+    private func abort(_ closure: @escaping (NabtoEdgeClientError) -> ()) {
+        // Do not invoke user callback in same callstack. Use a background queue (vs main) as caller can have no
+        // expectations about callback should happen on main thread; under normal circumstances, callback would happen
+        // in a thread started by the native client SDK.
+        DispatchQueue.global().async {
+            closure(.ABORTED)
+        }
     }
-
-
-
-
 }

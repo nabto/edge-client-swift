@@ -7,8 +7,8 @@ import Foundation
 @_implementationOnly import NabtoEdgeClientApi
 
 internal class ConnectionEventListener {
-    private let connection: NativeConnectionWrapper
-    private let client: NativeClientWrapper
+    private weak var connection: Connection?
+    private weak var client: Client?
     private let future: OpaquePointer
     private let listener: OpaquePointer
     private let helper: Helper
@@ -21,14 +21,14 @@ internal class ConnectionEventListener {
     private var userCbs: NSHashTable<ConnectionEventReceiver> = NSHashTable<ConnectionEventReceiver>()
     private var event: NabtoClientConnectionEvent = -1
 
-    init(nabtoConnection: NativeConnectionWrapper, nabtoClient: NativeClientWrapper) throws {
+    init(nabtoConnection: Connection, nabtoClient: Client) throws {
         self.connection = nabtoConnection
         self.client = nabtoClient
-        self.helper = Helper(nabtoClient: self.client)
-        self.future = nabto_client_future_new(self.client.nativeClient)
-        self.listener = nabto_client_listener_new(self.client.nativeClient)
+        self.helper = Helper(nabtoClient: nabtoClient)
+        self.future = nabto_client_future_new(nabtoClient.nativeClient)
+        self.listener = nabto_client_listener_new(nabtoClient.nativeClient)
 
-        let ec = nabto_client_connection_events_init_listener(self.connection.nativeConnection, self.listener)
+        let ec = nabto_client_connection_events_init_listener(nabtoConnection.nativeConnection, self.listener)
         try Helper.throwIfNotOk(ec)
 
         nabto_client_listener_connection_event(self.listener, self.future, &self.event)

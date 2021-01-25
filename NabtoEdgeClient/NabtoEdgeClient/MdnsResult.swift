@@ -23,7 +23,7 @@ public class MdnsResult : NSObject {
     /**
      * The service instance name. Can be considered a globally unique primary key for the announced
      * service and used for maintaining a service cache in the client, identifying each entry. The
-     * provided action in the reult specifies how the cache should be updated for this service.
+     * provided action in the result specifies how the cache should be updated for this service.
      */
     public let serviceInstanceName: String
 
@@ -56,6 +56,6 @@ public class MdnsResult : NSObject {
     }
 
     public override var description: String {
-        "MdnsResult(serviceInstanceName: \(serviceInstanceName), action: \(action), deviceId: \(deviceId), productId: \(productId), txtItems: \(txtItems))"
+        "MdnsResult(serviceInstanceName: \(serviceInstanceName), action: \(action), deviceId: \(deviceId ?? "(nil)"), productId: \(productId ?? "(nil)"), txtItems: \(txtItems))"
     }
 }

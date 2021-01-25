@@ -54,16 +54,11 @@ public class Client: NSObject, NativeClientWrapper {
     override public init() {
         self.nativeClient = nabto_client_new()
         super.init()
-        NSLog("*** client init, id=\(String(UInt(bitPattern: ObjectIdentifier(self))))")
     }
 
     deinit {
-        NSLog("*** client deinit begin, id=\(String(UInt(bitPattern: ObjectIdentifier(self))))")
-        if (self.apiLogCallBackRegistered) {
-            nabto_client_set_log_callback(self.nativeClient, nil, nil)
-        }
+        self.stop()
         nabto_client_free(self.nativeClient)
-        NSLog("*** client deinit end, id=\(String(UInt(bitPattern: ObjectIdentifier(self))))")
     }
 
     /**
@@ -107,8 +102,8 @@ public class Client: NSObject, NativeClientWrapper {
      * @throws NabtoEdgeClientError
      * @return the MdnsScanner
      */
-    public func createMdnsScanner(subType: String?=nil) throws -> MdnsScanner {
-        return try MdnsScanner(client: self, subType: subType)
+    public func createMdnsScanner(subType: String?=nil) -> MdnsScanner {
+        return MdnsScanner(client: self, subType: subType)
     }
 
 
@@ -162,6 +157,9 @@ public class Client: NSObject, NativeClientWrapper {
      * are in progress or on the event or callback queues.
      */
     public func stop() {
+        if (self.apiLogCallBackRegistered) {
+            nabto_client_set_log_callback(self.nativeClient, nil, nil)
+        }
         nabto_client_stop(self.nativeClient)
     }
 
@@ -183,7 +181,6 @@ public class Client: NSObject, NativeClientWrapper {
     }
 
     private func registerApiLogCallback() {
-        //NSLog("*** registerApiLogCallback - self.refcount=\(CFGetRetainCount(self))")
         let rawSelf = Unmanaged.passUnretained(self).toOpaque()
         let res = nabto_client_set_log_callback(self.nativeClient, { (pmsg: Optional<UnsafePointer<NabtoClientLogMessage>>, data: Optional<UnsafeMutableRawPointer>) -> Void in
             if (pmsg == nil || data == nil) {
