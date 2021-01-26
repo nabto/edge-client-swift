@@ -52,7 +52,7 @@ public class MdnsScanner: NSObject {
      * Start the scan for local devices using mDNS.
      *
      * Add result listeners prior to invoking to ensure all results are retrieved.
-     * @throws TBD
+     * @throws INVALID_STATE if the scan could not be started, e.g. if the client is being stopped
      */
     public func start() throws {
         try self.serialQueue.sync {
