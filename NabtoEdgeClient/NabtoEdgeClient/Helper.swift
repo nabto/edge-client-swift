@@ -85,7 +85,7 @@ internal class Helper {
         case NABTO_CLIENT_EC_NOT_ATTACHED: return NabtoEdgeClientError.NOT_ATTACHED
         case NABTO_CLIENT_EC_NOT_CONNECTED: return NabtoEdgeClientError.NOT_CONNECTED
         case NABTO_CLIENT_EC_NOT_FOUND: return NabtoEdgeClientError.NOT_FOUND
-        case NABTO_CLIENT_EC_NO_DATA: return NabtoEdgeClientError.NO_DATA
+        case NABTO_CLIENT_EC_NO_DATA: return NabtoEdgeClientError.OK
         case NABTO_CLIENT_EC_OPERATION_IN_PROGRESS: return NabtoEdgeClientError.OPERATION_IN_PROGRESS
         case NABTO_CLIENT_EC_STOPPED: return NabtoEdgeClientError.STOPPED
         case NABTO_CLIENT_EC_TIMEOUT: return NabtoEdgeClientError.TIMEOUT

@@ -11,3 +11,7 @@ platform :ios, '11.0'
 target 'NabtoEdgeClient' do
   pod 'NabtoEdgeClientApi', '1.0.5'
 end
+
+target 'NabtoEdgeClientTests' do
+  pod 'CBOR'
+end

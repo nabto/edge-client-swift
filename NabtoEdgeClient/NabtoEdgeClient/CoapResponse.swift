@@ -39,13 +39,25 @@ public class CoapResponse {
         }
 
         ec = nabto_client_coap_get_response_content_format(coap, &uint16Result)
-        try Helper.throwIfNotOk(ec)
-        self.contentFormat = uint16Result
+        if (ec == NABTO_CLIENT_EC_OK) {
+            self.contentFormat = uint16Result
+        } else {
+            if (ec != NABTO_CLIENT_EC_NO_DATA) {
+                try Helper.throwIfNotOk(ec)
+            }
+            self.contentFormat = nil
+        }
 
         var payload: UnsafeMutableRawPointer?
         var length: Int = 0
-        let status = nabto_client_coap_get_response_payload(coap, &payload, &length)
-        try Helper.throwIfNotOk(status)
-        self.payload = Data(bytes: payload!, count: length)
+        ec = nabto_client_coap_get_response_payload(coap, &payload, &length)
+        if (ec == NABTO_CLIENT_EC_OK) {
+            self.payload = Data(bytes: payload!, count: length)
+        } else {
+            if (ec != NABTO_CLIENT_EC_NO_DATA) {
+                try Helper.throwIfNotOk(ec)
+            }
+            self.payload = nil
+        }
     }
 }

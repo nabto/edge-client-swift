@@ -98,7 +98,7 @@ public class Client: NSObject, NativeClientWrapper {
      * Create an mDNS scanner to discover local devices.
      *
      * @param subType the mDNS subtype to scan for: If nil or the empty string, the mDNS subtype
-     * `_nabto._udp.local` is located; if subtype is specified, `<subtype>._sub._nabto._udp.local` is located.
+     * `_nabto._udp.local` is located; if subtype is specified, `[subtype]._sub._nabto._udp.local` is located.
      * @throws NabtoEdgeClientError
      * @return the MdnsScanner
      */

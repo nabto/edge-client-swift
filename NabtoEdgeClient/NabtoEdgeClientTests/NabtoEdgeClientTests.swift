@@ -9,6 +9,7 @@
 import XCTest
 import NabtoEdgeClient
 import Foundation
+import CBOR
 
 // test org: or-3uhjvwuh (https://console.cloud.nabto.com/#/dashboard/organizations/or-3uhjvwuh)
 // test device source: nabto-embedded-sdk/examples/simple_coap
@@ -109,6 +110,15 @@ class NabtoEdgeClientTests: XCTestCase {
             fp: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
             sct: "none",
             local: true
+    )
+
+    let passwordProtectedDevice = Device(
+            productId: "pr-fatqcwj9",
+            deviceId: "de-rdukj443",
+            url: "https://pr-fatqcwj9.clients.nabto.net",
+            key: "sk-5f3ab4bea7cc2585091539fb950084ce",
+            fp: "527c7313a624ea7473067cbcdd601706ffd4fc9f58c122b4b87bac042257e0f8",
+            sct: "qvVHttA9rxtp"
     )
 
     let streamPort: UInt32 = 42
@@ -400,6 +410,7 @@ class NabtoEdgeClientTests: XCTestCase {
 
     // ./examples/simple_mdns/simple_mdns_device pr-mdns de-mdns swift-test-subtype swift-txt-key swift-txt-val
     func testMdnsDiscovery() throws {
+        throw XCTSkip("Needs local device for testing")
         self.client = Client()
         try! client.setLogLevel(level: "info")
         client.enableNsLogLogging()
@@ -808,4 +819,51 @@ class NabtoEdgeClientTests: XCTestCase {
         wait(for: [exp1, exp2], timeout: 10.0)
     }
 
+    func testPasswordOpenPairing() {
+        self.client = Client()
+        try! self.client.setLogLevel(level: "info")
+        self.client.enableNsLogLogging()
+
+        self.connection = try! client.createConnection()
+        let key = try! client.createPrivateKey()
+        try! self.connection.setPrivateKey(key: key)
+        try! self.connection.updateOptions(json: passwordProtectedDevice.asJson())
+        try! self.connection.connect()
+        try! self.connection.passwordAuthenticate(username: "", password: "open-password")
+
+        let coap = try! self.connection.createCoapRequest(method: "POST", path: "/iam/pairing/password-open")
+        let json: [String:String] = ["Username": UUID().uuidString]
+        let cbor = CBOR.encode(json)
+        try! coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: Data(cbor))
+        let response = try! coap.execute()
+        XCTAssertEqual(response.status, 201)
+        XCTAssertEqual(response.contentFormat, nil)
+        XCTAssertEqual(response.payload, nil)
+
+        // in an actual pairing use case, now persist device's fingerprint (obtained with connection.getDeviceFingerprintHex())
+        // along with device id etc and compare at subsequent connection attempt
+    }
+
+    func testPasswordInvitePairing() throws {
+        throw XCTSkip("An invitation only works for a single pairing so this test needs clearing device state")
+        self.client = Client()
+        try! self.client.setLogLevel(level: "info")
+        self.client.enableNsLogLogging()
+
+        self.connection = try! client.createConnection()
+        let key = try! client.createPrivateKey()
+        try! self.connection.setPrivateKey(key: key)
+        try! self.connection.updateOptions(json: passwordProtectedDevice.asJson())
+        try! self.connection.connect()
+        try! self.connection.passwordAuthenticate(username: "invited-user", password: "invited-password")
+
+        let coap = try! self.connection.createCoapRequest(method: "POST", path: "/iam/pairing/password-invite")
+        let response = try! coap.execute()
+        XCTAssertEqual(response.status, 201)
+        XCTAssertEqual(response.contentFormat, nil)
+        XCTAssertEqual(response.payload, nil)
+
+        // in an actual pairing use case, now persist device's fingerprint (obtained with connection.getDeviceFingerprintHex())
+        // along with device id etc and compare at subsequent connection attempt
+    }
 }

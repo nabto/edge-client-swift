@@ -18,7 +18,7 @@ import Foundation
 }
 
 /**
- * This class scans for local mDNS enabled devices.
+ * This class scans for local mDNS enabled devices. It is created with Client.createMdnsScanner().
  */
 public class MdnsScanner: NSObject {
     private let client: Client

@@ -151,6 +151,14 @@ public class Connection: NSObject, NativeConnectionWrapper {
     }
 
     /**
+     */
+    public func passwordAuthenticate(username: String?, password: String?) throws {
+        try helper.wait { future in
+            nabto_client_connection_password_authenticate(self.nativeConnection, username, password, future)
+        }
+    }
+
+    /**
      * Get current representation of connection options.
      *
      * This is generally the same set of options as `updateOptions()` takes,
