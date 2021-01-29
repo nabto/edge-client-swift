@@ -819,6 +819,42 @@ class NabtoEdgeClientTests: XCTestCase {
         wait(for: [exp1, exp2], timeout: 10.0)
     }
 
+    func testPasswordAuthAsyncFail() {
+        self.client = Client()
+        try! self.client.setLogLevel(level: "info")
+        self.client.enableNsLogLogging()
+
+        self.connection = try! client.createConnection()
+        let key = try! client.createPrivateKey()
+        try! self.connection.setPrivateKey(key: key)
+        try! self.connection.updateOptions(json: passwordProtectedDevice.asJson())
+        try! self.connection.connect()
+        let exp = XCTestExpectation(description: "expect connect callback")
+        try! self.connection.passwordAuthenticateAsync(username: "", password: "wrong-password") { ec in
+            XCTAssertEqual(ec, .UNAUTHORIZED)
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 2.0)
+    }
+
+    func testPasswordAuthAsyncOk() {
+        self.client = Client()
+        try! self.client.setLogLevel(level: "info")
+        self.client.enableNsLogLogging()
+
+        self.connection = try! client.createConnection()
+        let key = try! client.createPrivateKey()
+        try! self.connection.setPrivateKey(key: key)
+        try! self.connection.updateOptions(json: passwordProtectedDevice.asJson())
+        try! self.connection.connect()
+        let exp = XCTestExpectation(description: "expect connect callback")
+        try! self.connection.passwordAuthenticateAsync(username: "", password: "open-password") { ec in
+            XCTAssertEqual(ec, .OK)
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 2.0)
+    }
+
     func testPasswordOpenPairing() {
         self.client = Client()
         try! self.client.setLogLevel(level: "info")
@@ -866,4 +902,5 @@ class NabtoEdgeClientTests: XCTestCase {
         // in an actual pairing use case, now persist device's fingerprint (obtained with connection.getDeviceFingerprintHex())
         // along with device id etc and compare at subsequent connection attempt
     }
+
 }

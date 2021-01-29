@@ -151,9 +151,52 @@ public class Connection: NSObject, NativeConnectionWrapper {
     }
 
     /**
+     * Password authenticate, do a password authentication exchange with a
+     * device. Blocks until authentication attempt is complete.
+     *
+     * Password authenticate the client and the device. The password
+     * authentication is bidirectional and based on PAKE, such that both
+     * the client and the device learns that the other end knows the
+     * password, without revealing the password to the other end.
+     *
+     * A specific use case for the password authentication is to prove the
+     * identity of a device which identity is not already known, e.g. in a
+     * pairing scenario.
+     * @param username The username (note: use the empty string if using for Password Open Pairing, see https://docs.nabto.com/developer/guides/iam/pairing.html)
+     * @param password The password (typically the open (global) or invite (per-user) pairing password)
+     * @throws UNAUTHORIZED if the username or password is invalid
+     * @throws NOT_FOUND if the password authentication feature is not available on the device
+     * @throws NOT_CONNECTED if the connection is not open
+     * @throws OPERATION_IN_PROGRESS if a password authentication request is already in progress on the connection
+     * @throws TOO_MANY_REQUESTS if too many password attempts has been made
      */
-    public func passwordAuthenticate(username: String?, password: String?) throws {
+    public func passwordAuthenticate(username: String, password: String) throws {
         try helper.wait { future in
+            nabto_client_connection_password_authenticate(self.nativeConnection, username, password, future)
+        }
+    }
+
+
+    /**
+     * Password authenticate asynchronously, do a password authentication exchange with a
+     * device.
+     *
+     * Password authenticate the client and the device. The password
+     * authentication is bidirectional and based on PAKE, such that both
+     * the client and the device learns that the other end knows the
+     * password, without revealing the password to the other end.
+     *
+     * A specific use case for the password authentication is to prove the
+     * identity of a device which identity is not already known, e.g. in a
+     * pairing scenario.
+     *
+     * The specified AsyncStatusReceiver closure is invoked with an error if an error occurs, see
+     * the `passwordAuthenticate()` function for details about error codes.
+     * @param username The username (note: use the empty string if using for Password Open Pairing, see https://docs.nabto.com/developer/guides/iam/pairing.html)
+     * @param password The password (typically the open (global) or invite (per-user) pairing password)
+     */
+    public func passwordAuthenticateAsync(username: String, password: String, closure: @escaping AsyncStatusReceiver) throws {
+        try helper.invokeAsync(userClosure: closure, connection: self) { future in
             nabto_client_connection_password_authenticate(self.nativeConnection, username, password, future)
         }
     }
