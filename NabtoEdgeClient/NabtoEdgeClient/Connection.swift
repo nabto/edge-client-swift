@@ -257,7 +257,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
 
     /**
      * Create a new stream on this connection. Stream must subsequently be opened.
-     * @throw ALLOCATION_ERROR if the stream could not be created.
+     * @throws ALLOCATION_ERROR if the stream could not be created.
      */
     public func createStream() throws -> Stream {
         return try Stream(nabtoClient: self.client, nabtoConnection: self)
@@ -275,7 +275,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
 
     /**
      * Create a new tunnel on this connection. Tunnel must subsequently be opened.
-     * @throw ALLOCATION_ERROR if the stream could not be created.
+     * @throws ALLOCATION_ERROR if the tunnel could not be created.
      */
     public func createTcpTunnel() throws -> TcpTunnel {
         return try TcpTunnel(nabtoClient: self.client, nabtoConnection: self)

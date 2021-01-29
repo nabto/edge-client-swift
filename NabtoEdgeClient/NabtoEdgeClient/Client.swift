@@ -155,6 +155,8 @@ public class Client: NSObject, NativeClientWrapper {
     /**
      * Stop a client for final cleanup, this function is blocking until no more callbacks
      * are in progress or on the event or callback queues.
+     *
+     * If SDK logging has been configured, this function MUST be called, otherwise Client instances are leaked.
      */
     public func stop() {
         if (self.apiLogCallBackRegistered) {
