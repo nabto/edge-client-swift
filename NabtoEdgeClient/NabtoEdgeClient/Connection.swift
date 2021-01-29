@@ -267,7 +267,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * Create a new CoAP request on this connection. Request must subsequently be executed.
      * @param method   The CoAP method (either `GET`. `POST`, `PUT` or `DELETE`)
      * @param path   The CoAP path (e.g., `/heatpump/temperature`)
-     * @throw ALLOCATION_ERROR if the request could not be created.
+     * @throws ALLOCATION_ERROR if the request could not be created.
      */
     public func createCoapRequest(method: String, path: String) throws -> CoapRequest {
         return try CoapRequest(nabtoClient: self.client, nabtoConnection: self, method: method, path: path)
@@ -284,7 +284,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
     /**
      * Add a callback function to receive connection events.
      * @param cb An implementation of the ConnectionEventReceiver protocol
-     * @throw INVALID_STATE if listener could not be added
+     * @throws INVALID_STATE if listener could not be added
      */
     public func addConnectionEventsReceiver(cb: ConnectionEventReceiver) throws {
         if (self.connectionEventListener == nil) {

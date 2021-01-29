@@ -100,7 +100,7 @@ public class MdnsScanner: NSObject {
     /**
      * Add an mDNS result callback, invoked when an mDNS result is retrieved. Scan must be started separately (with start()).
      * @param cb An implementation of the MdnsResultReceiver protocol
-     * @throw INVALID_STATE if callback could not be added
+     * @throws INVALID_STATE if callback could not be added
      */
     public func addMdnsResultReceiver(_ cb: MdnsResultReceiver) {
         self.userCbs.add(cb)
