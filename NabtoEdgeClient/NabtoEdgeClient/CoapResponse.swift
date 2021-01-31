@@ -8,6 +8,9 @@ import Foundation
 
 /**
  * This class encapsulates a CoAP response, resulting from executing a CoapRequest.
+ *
+ * See https://docs.nabto.com/developer/guides/get-started/coap/intro.html for info about Nabto Edge
+ * CoAP.
  */
 public class CoapResponse {
 

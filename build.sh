@@ -46,6 +46,6 @@ xcodebuild -create-xcframework \
 cd $ARTIFACTS
 
 cd $ARTIFACTS
-cp ../LICENSE ${PROJECT_NAME}.xcframework
+cp ../LICENSE ../README.md ${PROJECT_NAME}.xcframework
 
 zip -r ${PROJECT_NAME}.xcframework.zip ${PROJECT_NAME}.xcframework

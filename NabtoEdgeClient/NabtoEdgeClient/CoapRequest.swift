@@ -26,6 +26,9 @@ public typealias CoapResponseReceiver = (NabtoEdgeClientError, CoapResponse?) ->
  * This class represents a CoAP request on an open connection, ready to be executed.
  *
  * Instances are created using createCoapRequest() function on the Connection class.
+ *
+ * See https://docs.nabto.com/developer/guides/get-started/coap/intro.html for info about Nabto Edge
+ * CoAP.
  */
 public class CoapRequest {
 
@@ -78,7 +81,7 @@ public class CoapRequest {
      * @param string String to set as payload.
      * @throws NabtoEdgeClientError.FAILED if payload could not be set
      */
-    public func setRequestPayload(contentFormat: UInt16, string: String) throws {
+    public func setRequestPayloadString(contentFormat: UInt16, string: String) throws {
         let status = nabto_client_coap_set_request_payload(self.coap, contentFormat, string, string.count)
         try Helper.throwIfNotOk(status)
     }

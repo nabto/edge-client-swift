@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'NabtoEdgeClientSwift'
-  s.version      = "0.9.5"
+  s.version      = "0.9.6"
   s.summary      = "Nabto Edge Client for Swift"
   s.description  = <<-DESC
 This pod installs the high level Nabto Edge Client for Swift: It wraps the most common functionality of the low-level ANSI C Nabto Edge Client SDK (provided in the NabtoEdgeClientApi pod).
@@ -11,7 +11,7 @@ The platform has been designed from the ground and up with strong security as a 
 
 The Nabto Edge platform supersedes the Nabto Micro platform with many new features and capabilities. Read more about Nabto Edge on https://docs.nabto.com
 DESC
-  s.homepage         = 'https://docs.nabto.com'
+  s.homepage         = 'https://docs.nabto.com/developer/guides/overview/platform-overview.html'
   s.license      = { :type => 'Commercial', :file => 'NabtoEdgeClient.xcframework/LICENSE' }
   s.source           = { :http => "https://downloads.nabto.com/assets/edge/ios/nabto-client-swift/#{s.version}/NabtoEdgeClient.xcframework.zip"}
   #s.source           = { :http => "http://localhost:8081/pods/NabtoEdgeClient.xcframework.zip"}

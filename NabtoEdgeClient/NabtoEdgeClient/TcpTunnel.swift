@@ -17,6 +17,9 @@ import Foundation
  * client side to the TCP Server on the device side.
  *
  * Tunnel instances are created using `Connection.createTcpTunnel()`.
+ *
+ * See https://docs.nabto.com/developer/guides/get-started/tunnels/intro.html for info about Nabto Edge
+ * Tunnels.
  */
 public class TcpTunnel {
 
