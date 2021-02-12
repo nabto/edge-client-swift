@@ -7,14 +7,16 @@ import Foundation
 @_implementationOnly import NabtoEdgeClientApi
 
 /**
- * A Nabto Edge TCP tunnel allows tunnelling of tcp connections from a client to a device over a Nabto
- * connection. Under the hood, Nabto Streams are used to stream the data reliably.
+ * The TcpTunnel is a high level wrapper for streaming, allowing applications to tunnel traffic
+ * through Nabto by integrating through a simple TCP socket, just like e.g. SSH tunnels. TCP Tunnels
+ * can hence be used to quickly add remote access capabilities to existing applications that already
+ * support TCP communication.
  *
  * The client opens a TCP listener which listens for incoming TCP connections on the local
  * port. When a connection is accepted by the TCP listener, a new stream is created to the
- * device. When the stream is created on the device, the device opens a tcp connection to the
- * specified service. Once this connection is opened TCP data flows from the TCP Client on the
- * client side to the TCP Server on the device side.
+ * device. When the stream is created on the device, the device opens a TCP connection to the
+ * specified service. Once this connection is opened, TCP data flows from the TCP client on the
+ * client side to the TCP server on the device side.
  *
  * Tunnel instances are created using `Connection.createTcpTunnel()`.
  *
