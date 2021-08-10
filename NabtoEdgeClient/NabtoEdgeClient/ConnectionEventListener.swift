@@ -46,6 +46,7 @@ internal class ConnectionEventListener {
     private func apiEventCallback(ec: NabtoClientError) {
         let enumerator = self.userCbs.objectEnumerator()
         while let cb = enumerator.nextObject() {
+            print("apiEventCallback, ec=\(ec)")
             let mappedEvent: NabtoEdgeClientConnectionEvent = lastEdgeClientConnectionEvent()
             (cb as! ConnectionEventReceiver).onEvent(event: mappedEvent)
         }

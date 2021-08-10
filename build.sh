@@ -3,6 +3,7 @@
 set -e
 
 CONFIG=Release
+CONFIG=Debug
 
 PROJECT_NAME=NabtoEdgeClient
 BUILD_ROOT=`pwd`
@@ -47,5 +48,6 @@ cd $ARTIFACTS
 
 cd $ARTIFACTS
 cp ../LICENSE ${PROJECT_NAME}.xcframework
+cp ../README.md ${PROJECT_NAME}.xcframework
 
 zip -r ${PROJECT_NAME}.xcframework.zip ${PROJECT_NAME}.xcframework

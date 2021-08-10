@@ -1,6 +1,10 @@
 # Nabto Edge Client SDK wrapper for iOS / Swift
 
-High level swift wrapper for the [Nabto Edge Client SDK](https://docs.nabto.com/developer.html). Depends on the [low-level](https://docs.nabto.com/developer/api-reference/plain-c-client-sdk/intro.html) NabtoEdgeClientApi [cocoapod](https://cocoapods.org/pods/NabtoEdgeClientApi).
+High level swift wrapper for the Nabto Edge Client SDK. See the [iOS guide](https://docs.nabto.com/developer/guides/get-started/ios/intro.html) to get started.
+
+This wrapper depends on the [low-level](https://docs.nabto.com/developer/api-reference/plain-c-client-sdk/intro.html) NabtoEdgeClientApi [cocoapod](https://cocoapods.org/pods/NabtoEdgeClientApi).
+
+For a general intro to Nabto Edge and its purpose and capabilities, see the overview on our [documentation site](https://docs.nabto.com/developer/guides/overview/platform-overview.html).
 
 ## Installation
 
@@ -9,7 +13,7 @@ Use the following Podfile to install through cocoapods:
 ```
 target 'NabtoEdgeClientHello' do
     use_frameworks!
-    pod 'NabtoEdgeClientSwift', '0.9.0'
+    pod 'NabtoEdgeClientSwift', '1.0.0'
 end
 ```
 

@@ -9,6 +9,7 @@
 import XCTest
 import NabtoEdgeClient
 import Foundation
+import NabtoClient
 
 // test org: or-3uhjvwuh (https://console.cloud.nabto.com/#/dashboard/organizations/or-3uhjvwuh)
 // test device source: nabto-embedded-sdk/examples/simple_coap
@@ -49,12 +50,26 @@ struct Device {
 class NabtoEdgeClientTests: XCTestCase {
 
     let coapDevice = Device(
-            productId: "pr-fatqcwj9",
-            deviceId: "de-avmqjaje", // in device, change from "avmqjaxe..." in public example source
-            url: "https://pr-fatqcwj9.clients.nabto.net",
-            key: "sk-5f3ab4bea7cc2585091539fb950084ce",
-            fp: "8f1a9c9e591cebd67437a7b6dcf00d964971ce33f76a7435eb0d685789ae992a",
-            sct: "WzwjoTabnvux"
+//            productId: "pr-fatqcwj9",
+//            deviceId: "de-avmqjaje", // in device, change from "avmqjaxe..." in public example source
+//            url: "https://pr-fatqcwj9.clients.nabto.net",
+//            key: "sk-5f3ab4bea7cc2585091539fb950084ce",
+//            fp: "8f1a9c9e591cebd67437a7b6dcf00d964971ce33f76a7435eb0d685789ae992a",
+//            sct: "WzwjoTabnvux"
+
+//        server: URL(string: "https://pr-vmwj4yzz.clients.nabto.net")!,
+//        serverKey: "sk-9c826d2ebb4343a789b280fe22b98305",
+//        serverToken: "kVTtwXWMkVMf",
+//        product: "pr-vmwj4yzz",
+//        system: "de-nupuz7pr"
+        
+        productId: "pr-vmwj4yzz",
+        deviceId: "de-nupuz7pr", // in device, change from "avmqjaxe..." in public example source
+        url: "https://pr-vmwj4yzz.clients.nabto.net",
+        key: "sk-9c826d2ebb4343a789b280fe22b98305",
+        fp: "",
+        sct: "kVTtwXWMkVMf"
+
     )
 
     let streamDevice = Device(
@@ -353,6 +368,8 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testGetClientFingerprintHexFail() {
+        let n4 = NabtoClient()
+        NSLog("Nabto 4 version: " + n4.nabtoVersionString())
         self.client = Client()
         let connection = try! client.createConnection()
         XCTAssertThrowsError(try connection.getClientFingerprintHex()) { error in
@@ -362,7 +379,7 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func testTodo() throws {
         // reproduce OC-20532
-//        throw XCTSkip("todo")
+        throw XCTSkip("todo")
     }
 
     func testCoapRequest() {

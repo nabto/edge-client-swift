@@ -8,6 +8,7 @@
 
 import UIKit
 import NabtoEdgeClient
+import NabtoClient
 
 class ViewController: UIViewController {
 
@@ -15,11 +16,8 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let client = NabtoEdgeClient.Client()
-        let connection = try! client.createConnection()
-        let options = try! connection.getOptions()
-       // label.text = "Version: " + NabtoEdgeClient.versionString() + "\nOptions: [\(options)]"
-        label.text = "Options: [\(options)]"
+        let n4 = NabtoClient()
+        label.text = "Version: " + NabtoEdgeClient.Client.versionString() + ", " + n4.nabtoVersionString()
     }
 
 

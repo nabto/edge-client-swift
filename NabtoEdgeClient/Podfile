@@ -9,5 +9,13 @@ source 'https://github.com/CocoaPods/Specs.git'
 platform :ios, '11.0'
 
 target 'NabtoEdgeClient' do
-  pod 'NabtoEdgeClientApi', '1.0.5'
+  pod 'NabtoEdgeClientApi', '1.0.7'
+end
+
+target 'NabtoEdgeClientTests' do
+  pod 'NabtoClient', '5.1.3'
+end
+
+target 'HostForUnitTest' do
+  pod 'NabtoClient', '5.1.3'
 end

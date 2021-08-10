@@ -78,6 +78,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "D4B54C3524D045D500BBC161"
+            BuildableName = "NabtoEdgeClientTests.xctest"
+            BlueprintName = "NabtoEdgeClientTests"
+            ReferencedContainer = "container:NabtoEdgeClient.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

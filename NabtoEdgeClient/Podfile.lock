@@ -1,16 +1,20 @@
 PODS:
-  - NabtoEdgeClientApi (1.0.5)
+  - NabtoClient (5.1.3)
+  - NabtoEdgeClientApi (1.0.7)
 
 DEPENDENCIES:
-  - NabtoEdgeClientApi (= 1.0.5)
+  - NabtoClient (= 5.1.3)
+  - NabtoEdgeClientApi (= 1.0.7)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
+    - NabtoClient
     - NabtoEdgeClientApi
 
 SPEC CHECKSUMS:
-  NabtoEdgeClientApi: c1b9a801da511b311bbb087305920f93cda31dd6
+  NabtoClient: c708d7b175f39f40247a44c6345f3e5c88c055bc
+  NabtoEdgeClientApi: 08b84ee40755c14963832fedc1a7bb6cca369d34
 
-PODFILE CHECKSUM: 41aee9d458e1dd5906ae71e5887403c0f7005b2e
+PODFILE CHECKSUM: 68ecd2198e28e9aac4ff7508e296c2a7eab6521f
 
-COCOAPODS: 1.10.0.beta.2
+COCOAPODS: 1.10.0
