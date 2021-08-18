@@ -1,10 +1,10 @@
 PODS:
   - CBOR (0.2.0)
-  - NabtoEdgeClientApi (1.0.5)
+  - NabtoEdgeClientApi (1.0.8)
 
 DEPENDENCIES:
   - CBOR
-  - NabtoEdgeClientApi (= 1.0.5)
+  - NabtoEdgeClientApi (= 1.0.8)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -13,8 +13,8 @@ SPEC REPOS:
 
 SPEC CHECKSUMS:
   CBOR: f1117a073b831a9a55afefe36f4e29fb258571cb
-  NabtoEdgeClientApi: c1b9a801da511b311bbb087305920f93cda31dd6
+  NabtoEdgeClientApi: e6e31b65e8e02a58287c9286da3064c1e9debd7b
 
-PODFILE CHECKSUM: 680aadfe1af4f74225c7c46b900d0379e9206637
+PODFILE CHECKSUM: f71cd3f3518bf1f3f07482550da753c884c4c21b
 
-COCOAPODS: 1.10.0.beta.2
+COCOAPODS: 1.10.2
