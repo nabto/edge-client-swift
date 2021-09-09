@@ -1,6 +1,6 @@
-#source 'https://github.com/CocoaPods/Specs.git'
+source 'https://github.com/CocoaPods/Specs.git'
 
 target 'NabtoEdgeClientHello' do
     use_frameworks!
-    pod 'NabtoEdgeClientSwift', '0.9.6'
+    pod 'NabtoEdgeClientSwift', '~> 1.1.0-rc1'
 end

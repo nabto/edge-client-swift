@@ -1,16 +1,16 @@
 PODS:
-  - NabtoEdgeClientSwift (0.9.6)
+  - NabtoEdgeClientSwift (1.1.0-rc1)
 
 DEPENDENCIES:
-  - NabtoEdgeClientSwift (= 0.9.6)
+  - NabtoEdgeClientSwift (~> 1.1.0-rc1)
 
 SPEC REPOS:
-  trunk:
+  https://github.com/CocoaPods/Specs.git:
     - NabtoEdgeClientSwift
 
 SPEC CHECKSUMS:
-  NabtoEdgeClientSwift: 1ca11b13161012ff1f8cbdd1f28f6750fdf2e3ea
+  NabtoEdgeClientSwift: cf30c30b547a3ed30b49e8efdc81d97b261b8e1a
 
-PODFILE CHECKSUM: 14d65d3f07a21a41bd77a08210dcf8787a9ddc22
+PODFILE CHECKSUM: eb9760bcfc6e5f829b8e16873ceeb1612ee190dc
 
-COCOAPODS: 1.10.0
+COCOAPODS: 1.11.0

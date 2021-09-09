@@ -13,5 +13,10 @@ target 'NabtoEdgeClient' do
 end
 
 target 'NabtoEdgeClientTests' do
+  pod 'NabtoClient', '7.0.0'
   pod 'CBOR'
+end
+
+target 'HostForUnitTest' do
+  pod 'NabtoClient', '7.0.0'
 end

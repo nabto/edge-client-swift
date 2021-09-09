@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'NabtoEdgeClientSwift'
-  s.version      = "0.9.6"
+  s.version      = "1.1.0-rc1"
   s.summary      = "Nabto Edge Client for Swift"
   s.description  = <<-DESC
 This pod installs the high level Nabto Edge Client for Swift: It wraps the most common functionality of the low-level ANSI C Nabto Edge Client SDK (provided in the NabtoEdgeClientApi pod).
@@ -14,16 +14,16 @@ DESC
   s.homepage         = 'https://docs.nabto.com/developer/guides/overview/platform-overview.html'
   s.license      = { :type => 'Commercial', :file => 'NabtoEdgeClient.xcframework/LICENSE' }
   s.source           = { :http => "https://downloads.nabto.com/assets/edge/ios/nabto-client-swift/#{s.version}/NabtoEdgeClient.xcframework.zip"}
-  #s.source           = { :http => "http://localhost:8081/pods/NabtoEdgeClient.xcframework.zip"}
+#  s.source           = { :http => "http://localhost:8081/pods/NabtoEdgeClient.xcframework.zip"}
   s.author           = { 'nabto' => 'apps@nabto.com' }
   s.vendored_frameworks = 'NabtoEdgeClient.xcframework'
   s.platform = :ios
   s.ios.preserve_paths = 'NabtoEdgeClient.xcframework'
   s.ios.libraries = 'c++', 'stdc++'
-  s.ios.deployment_target = '12.0'
+  s.ios.deployment_target = '10.0'
 
   # no arm64 simulator support yet in core api (https://github.com/CocoaPods/CocoaPods/issues/10104)
-  s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
-  s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+  s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64 i386' }
+  s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64 i386' }
 
 end
