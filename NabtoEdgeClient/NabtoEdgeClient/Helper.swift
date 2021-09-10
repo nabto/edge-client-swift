@@ -69,6 +69,10 @@ internal class Helper {
 
     deinit {
     }
+    
+    internal static func apiStatusToString(_ status: NabtoClientError) -> String {
+        return String(cString: nabto_client_error_get_string(status))
+    }
 
     internal static func mapSimpleApiStatusToErrorCode(_ status: NabtoClientError) -> NabtoEdgeClientError {
         switch (status) {
@@ -97,8 +101,7 @@ internal class Helper {
         case NABTO_CLIENT_EC_UNKNOWN: return NabtoEdgeClientError.FAILED
 
         default:
-            let str = String(cString: nabto_client_error_get_string(status))
-            NSLog("Unexpected API status \(status): \(str)")
+            NSLog("Unexpected API status \(status): \(apiStatusToString(status))")
             return .UNEXPECTED_API_STATUS
         }
     }
