@@ -28,6 +28,7 @@ public class MdnsScanner: NSObject {
     private let subType: String?
     private var result: OpaquePointer? = nil
     private let serialQueue = DispatchQueue(label: "MdnsResultListener.serialQueue")
+    private var aliveSelf: MdnsScanner?
 
     // see comment on set vs hashtable and protocol/delegate vs closure on similar property in
     // ConnectionEventListener class
@@ -71,6 +72,8 @@ public class MdnsScanner: NSObject {
                 let mySelf = Unmanaged<MdnsScanner>.fromOpaque(data!).takeUnretainedValue()
                 mySelf.apiEventCallback(ec: ec)
             }, rawSelf)
+
+            self.aliveSelf = self
         }
     }
 
@@ -83,7 +86,7 @@ public class MdnsScanner: NSObject {
                 return
             }
             nabto_client_listener_stop(self.listener)
-            nabto_client_listener_free(self.listener)
+              nabto_client_listener_free(self.listener)
             self.listener = nil
         }
     }
@@ -115,6 +118,10 @@ public class MdnsScanner: NSObject {
     }
 
     private func apiEventCallback(ec: NabtoClientError) {
+        if (ec == NABTO_CLIENT_EC_STOPPED) {
+            self.aliveSelf = nil
+            return
+        }
         guard (ec == NABTO_CLIENT_EC_OK) else {
             return
         }
