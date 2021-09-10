@@ -41,28 +41,42 @@ struct Device {
         \"ProductId\": \"\(self.productId)\",\n
         \"DeviceId\": \"\(self.deviceId)\",\n
         \"ServerUrl\": \"\(self.url)\",\n
-        \"ServerConnectToken\": \"\(self.sct)\",\n     
         \"ServerKey\": \"\(self.key)\"\n}
         """
+//        return """
+//        {\n
+//        \"Local\": \(self.local),\n
+//        \"ProductId\": \"\(self.productId)\",\n
+//        \"DeviceId\": \"\(self.deviceId)\",\n
+//        \"ServerUrl\": \"\(self.url)\",\n
+//        \"ServerConnectToken\": \"\(self.sct)\",\n
+//        \"ServerKey\": \"\(self.key)\"\n}
+//        """
     }
 }
 
 class NabtoEdgeClientTests: XCTestCase {
 
     let coapDevice = Device(
-            productId: "pr-fatqcwj9",
-            deviceId: "de-avmqjaje", // in device, change from "avmqjaxe..." in public example source
+            productId: "pr-s44qkbfi",
+            //productId: "pr-fatqcwj9",
+            deviceId: "de-nkgp97nw",
+            //deviceId: "de-avmqjaje",
             url: "https://pr-fatqcwj9.clients.nabto.net",
-            key: "sk-5f3ab4bea7cc2585091539fb950084ce",
-            fp: "8f1a9c9e591cebd67437a7b6dcf00d964971ce33f76a7435eb0d685789ae992a",
+            key: "sk-b688df8ae416ead9d125bfd1b7f0808c",
+            //key: "sk-5f3ab4bea7cc2585091539fb950084ce",
+            fp: "4886ae0e75f85a0bbf222cecc1a641902a89c95ded2b602f3f46bc3db42a003b",
             sct: "WzwjoTabnvux"
     )
 
     let streamDevice = Device(
-            productId: "pr-fatqcwj9",
-            deviceId: "de-bdsotcgm",
+//            productId: "pr-fatqcwj9",
+//            deviceId: "de-bdsotcgm",
+            productId: "pr-s44qkbfi",
+            deviceId: "de-3dfwgxd3",
             url: "https://pr-fatqcwj9.clients.nabto.net",
-            key: "sk-5f3ab4bea7cc2585091539fb950084ce",
+            key: "sk-b688df8ae416ead9d125bfd1b7f0808c",
+//            key: "sk-5f3ab4bea7cc2585091539fb950084ce",
             fp: "19ca7f85c9f4bfc47cffd8564339b897aaaef3225bde5c7b90dfff46b5eaab5b",
             sct: "WzwjoTabnvux"
     )
@@ -239,7 +253,8 @@ class NabtoEdgeClientTests: XCTestCase {
         self.connection = try! connect(self.coapDevice)
     }
 
-    func testConnectInvalidToken() {
+    func testConnectInvalidToken() throws {
+        throw XCTSkip("SCT currently not enabled")
         self.client = Client()
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
@@ -305,7 +320,7 @@ class NabtoEdgeClientTests: XCTestCase {
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
         var device = coapDevice
-        device.deviceId = "de-jhnoa9u7"
+        device.deviceId = "de-z7mmmgae"
         try! self.connection.updateOptions(json: device.asJson())
         let exp = XCTestExpectation(description: "expect connect callback")
         self.connection.connectAsync { ec in
@@ -393,6 +408,7 @@ class NabtoEdgeClientTests: XCTestCase {
         }
 
         public func onResultReady(result: MdnsResult) {
+            print("*** got result: \(result.description)")
             results.append(result)
             if (results.count == 1) {
                 exp.fulfill()
@@ -410,7 +426,7 @@ class NabtoEdgeClientTests: XCTestCase {
 
     // ./examples/simple_mdns/simple_mdns_device pr-mdns de-mdns swift-test-subtype swift-txt-key swift-txt-val
     func testMdnsDiscovery() throws {
-        throw XCTSkip("Needs local device for testing")
+//        throw XCTSkip("Needs local device for testing")
         self.client = Client()
         try! client.setLogLevel(level: "info")
         client.enableNsLogLogging()
@@ -419,7 +435,7 @@ class NabtoEdgeClientTests: XCTestCase {
         let stub = TestMdnsResultReceiver(exp)
         scanner.addMdnsResultReceiver(stub)
         try! scanner.start()
-        wait(for: [exp], timeout: 1)
+        wait(for: [exp], timeout: 10)
         XCTAssertEqual(stub.results.count, 1)
         XCTAssertEqual(stub.results[0].deviceId, self.mdnsDevice.deviceId)
         XCTAssertEqual(stub.results[0].productId, self.mdnsDevice.productId)
@@ -542,15 +558,21 @@ class NabtoEdgeClientTests: XCTestCase {
 
     public class TestConnectionEventCallbackReceiver : ConnectionEventReceiver {
         var events: [NabtoEdgeClientConnectionEvent] = []
-        let exp: XCTestExpectation
+        let expConnect: XCTestExpectation
+        let expClosed: XCTestExpectation
 
-        public init(_ exp: XCTestExpectation) {
-            self.exp = exp
+        public init(_ expConnect: XCTestExpectation, _ expClosed: XCTestExpectation) {
+            self.expConnect = expConnect
+            self.expClosed = expClosed
         }
 
         func onEvent(event: NabtoEdgeClientConnectionEvent) {
             events.append(event)
-            exp.fulfill()
+            if (event == .CONNECTED) {
+                self.expConnect.fulfill()
+            } else if (event == .CLOSED) {
+                self.expClosed.fulfill()
+            }
         }
     }
 
@@ -560,7 +582,7 @@ class NabtoEdgeClientTests: XCTestCase {
         client.enableNsLogLogging()
         self.connection = try! client.createConnection()
         let exp = XCTestExpectation(description: "expect event callback")
-        let listener = TestConnectionEventCallbackReceiver(exp)
+        let listener = TestConnectionEventCallbackReceiver(exp, exp)
         try! connection.addConnectionEventsReceiver(cb: listener)
         let key = try! client.createPrivateKey()
         try! connection.setPrivateKey(key: key)
@@ -569,6 +591,31 @@ class NabtoEdgeClientTests: XCTestCase {
         wait(for: [exp], timeout: 2.0)
         XCTAssertEqual(listener.events.count, 1)
         XCTAssertEqual(listener.events[0], .CONNECTED)
+    }
+
+    func testConnectionEventListenerMultipleEvents() {
+        self.client = Client()
+        try! client.setLogLevel(level: "info")
+        client.enableNsLogLogging()
+        self.connection = try! client.createConnection()
+        let expConnect = XCTestExpectation(description: "expect connect event callback")
+        let expClosed = XCTestExpectation(description: "expect close event callback")
+        let listener = TestConnectionEventCallbackReceiver(expConnect, expClosed)
+        try! connection.addConnectionEventsReceiver(cb: listener)
+        let key = try! client.createPrivateKey()
+        try! connection.setPrivateKey(key: key)
+        try! connection.updateOptions(json: self.coapDevice.asJson())
+
+        try! connection.connect()
+        wait(for: [expConnect], timeout: 2.0)
+        XCTAssertEqual(listener.events.count, 1)
+        XCTAssertEqual(listener.events[0], .CONNECTED)
+
+        try! connection.close()
+        wait(for: [expClosed], timeout: 2.0)
+        XCTAssertEqual(listener.events.count, 2)
+        XCTAssertEqual(listener.events[0], .CONNECTED)
+        XCTAssertEqual(listener.events[1], .CLOSED)
     }
 
     func testStreamWriteThenReadSome() {
@@ -687,7 +734,7 @@ class NabtoEdgeClientTests: XCTestCase {
         urlSession1.dataTask(with: URL(string: "http://127.0.0.1:\(port)/")!) {(data, response, error) in
             XCTAssertNil(error)
             let body = String(data: data!, encoding: String.Encoding.utf8) ?? ""
-            XCTAssertTrue(body.contains("Debian"))
+            XCTAssertTrue(body.contains("html"))
 
             try! tunnel.close()
             let urlSession2 = URLSession(configuration: config)
@@ -729,7 +776,7 @@ class NabtoEdgeClientTests: XCTestCase {
             urlSession1.dataTask(with: URL(string: "http://127.0.0.1:\(port)/")!) { [weak tunnel] (data, response, error) in
                 XCTAssertNil(error)
                 let body = String(data: data!, encoding: String.Encoding.utf8) ?? ""
-                XCTAssertTrue(body.contains("Debian"))
+                XCTAssertTrue(body.contains("html"))
 
                 tunnel?.closeAsync { ec in
                     XCTAssertEqual(ec, .OK)
@@ -806,7 +853,7 @@ class NabtoEdgeClientTests: XCTestCase {
             urlSession1.dataTask(with: URL(string: "http://127.0.0.1:\(port)/")!) { [weak tunnel] (data, response, error) in
                 XCTAssertNil(error)
                 let body = String(data: data!, encoding: String.Encoding.utf8) ?? ""
-                XCTAssertTrue(body.contains("Debian"))
+                XCTAssertTrue(body.contains("html"))
 
                 tunnel!.closeAsync { ec in
                     XCTAssertEqual(ec, .OK)
@@ -819,7 +866,8 @@ class NabtoEdgeClientTests: XCTestCase {
         wait(for: [exp1, exp2], timeout: 10.0)
     }
 
-    func testPasswordAuthAsyncFail() {
+    func testPasswordAuthAsyncFail() throws {
+        throw XCTSkip("missing password auth device (ch #584)")
         self.client = Client()
         try! self.client.setLogLevel(level: "info")
         self.client.enableNsLogLogging()
@@ -837,7 +885,8 @@ class NabtoEdgeClientTests: XCTestCase {
         wait(for: [exp], timeout: 2.0)
     }
 
-    func testPasswordAuthAsyncOk() {
+    func testPasswordAuthAsyncOk() throws {
+        throw XCTSkip("missing password auth device (ch #584)")
         self.client = Client()
         try! self.client.setLogLevel(level: "info")
         self.client.enableNsLogLogging()
@@ -855,7 +904,8 @@ class NabtoEdgeClientTests: XCTestCase {
         wait(for: [exp], timeout: 2.0)
     }
 
-    func testPasswordOpenPairing() {
+    func testPasswordOpenPairing() throws {
+        throw XCTSkip("missing password auth device (ch #584)")
         self.client = Client()
         try! self.client.setLogLevel(level: "info")
         self.client.enableNsLogLogging()
