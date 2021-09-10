@@ -290,7 +290,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
         if (self.connectionEventListener == nil) {
             self.connectionEventListener = try ConnectionEventListener(nabtoConnection: self, nabtoClient: self.client)
         }
-        self.connectionEventListener!.addUserCb(cb)
+        try self.connectionEventListener!.addUserCb(cb)
     }
 
     /**
