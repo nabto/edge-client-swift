@@ -64,16 +64,9 @@ public class MdnsScanner: NSObject {
             let ec = nabto_client_mdns_resolver_init_listener(
                     self.client.nativeClient, self.listener, self.subType ?? "" /* nil causes crash (NABTO-2359) */)
             try Helper.throwIfNotOk(ec)
-
-            nabto_client_listener_new_mdns_result(self.listener, self.future, &self.result)
-
-            let rawSelf = Unmanaged.passUnretained(self).toOpaque()
-            nabto_client_future_set_callback(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
-                let mySelf = Unmanaged<MdnsScanner>.fromOpaque(data!).takeUnretainedValue()
-                mySelf.apiEventCallback(ec: ec)
-            }, rawSelf)
-
+            // prevent ARC reclaim until we get a close event
             self.aliveSelf = self
+            self.armListener()
         }
     }
 
@@ -86,7 +79,7 @@ public class MdnsScanner: NSObject {
                 return
             }
             nabto_client_listener_stop(self.listener)
-              nabto_client_listener_free(self.listener)
+            nabto_client_listener_free(self.listener)
             self.listener = nil
         }
     }
@@ -119,6 +112,7 @@ public class MdnsScanner: NSObject {
 
     private func apiEventCallback(ec: NabtoClientError) {
         if (ec == NABTO_CLIENT_EC_STOPPED) {
+            // allow ARC to reclaim us
             self.aliveSelf = nil
             return
         }
@@ -131,6 +125,10 @@ public class MdnsScanner: NSObject {
                 (cb as! MdnsResultReceiver).onResultReady(result: self.createFromResult(res))
             }
         }
+        self.armListener()
+    }
+
+    private func armListener() {
         nabto_client_listener_new_mdns_result(self.listener, self.future, &self.result)
         let rawSelf = Unmanaged.passUnretained(self).toOpaque()
         nabto_client_future_set_callback(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in

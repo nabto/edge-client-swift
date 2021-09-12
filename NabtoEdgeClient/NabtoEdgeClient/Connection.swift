@@ -68,6 +68,9 @@ public class Connection: NSObject, NativeConnectionWrapper {
     }
 
     deinit {
+        if let listener = self.connectionEventListener {
+            listener.stop()
+        }
         nabto_client_connection_free(self.nativeConnection)
     }
 

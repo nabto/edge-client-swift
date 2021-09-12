@@ -28,7 +28,6 @@ internal class ConnectionEventListener {
     }
 
     deinit {
-        nabto_client_listener_stop(self.listener)
         nabto_client_listener_free(self.listener)
         nabto_client_future_free(self.future)
     }
@@ -36,21 +35,15 @@ internal class ConnectionEventListener {
     private func start() throws {
         let ec = nabto_client_connection_events_init_listener(self.connection?.nativeConnection, self.listener)
         try Helper.throwIfNotOk(ec)
-
+        // prevent ARC reclaim until we get a close event
         self.keepSelfAlive = self
-        nabto_client_listener_connection_event(self.listener, self.future, &self.event)
-
-        let rawSelf = Unmanaged.passUnretained(self).toOpaque()
-        nabto_client_future_set_callback(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
-            let mySelf = Unmanaged<ConnectionEventListener>.fromOpaque(data!).takeUnretainedValue()
-            mySelf.apiEventCallback(ec: ec)
-        }, rawSelf)
-
+        self.armListener()
     }
 
     private func apiEventCallback(ec: NabtoClientError) {
         NSLog("apiEventCallback: ec=\(ec), event=\(self.event)")
-        if (ec == NABTO_CLIENT_EC_CLOSED) {
+        if (ec == NABTO_CLIENT_EC_STOPPED) { // leak bug: triggers med listener.close - som kun triggers fra deinit, som kun kaldes hvis keepSelfAlive == nil
+            // allow ARC to reclaim us
             self.keepSelfAlive = nil
             return
         }
@@ -62,13 +55,16 @@ internal class ConnectionEventListener {
             let mappedEvent: NabtoEdgeClientConnectionEvent = lastEdgeClientConnectionEvent()
             (cb as! ConnectionEventReceiver).onEvent(event: mappedEvent)
         }
+        self.armListener()
+    }
+
+    private func armListener() {
         nabto_client_listener_connection_event(self.listener, self.future, &self.event)
         let rawSelf = Unmanaged.passUnretained(self).toOpaque()
         nabto_client_future_set_callback(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
             let mySelf = Unmanaged<ConnectionEventListener>.fromOpaque(data!).takeUnretainedValue()
             mySelf.apiEventCallback(ec: ec)
         }, rawSelf)
-
     }
 
     private func lastEdgeClientConnectionEvent() -> NabtoEdgeClientConnectionEvent {
@@ -88,6 +84,13 @@ internal class ConnectionEventListener {
 
     internal func removeUserCb(_ cb: ConnectionEventReceiver) {
         self.userCbs.remove(cb)
+        if (self.userCbs.count == 0) {
+            self.stop()
+        }
+    }
+
+    internal func stop() {
+        nabto_client_listener_stop(self.listener)
     }
 
 }
