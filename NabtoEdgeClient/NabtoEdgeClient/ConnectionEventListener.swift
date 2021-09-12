@@ -41,8 +41,7 @@ internal class ConnectionEventListener {
     }
 
     private func apiEventCallback(ec: NabtoClientError) {
-        NSLog("apiEventCallback: ec=\(ec), event=\(self.event)")
-        if (ec == NABTO_CLIENT_EC_STOPPED) { 
+        if (ec == NABTO_CLIENT_EC_STOPPED) {
             // allow ARC to reclaim us
             self.keepSelfAlive = nil
             return
