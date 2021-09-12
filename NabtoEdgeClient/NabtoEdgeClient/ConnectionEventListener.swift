@@ -42,7 +42,7 @@ internal class ConnectionEventListener {
 
     private func apiEventCallback(ec: NabtoClientError) {
         NSLog("apiEventCallback: ec=\(ec), event=\(self.event)")
-        if (ec == NABTO_CLIENT_EC_STOPPED) { // leak bug: triggers med listener.close - som kun triggers fra deinit, som kun kaldes hvis keepSelfAlive == nil
+        if (ec == NABTO_CLIENT_EC_STOPPED) { 
             // allow ARC to reclaim us
             self.keepSelfAlive = nil
             return

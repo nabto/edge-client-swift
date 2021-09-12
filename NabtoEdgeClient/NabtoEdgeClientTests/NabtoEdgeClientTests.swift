@@ -82,11 +82,14 @@ class NabtoEdgeClientTests: XCTestCase {
     )
 
     let tunnelDevice = Device(
-            productId: "pr-fatqcwj9",
-            deviceId: "de-ijrdq47i",
-            url: "https://pr-fatqcwj9.clients.nabto.net",
-            key: "sk-5f3ab4bea7cc2585091539fb950084ce",
-            fp: "0b168a3b714ebe92e56b2514e5424c4c544ab760db547c34b7ff00ff90bd72cb",
+//            productId: "pr-fatqcwj9",
+            productId: "pr-s44qkbfi",
+            deviceId: "de-xf3vvsik",
+//            deviceId: "de-ijrdq47i",
+            url: "https://pr-s44qkbfi.clients.nabto.net",
+            key: "sk-b688df8ae416ead9d125bfd1b7f0808c",
+//            key: "sk-5f3ab4bea7cc2585091539fb950084ce",
+            fp: "fc83cc32184d20d1779b78188f0663e4007bf97246ced1569043d5a37fd713fd",
             sct: "WzwjoTabnvux"
     )
 
