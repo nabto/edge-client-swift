@@ -459,7 +459,35 @@ class NabtoEdgeClientTests: XCTestCase {
         let response = try! coap.execute()
         XCTAssertEqual(response.status, 404)
     }
-
+    
+    // [*] for some reason this simple async test with asserts in the async complete closure is completely
+    // broken; failing asserts are ignored and test continues - probably something about using xctassert
+    // outside the main thread (but no documentation found on the matter). Solution / work around is the
+    // super ugly alternative seen in testCoapRequestAsync with asserts moved out of the closure.
+    
+//    func testCoapRequestAsync_Original() {
+//        self.client = Client()
+//        self.connection = try! client.createConnection()
+//        let key = try! client.createPrivateKey()
+//        try! self.connection.setPrivateKey(key: key)
+//        try! self.connection.updateOptions(json: self.coapDevice.asJson())
+//        let exp = XCTestExpectation(description: "expect coap done callback")
+//
+//        self.connection.connectAsync { ec in
+//            XCTAssertEqual(ec, .OK)
+//            XCTAssert(false) // <===== added to original test case ... test passes just fine with this, hence giving up
+//            let coap = try! self.connection.createCoapRequest(method: "GET", path: "/hello-world")
+//            coap.executeAsync { ec, response in
+//                XCTAssertEqual(ec, .OK)
+//                XCTAssertEqual(response!.status, 205)
+//                XCTAssertEqual(response!.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
+//                XCTAssertEqual(String(decoding: response!.payload, as: UTF8.self), "Hello world")
+//                exp.fulfill()
+//            }
+//        }
+//
+//        wait(for: [exp], timeout: 2.0)
+//    }
 
     func testCoapRequestAsync() {
         self.client = Client()
@@ -467,21 +495,35 @@ class NabtoEdgeClientTests: XCTestCase {
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
         try! self.connection.updateOptions(json: self.coapDevice.asJson())
-        let exp = XCTestExpectation(description: "expect coap done callback")
 
-        self.connection.connectAsync { ec in
-            XCTAssertEqual(ec, .OK)
-            let coap = try! self.connection.createCoapRequest(method: "GET", path: "/hello-world")
-            coap.executeAsync { ec, response in
-                XCTAssertEqual(ec, .OK)
-                XCTAssertEqual(response!.status, 205)
-                XCTAssertEqual(response!.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
-                XCTAssertEqual(String(decoding: response!.payload, as: UTF8.self), "Hello world")
-                exp.fulfill()
-            }
+        let exp1 = XCTestExpectation(description: "expect connect done callback")
+        
+        var ec: NabtoEdgeClientError = .FAILED
+        self.connection.connectAsync { cbEc in
+            ec = cbEc
+            exp1.fulfill()
+            // asserts do currently not work in these closures hence this ugly structure ... see [*] comment above
         }
+        
+        wait(for: [exp1], timeout: 2)
+        XCTAssertEqual(ec, .OK)
 
-        wait(for: [exp], timeout: 2.0)
+        let exp2 = XCTestExpectation(description: "expect coap done callback")
+        let coap = try! self.connection.createCoapRequest(method: "GET", path: "/hello-world")
+        var response: CoapResponse?
+        coap.executeAsync { cbEc, cbResponse in
+            ec = cbEc
+            response = cbResponse
+            exp2.fulfill()
+        }
+    
+        wait(for: [exp2], timeout: 2.0)
+    
+        XCTAssertEqual(ec, .OK)
+        XCTAssertEqual(response!.status, 205)
+        XCTAssertEqual(response!.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
+        XCTAssertEqual(String(decoding: response!.payload, as: UTF8.self), "Hello world")
+
     }
 
     func testCoapRequestSyncAfterAsyncConnect() {
