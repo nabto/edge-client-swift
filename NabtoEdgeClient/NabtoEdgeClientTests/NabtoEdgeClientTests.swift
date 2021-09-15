@@ -14,6 +14,10 @@ import CBOR
 // test org: or-3uhjvwuh (https://console.cloud.nabto.com/#/dashboard/organizations/or-3uhjvwuh)
 // test device source: nabto-embedded-sdk/examples/simple_coap
 // if unauthorized errors: check auth type is set to sct in console and device sets the sct
+//
+// xcode does not allow running tests directly on physical iOS device; embed in a host application to do this (look for
+// "Host Application" setting under the "General" tab for the test target). Note that this then fails or simulator - so
+// to change back and forth between device and simulator, this option must be toggled between "None" and the host application ("HostsForTests").
 
 struct Device {
     var productId: String
@@ -21,10 +25,10 @@ struct Device {
     var url: String
     var key: String
     var fp: String
-    var sct: String
+    var sct: String?
     var local: Bool
 
-    init(productId: String, deviceId: String, url: String, key: String, fp: String, sct: String, local: Bool=false) {
+    init(productId: String, deviceId: String, url: String, key: String, fp: String, sct: String?=nil, local: Bool=false) {
         self.productId = productId
         self.deviceId = deviceId
         self.url = url
@@ -35,13 +39,14 @@ struct Device {
     }
 
     func asJson() -> String {
+        let sctElement = sct != nil ? "\"ServerConnectToken\": \"\(sct!)\",\n" : ""
         return """
         {\n
         \"Local\": \(self.local),\n
         \"ProductId\": \"\(self.productId)\",\n
         \"DeviceId\": \"\(self.deviceId)\",\n
         \"ServerUrl\": \"\(self.url)\",\n
-        \"ServerConnectToken\": \"\(self.sct)\",\n     
+        \(sctElement)
         \"ServerKey\": \"\(self.key)\"\n}
         """
     }
@@ -51,11 +56,10 @@ class NabtoEdgeClientTests: XCTestCase {
 
     let coapDevice = Device(
             productId: "pr-fatqcwj9",
-            deviceId: "de-avmqjaje", // in device, change from "avmqjaxe..." in public example source
+            deviceId: "de-avmqjaje",
             url: "https://pr-fatqcwj9.clients.nabto.net",
             key: "sk-5f3ab4bea7cc2585091539fb950084ce",
-            fp: "8f1a9c9e591cebd67437a7b6dcf00d964971ce33f76a7435eb0d685789ae992a",
-            sct: "WzwjoTabnvux"
+            fp: "fcb78f8d53c67dbc4f72c36ca6cd2d5fc5592d584222059f0d76bdb514a9340c"
     )
 
     let streamDevice = Device(
@@ -63,15 +67,14 @@ class NabtoEdgeClientTests: XCTestCase {
             deviceId: "de-bdsotcgm",
             url: "https://pr-fatqcwj9.clients.nabto.net",
             key: "sk-5f3ab4bea7cc2585091539fb950084ce",
-            fp: "19ca7f85c9f4bfc47cffd8564339b897aaaef3225bde5c7b90dfff46b5eaab5b",
-            sct: "WzwjoTabnvux"
+            fp: "19ca7f85c9f4bfc47cffd8564339b897aaaef3225bde5c7b90dfff46b5eaab5b"
     )
 
     let tunnelDevice = Device(
             productId: "pr-fatqcwj9",
             deviceId: "de-ijrdq47i",
             url: "https://pr-fatqcwj9.clients.nabto.net",
-            key: "sk-5f3ab4bea7cc2585091539fb950084ce",
+            key: "sk-9c826d2ebb4343a789b280fe22b98305",
             fp: "0b168a3b714ebe92e56b2514e5424c4c544ab760db547c34b7ff00ff90bd72cb",
             sct: "WzwjoTabnvux"
     )
@@ -84,6 +87,16 @@ class NabtoEdgeClientTests: XCTestCase {
             fp: "d731bc1f41deecafd8368fa865e430339148c16335c5f17d0f7e25025901e182",
             sct: "WzwjoTabnvux"
     )
+    
+    let passwordProtectedDevice = Device(
+            productId: "pr-fatqcwj9",
+            deviceId: "de-ijrdq47i",
+            url: "https://pr-fatqcwj9.clients.nabto.net",
+            key: "sk-9c826d2ebb4343a789b280fe22b98305",
+            fp: "c25c6a3805af4d8a263541fc0ac32e5909b4cae293b85bea05d81445fed9273c",
+            sct: "WzwjoTabnvux"
+    )
+
 
     // build a device for mDNS discovery testing
     //
@@ -110,15 +123,6 @@ class NabtoEdgeClientTests: XCTestCase {
             fp: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
             sct: "none",
             local: true
-    )
-
-    let passwordProtectedDevice = Device(
-            productId: "pr-fatqcwj9",
-            deviceId: "de-rdukj443",
-            url: "https://pr-fatqcwj9.clients.nabto.net",
-            key: "sk-5f3ab4bea7cc2585091539fb950084ce",
-            fp: "527c7313a624ea7473067cbcdd601706ffd4fc9f58c122b4b87bac042257e0f8",
-            sct: "qvVHttA9rxtp"
     )
 
     let streamPort: UInt32 = 42
@@ -246,7 +250,8 @@ class NabtoEdgeClientTests: XCTestCase {
         try! self.connection.setPrivateKey(key: key)
         var device = self.tunnelDevice
         device.sct = "invalid"
-        try! self.connection.updateOptions(json: device.asJson())
+        let json = device.asJson()
+        try! self.connection.updateOptions(json: json)
         let exp = XCTestExpectation(description: "error thrown")
         do {
             _ = try self.connection.connect()
@@ -402,15 +407,24 @@ class NabtoEdgeClientTests: XCTestCase {
 
     // reproduce segfault
     func testCreateManyClientsWithLoggingEnabled() {
-        for _ in 1...1000 {
-            let client = Client()
-            client.enableNsLogLogging()
+        let n: Int
+        #if targetEnvironment(simulator)
+            n = 1000
+        #else
+            // each iteration takes several seconds on actual device with iOS 14.7 / Xcode 12.5.1
+            n = 3
+        #endif
+        for _ in 1...n {
+            _ = Client()
         }
     }
 
     // ./examples/simple_mdns/simple_mdns_device pr-mdns de-mdns swift-test-subtype swift-txt-key swift-txt-val
     func testMdnsDiscovery() throws {
-        throw XCTSkip("Needs local device for testing")
+        #if !targetEnvironment(simulator)
+        throw XCTSkip("mDNS forbidden on iOS 14.5+ physical device, awaiting apple app approval of container app")
+//        throw XCTSkip("Needs local device for testing")
+        #endif
         self.client = Client()
         try! client.setLogLevel(level: "info")
         client.enableNsLogLogging()
@@ -523,7 +537,6 @@ class NabtoEdgeClientTests: XCTestCase {
         XCTAssertEqual(response!.status, 205)
         XCTAssertEqual(response!.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
         XCTAssertEqual(String(decoding: response!.payload, as: UTF8.self), "Hello world")
-
     }
 
     func testCoapRequestSyncAfterAsyncConnect() {
@@ -729,7 +742,7 @@ class NabtoEdgeClientTests: XCTestCase {
         urlSession1.dataTask(with: URL(string: "http://127.0.0.1:\(port)/")!) {(data, response, error) in
             XCTAssertNil(error)
             let body = String(data: data!, encoding: String.Encoding.utf8) ?? ""
-            XCTAssertTrue(body.contains("Debian"))
+            XCTAssertTrue(body.contains("html"))
 
             try! tunnel.close()
             let urlSession2 = URLSession(configuration: config)
@@ -771,7 +784,7 @@ class NabtoEdgeClientTests: XCTestCase {
             urlSession1.dataTask(with: URL(string: "http://127.0.0.1:\(port)/")!) { [weak tunnel] (data, response, error) in
                 XCTAssertNil(error)
                 let body = String(data: data!, encoding: String.Encoding.utf8) ?? ""
-                XCTAssertTrue(body.contains("Debian"))
+                XCTAssertTrue(body.contains("html"))
 
                 tunnel?.closeAsync { ec in
                     XCTAssertEqual(ec, .OK)
@@ -848,7 +861,7 @@ class NabtoEdgeClientTests: XCTestCase {
             urlSession1.dataTask(with: URL(string: "http://127.0.0.1:\(port)/")!) { [weak tunnel] (data, response, error) in
                 XCTAssertNil(error)
                 let body = String(data: data!, encoding: String.Encoding.utf8) ?? ""
-                XCTAssertTrue(body.contains("Debian"))
+                XCTAssertTrue(body.contains("html"))
 
                 tunnel!.closeAsync { ec in
                     XCTAssertEqual(ec, .OK)
@@ -910,7 +923,7 @@ class NabtoEdgeClientTests: XCTestCase {
         try! self.connection.passwordAuthenticate(username: "", password: "open-password")
 
         let coap = try! self.connection.createCoapRequest(method: "POST", path: "/iam/pairing/password-open")
-        let json: [String:String] = ["Username": UUID().uuidString]
+        let json: [String:String] = ["Username": UUID().uuidString.lowercased()]
         let cbor = CBOR.encode(json)
         try! coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: Data(cbor))
         let response = try! coap.execute()
@@ -933,7 +946,7 @@ class NabtoEdgeClientTests: XCTestCase {
         try! self.connection.setPrivateKey(key: key)
         try! self.connection.updateOptions(json: passwordProtectedDevice.asJson())
         try! self.connection.connect()
-        try! self.connection.passwordAuthenticate(username: "invited-user", password: "invited-password")
+        try! self.connection.passwordAuthenticate(username: "admin", password: "admin-password")
 
         let coap = try! self.connection.createCoapRequest(method: "POST", path: "/iam/pairing/password-invite")
         let response = try! coap.execute()
