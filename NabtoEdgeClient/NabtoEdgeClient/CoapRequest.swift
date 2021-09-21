@@ -118,7 +118,7 @@ public class CoapRequest {
     public func executeAsync(closure: @escaping CoapResponseReceiver) {
         let future: OpaquePointer = nabto_client_future_new(self.client.nativeClient)
         nabto_client_coap_execute(self.coap, future)
-        let w = CallbackWrapper(client: self.client, connection: nil, future: future)
+        let w = CallbackWrapper(future: future, connection: nil)
         self.activeCallbacks.insert(w)
         w.setCleanupClosure(cleanupClosure: { [weak w] in
             if let w = w {

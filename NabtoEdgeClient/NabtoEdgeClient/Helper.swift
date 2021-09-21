@@ -6,45 +6,46 @@
 import Foundation
 @_implementationOnly import NabtoEdgeClientApi
 
-// ensures client is kept alive until future is resolved
 internal class CallbackWrapper : NSObject {
-    var client: Client
-    var connection: Connection?
     let future: OpaquePointer
+    weak var connection: Connection?
     var cb: AsyncStatusReceiver?
-    var cleanupClosure: (() -> Void)?
+    var keepMeAlive: CallbackWrapper?
 
-    init(client: Client,
-         connection: Connection?,
-         future: OpaquePointer) {
-        self.client = client
-        self.connection = connection
+    init(future: OpaquePointer, connection: Connection?=nil) {
         self.future = future
+        self.connection = connection
+    }
+
+    deinit {
+        print(" ***** callback wrapper deinit ***** ")
     }
 
     public func registerCallback(_ cb: @escaping AsyncStatusReceiver) {
         self.cb = cb
         let rawSelf = Unmanaged.passUnretained(self).toOpaque()
+        self.keepMeAlive = self
         nabto_client_future_set_callback(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
             let mySelf = Unmanaged<CallbackWrapper>.fromOpaque(data!).takeUnretainedValue()
-            let wrapperError = mySelf.mapToWrapperError(ec: ec)
+            let wrapperError = mySelf.mapToSwiftError(ec: ec)
             mySelf.invokeUserCallback(wrapperError)
-
+            print(" ***** Helper::callback done *****")
+            mySelf.keepMeAlive = nil
         }, rawSelf)
     }
 
-    private func mapToWrapperError(ec: NabtoClientError) -> NabtoEdgeClientError {
-        let wrapperError: NabtoEdgeClientError
+    private func mapToSwiftError(ec: NabtoClientError) -> NabtoEdgeClientError {
+        let swiftError: NabtoEdgeClientError
         if (ec == NABTO_CLIENT_EC_NO_CHANNELS) {
-            if (connection != nil) {
-                wrapperError = Helper.createConnectionError(connection: connection!)
+            if let connection = self.connection {
+                swiftError = Helper.createConnectionError(connection: connection)
             } else {
-                wrapperError = NabtoEdgeClientError.UNEXPECTED_API_STATUS
+                swiftError = NabtoEdgeClientError.UNEXPECTED_API_STATUS
             }
         } else {
-            wrapperError = Helper.mapSimpleApiStatusToErrorCode(ec)
+            swiftError = Helper.mapSimpleApiStatusToErrorCode(ec)
         }
-        return wrapperError
+        return swiftError
     }
 
     func setCleanupClosure(cleanupClosure: @escaping () -> Void) {
@@ -54,7 +55,6 @@ internal class CallbackWrapper : NSObject {
     func invokeUserCallback(_ wrapperError: NabtoEdgeClientError) {
         self.cb?(wrapperError)
         nabto_client_future_free(self.future)
-        self.cleanupClosure?()
     }
 }
 
@@ -155,7 +155,7 @@ internal class Helper {
             implClosure(future)
 
             // keep client and connection swift objects alive until future resolves
-            let w = CallbackWrapper(client: client, connection: connection, future: future)
+            let w = CallbackWrapper(future: future, connection: connection)
             self.activeCallbacks.insert(w)
 
             // when future resolves, remove reference to client and connection and allow them to be reclaimed

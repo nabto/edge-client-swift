@@ -12,6 +12,14 @@
 		D484CF1025A60DC3009DCC1C /* NabtoEdgeClientError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D484CF0F25A60DC3009DCC1C /* NabtoEdgeClientError.swift */; };
 		D4B54C3924D045D500BBC161 /* NabtoEdgeClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B54C3824D045D500BBC161 /* NabtoEdgeClientTests.swift */; };
 		D4B54C3B24D045D500BBC161 /* NabtoEdgeClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42A03B024CEE12D008E4B2D /* NabtoEdgeClient.framework */; };
+		D4D9589B26F90DB700A921F3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4D9589A26F90DB700A921F3 /* AppDelegate.swift */; };
+		D4D9589D26F90DB700A921F3 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4D9589C26F90DB700A921F3 /* SceneDelegate.swift */; };
+		D4D9589F26F90DB700A921F3 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4D9589E26F90DB700A921F3 /* ViewController.swift */; };
+		D4D958A226F90DB700A921F3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D4D958A026F90DB700A921F3 /* Main.storyboard */; };
+		D4D958A426F90DB900A921F3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D4D958A326F90DB900A921F3 /* Assets.xcassets */; };
+		D4D958A726F90DB900A921F3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D4D958A526F90DB900A921F3 /* LaunchScreen.storyboard */; };
+		D4D958AE26F90E8A00A921F3 /* NabtoEdgeClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42A03B024CEE12D008E4B2D /* NabtoEdgeClient.framework */; };
+		D4D958AF26F90E8A00A921F3 /* NabtoEdgeClient.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D42A03B024CEE12D008E4B2D /* NabtoEdgeClient.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E92313C8852752D234D588C4 /* MdnsResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92845C3851C3FF4C907E633 /* MdnsResult.swift */; };
 		E925C63B8544C672D3B4D09B /* MdnsScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9229B3C89D448937E34F990 /* MdnsScanner.swift */; };
 		E925D05C1F5E162B0381020C /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E923BA86B8DCE94DF9DFF0E0 /* Connection.swift */; };
@@ -33,7 +41,35 @@
 			remoteGlobalIDString = D42A03AF24CEE12D008E4B2D;
 			remoteInfo = NabtoEdgeClient;
 		};
+		D4D958AC26F90DE000A921F3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D42A03A724CEE12D008E4B2D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D4D9589726F90DB700A921F3;
+			remoteInfo = HostForTests;
+		};
+		D4D958B026F90E8A00A921F3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D42A03A724CEE12D008E4B2D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D42A03AF24CEE12D008E4B2D;
+			remoteInfo = NabtoEdgeClient;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D4D958B226F90E8A00A921F3 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D4D958AF26F90E8A00A921F3 /* NabtoEdgeClient.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		622934FB1E627B3A5F2AB44E /* libPods-NabtoEdgeClientTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NabtoEdgeClientTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -48,6 +84,14 @@
 		D4B54C3824D045D500BBC161 /* NabtoEdgeClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NabtoEdgeClientTests.swift; sourceTree = "<group>"; };
 		D4B54C3A24D045D500BBC161 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D4B54C4324D04DA600BBC161 /* NabtoEdgeClientTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NabtoEdgeClientTests-Bridging-Header.h"; sourceTree = "<group>"; };
+		D4D9589826F90DB700A921F3 /* HostForTests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HostForTests.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D4D9589A26F90DB700A921F3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		D4D9589C26F90DB700A921F3 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		D4D9589E26F90DB700A921F3 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		D4D958A126F90DB700A921F3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		D4D958A326F90DB900A921F3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D4D958A626F90DB900A921F3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		D4D958A826F90DB900A921F3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E91E86E49DE48350DEC50EFD /* Pods-NabtoEdgeClientTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClientTests.debug.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClientTests/Pods-NabtoEdgeClientTests.debug.xcconfig"; sourceTree = "<group>"; };
 		E921D0ADFA95E0D7B453F106 /* ConnectionEventListener.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionEventListener.swift; sourceTree = "<group>"; };
 		E9229B3C89D448937E34F990 /* MdnsScanner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MdnsScanner.swift; sourceTree = "<group>"; };
@@ -80,6 +124,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D4D9589526F90DB700A921F3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D4D958AE26F90E8A00A921F3 /* NabtoEdgeClient.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -108,6 +160,7 @@
 			children = (
 				D42A03B224CEE12D008E4B2D /* NabtoEdgeClient */,
 				D4B54C3724D045D500BBC161 /* NabtoEdgeClientTests */,
+				D4D9589926F90DB700A921F3 /* HostForTests */,
 				D42A03B124CEE12D008E4B2D /* Products */,
 				A6E0D4F7F182EAC675676AA0 /* Pods */,
 				9B2468AE849F01914C41B7FD /* Frameworks */,
@@ -119,6 +172,7 @@
 			children = (
 				D42A03B024CEE12D008E4B2D /* NabtoEdgeClient.framework */,
 				D4B54C3624D045D500BBC161 /* NabtoEdgeClientTests.xctest */,
+				D4D9589826F90DB700A921F3 /* HostForTests.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -152,6 +206,20 @@
 				D4B54C4324D04DA600BBC161 /* NabtoEdgeClientTests-Bridging-Header.h */,
 			);
 			path = NabtoEdgeClientTests;
+			sourceTree = "<group>";
+		};
+		D4D9589926F90DB700A921F3 /* HostForTests */ = {
+			isa = PBXGroup;
+			children = (
+				D4D9589A26F90DB700A921F3 /* AppDelegate.swift */,
+				D4D9589C26F90DB700A921F3 /* SceneDelegate.swift */,
+				D4D9589E26F90DB700A921F3 /* ViewController.swift */,
+				D4D958A026F90DB700A921F3 /* Main.storyboard */,
+				D4D958A326F90DB900A921F3 /* Assets.xcassets */,
+				D4D958A526F90DB900A921F3 /* LaunchScreen.storyboard */,
+				D4D958A826F90DB900A921F3 /* Info.plist */,
+			);
+			path = HostForTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -199,11 +267,31 @@
 			);
 			dependencies = (
 				D4B54C3D24D045D500BBC161 /* PBXTargetDependency */,
+				D4D958AD26F90DE000A921F3 /* PBXTargetDependency */,
 			);
 			name = NabtoEdgeClientTests;
 			productName = NabtoEdgeClientTests;
 			productReference = D4B54C3624D045D500BBC161 /* NabtoEdgeClientTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		D4D9589726F90DB700A921F3 /* HostForTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D4D958A926F90DB900A921F3 /* Build configuration list for PBXNativeTarget "HostForTests" */;
+			buildPhases = (
+				D4D9589426F90DB700A921F3 /* Sources */,
+				D4D9589526F90DB700A921F3 /* Frameworks */,
+				D4D9589626F90DB700A921F3 /* Resources */,
+				D4D958B226F90E8A00A921F3 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D4D958B126F90E8A00A921F3 /* PBXTargetDependency */,
+			);
+			name = HostForTests;
+			productName = HostForTests;
+			productReference = D4D9589826F90DB700A921F3 /* HostForTests.app */;
+			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
@@ -211,7 +299,7 @@
 		D42A03A724CEE12D008E4B2D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1150;
+				LastSwiftUpdateCheck = 1250;
 				LastUpgradeCheck = 1150;
 				ORGANIZATIONNAME = Nabto;
 				TargetAttributes = {
@@ -222,6 +310,10 @@
 					D4B54C3524D045D500BBC161 = {
 						CreatedOnToolsVersion = 11.5;
 						LastSwiftMigration = 1150;
+						TestTargetID = D4D9589726F90DB700A921F3;
+					};
+					D4D9589726F90DB700A921F3 = {
+						CreatedOnToolsVersion = 12.5.1;
 					};
 				};
 			};
@@ -240,6 +332,7 @@
 			targets = (
 				D42A03AF24CEE12D008E4B2D /* NabtoEdgeClient */,
 				D4B54C3524D045D500BBC161 /* NabtoEdgeClientTests */,
+				D4D9589726F90DB700A921F3 /* HostForTests */,
 			);
 		};
 /* End PBXProject section */
@@ -257,6 +350,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D4D9589626F90DB700A921F3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D4D958A726F90DB900A921F3 /* LaunchScreen.storyboard in Resources */,
+				D4D958A426F90DB900A921F3 /* Assets.xcassets in Resources */,
+				D4D958A226F90DB700A921F3 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -337,6 +440,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D4D9589426F90DB700A921F3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D4D9589F26F90DB700A921F3 /* ViewController.swift in Sources */,
+				D4D9589B26F90DB700A921F3 /* AppDelegate.swift in Sources */,
+				D4D9589D26F90DB700A921F3 /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -345,7 +458,36 @@
 			target = D42A03AF24CEE12D008E4B2D /* NabtoEdgeClient */;
 			targetProxy = D4B54C3C24D045D500BBC161 /* PBXContainerItemProxy */;
 		};
+		D4D958AD26F90DE000A921F3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D4D9589726F90DB700A921F3 /* HostForTests */;
+			targetProxy = D4D958AC26F90DE000A921F3 /* PBXContainerItemProxy */;
+		};
+		D4D958B126F90E8A00A921F3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D42A03AF24CEE12D008E4B2D /* NabtoEdgeClient */;
+			targetProxy = D4D958B026F90E8A00A921F3 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		D4D958A026F90DB700A921F3 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D4D958A126F90DB700A921F3 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		D4D958A526F90DB900A921F3 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D4D958A626F90DB900A921F3 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		D42A03B624CEE12D008E4B2D /* Debug */ = {
@@ -554,6 +696,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HostForTests.app/HostForTests";
 				USER_HEADER_SEARCH_PATHS = "\"${PROJECT_DIR}/Pods\"/**";
 			};
 			name = Debug;
@@ -576,7 +719,50 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "NabtoEdgeClientTests/NabtoEdgeClientTests-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HostForTests.app/HostForTests";
 				USER_HEADER_SEARCH_PATHS = "\"${PROJECT_DIR}/Pods\"/**";
+			};
+			name = Release;
+		};
+		D4D958AA26F90DB900A921F3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E55K8RCV2E;
+				INFOPLIST_FILE = HostForTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nabto.HostForTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D4D958AB26F90DB900A921F3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = E55K8RCV2E;
+				INFOPLIST_FILE = HostForTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nabto.HostForTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -606,6 +792,15 @@
 			buildConfigurations = (
 				D4B54C3F24D045D500BBC161 /* Debug */,
 				D4B54C4024D045D500BBC161 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D4D958A926F90DB900A921F3 /* Build configuration list for PBXNativeTarget "HostForTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D4D958AA26F90DB900A921F3 /* Debug */,
+				D4D958AB26F90DB900A921F3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

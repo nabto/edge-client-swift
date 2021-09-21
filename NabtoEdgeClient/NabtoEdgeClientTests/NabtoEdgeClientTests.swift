@@ -41,14 +41,14 @@ struct Device {
     func asJson() -> String {
         let sctElement = sct != nil ? "\"ServerConnectToken\": \"\(sct!)\",\n" : ""
         return """
-        {\n
-        \"Local\": \(self.local),\n
-        \"ProductId\": \"\(self.productId)\",\n
-        \"DeviceId\": \"\(self.deviceId)\",\n
-        \"ServerUrl\": \"\(self.url)\",\n
-        \(sctElement)
-        \"ServerKey\": \"\(self.key)\"\n}
-        """
+               {\n
+               \"Local\": \(self.local),\n
+               \"ProductId\": \"\(self.productId)\",\n
+               \"DeviceId\": \"\(self.deviceId)\",\n
+               \"ServerUrl\": \"\(self.url)\",\n
+               \(sctElement)
+               \"ServerKey\": \"\(self.key)\"\n}
+               """
     }
 }
 
@@ -409,10 +409,10 @@ class NabtoEdgeClientTests: XCTestCase {
     func testCreateManyClientsWithLoggingEnabled() {
         let n: Int
         #if targetEnvironment(simulator)
-            n = 1000
+        n = 1000
         #else
-            // each iteration takes several seconds on actual device with iOS 14.7 / Xcode 12.5.1
-            n = 3
+        // each iteration takes several seconds on actual device with iOS 14.7 / Xcode 12.5.1
+        n = 3
         #endif
         for _ in 1...n {
             _ = Client()
@@ -478,7 +478,7 @@ class NabtoEdgeClientTests: XCTestCase {
     // broken; failing asserts are ignored and test continues - probably something about using xctassert
     // outside the main thread (but no documentation found on the matter). Solution / work around is the
     // super ugly alternative seen in testCoapRequestAsync with asserts moved out of the closure.
-    
+
 //    func testCoapRequestAsync_Original() {
 //        self.client = Client()
 //        self.connection = try! client.createConnection()
@@ -530,13 +530,57 @@ class NabtoEdgeClientTests: XCTestCase {
             response = cbResponse
             exp2.fulfill()
         }
-    
+
         wait(for: [exp2], timeout: 2.0)
-    
+
         XCTAssertEqual(ec, .OK)
         XCTAssertEqual(response!.status, 205)
         XCTAssertEqual(response!.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
         XCTAssertEqual(String(decoding: response!.payload, as: UTF8.self), "Hello world")
+    }
+
+    func testReproduceCrashFreeClientFromCallback() {
+        for i in 1...3 {
+            self.doTestReproduceCrashFreeClientFromCallback()
+        }
+    }
+
+    func doTestReproduceCrashFreeClientFromCallback() {
+        let exp1 = XCTestExpectation(description: "expect coap done callback")
+        do {
+            let client = Client()
+            try! client.setLogLevel(level: "trace")
+            client.enableNsLogLogging()
+            let connection = try! client.createConnection()
+            let key = try! client.createPrivateKey()
+            try! connection.setPrivateKey(key: key)
+            try! connection.updateOptions(json: self.coapDevice.asJson())
+
+
+            var ec: NabtoEdgeClientError = .FAILED
+            connection.connectAsync { ec in
+                guard (ec == .OK) else {
+                    XCTFail("Connect error: \(ec)")
+                    return
+                }
+                let coap = try! connection.createCoapRequest(method: "GET", path: "/hello-world")
+                var response: CoapResponse?
+                coap.executeAsync { ec, response in
+                    guard (ec == .OK) else {
+                        XCTFail("Coap error: \(ec)")
+                        return
+                    }
+                    exp1.fulfill()
+                }
+            }
+        }
+        wait(for: [exp1], timeout: 2)
+    }
+
+    func testRepeat_testCoapRequestSyncAfterAsyncConnect() {
+        for _ in 1...10 {
+            self.testCoapRequestSyncAfterAsyncConnect()
+        }
     }
 
     func testCoapRequestSyncAfterAsyncConnect() {
@@ -956,6 +1000,136 @@ class NabtoEdgeClientTests: XCTestCase {
 
         // in an actual pairing use case, now persist device's fingerprint (obtained with connection.getDeviceFingerprintHex())
         // along with device id etc and compare at subsequent connection attempt
+    }
+    
+    func testReproduceCrash() {
+        let exp = XCTestExpectation(description: "wait")
+        try! self.connectPairAndSubscribe()
+        print(" ***********************************************************************")
+        print(" ***********************************************************************")
+        print(" ***********************************************************************")
+        print(" *** done, waiting for crash")
+        print(" ***********************************************************************")
+        print(" ***********************************************************************")
+        print(" ***********************************************************************")
+        wait(for: [exp], timeout: 30)
+    }
+    
+    func invokeCoapWithCbor(
+            method: String,
+            connection: NabtoEdgeClient.Connection,
+            path: String,
+            cbor: [UInt8]) throws -> NabtoEdgeClient.CoapResponse {
+        let coap = try connection.createCoapRequest(method: method, path: path)
+        try! coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: Data(cbor))
+        return try coap.execute()
+    }
+
+    func invokeCoapMap(
+            method: String,
+            connection: NabtoEdgeClient.Connection,
+            path: String,
+            map: [String:String]) throws -> NabtoEdgeClient.CoapResponse {
+        return try self.invokeCoapWithCbor(
+                method: method,
+                connection: connection,
+                path: path,
+                cbor: CBOR.encode(map))
+    }
+
+    func invokeCoapArray(
+            method: String,
+            connection: NabtoEdgeClient.Connection,
+            path: String,
+            array: [String]) throws -> NabtoEdgeClient.CoapResponse {
+        return try self.invokeCoapWithCbor(
+                method: method,
+                connection: connection,
+                path: path,
+                cbor: CBOR.encode(array))
+    }
+
+
+    func pairAndSubscribe(_ connection: NabtoEdgeClient.Connection) throws -> Bool {
+        let username = UUID().uuidString.lowercased()
+
+        var response = try self.invokeCoapMap(
+                method: "POST",
+                connection: connection,
+                path: "/iam/pairing/password-open",
+                map: ["Username": username])
+        if (response.status != 201) {
+            NSLog("Pairing failed: \(response)")
+            return false
+        }
+
+        let token = "foo"
+        
+        // coap invoke { "Token": "<token>", "ProjectId": "fir-edge-push" }
+        response = try self.invokeCoapMap(
+                method: "PUT",
+                connection: connection,
+                path: "/iam/users/\(username)/fcm",
+                map: ["Token": token, "ProjectId": "fir-edge-push"])
+
+        if (response.status != 204) {
+            NSLog("Subscribe failed: \(response)")
+            return false
+        }
+
+        response = try self.invokeCoapArray(
+                method: "PUT",
+                connection: connection,
+                path: "/iam/users/\(username)/notification-categories",
+                array: ["Warn", "Alert"])
+        if (response.status != 204) {
+            NSLog("Set categories failed: \(response)")
+            return false
+        }
+        return true
+
+    }
+
+    func connectPairAndSubscribe() throws {
+        var client: NabtoEdgeClient.Client!
+
+        client = Client()
+        try client.setLogLevel(level: "trace")
+        client.enableNsLogLogging()
+
+        let connection = try client.createConnection()
+        let key = try client.createPrivateKey()
+        try connection.setPrivateKey(key: key)
+        try connection.updateOptions(json:
+        """
+        {
+          "ProductId": "pr-fatqcwj9",
+          "DeviceId": "de-wbtro9fp",
+          "ServerUrl": "https://pr-fatqcwj9.clients.nabto.net",
+          "ServerKey": "sk-c132dff0eaf6e2f73a7fb312140616ed",
+          "ServerConnectToken": "kqhpOLQMBdt7"
+        }
+        """)
+        do {
+            try connection.connect()
+        } catch {
+            XCTFail("Connect failed: \(error)")
+        }
+        try connection.passwordAuthenticateAsync(username: "", password: "openPassword") { ec in
+            NSLog("Password auth completed, status is \(ec)")
+            if (ec == .OK) {
+                do {
+                    if (try self.pairAndSubscribe(connection)) {
+                        NSLog("Success!");
+                    } else {
+                        NSLog("High level failure - logged above")
+                    }
+                } catch {
+                    NSLog("Low level failure: \(error)")
+                }
+            }
+        }
+        print(" *** async func done, no more obj refs in this function")
     }
 
 }

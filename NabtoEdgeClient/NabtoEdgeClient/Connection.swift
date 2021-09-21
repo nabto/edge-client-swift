@@ -68,6 +68,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
     }
 
     deinit {
+        print(" ***** connection::deinit() *****")
         nabto_client_connection_free(self.nativeConnection)
     }
 

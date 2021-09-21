@@ -143,7 +143,7 @@ public class Stream {
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: self.chunkSize)
         var readSize: Int = 0
         nabto_client_stream_read_some(self.stream, future, buffer, self.chunkSize, &readSize)
-        let w = CallbackWrapper(client: self.client, connection: nil, future: future)
+        let w = CallbackWrapper(future: future)
         w.registerCallback{ ec in
             if (ec == .OK) {
                 closure(ec, Data(bytes: buffer, count: readSize))
@@ -198,7 +198,7 @@ public class Stream {
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: length)
         var readSize: Int = 0
         nabto_client_stream_read_all(self.stream, future, buffer, length, &readSize)
-        let w = CallbackWrapper(client: self.client, connection: nil, future: future)
+        let w = CallbackWrapper(future: future, connection: nil)
         self.activeCallbacks.insert(w)
         w.setCleanupClosure(cleanupClosure: { [weak w] in
             if let w = w {
