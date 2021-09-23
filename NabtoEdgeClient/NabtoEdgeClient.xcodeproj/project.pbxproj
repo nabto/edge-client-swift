@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BE4C087843447C1B19887846 /* libPods-NabtoEdgeClientTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 622934FB1E627B3A5F2AB44E /* libPods-NabtoEdgeClientTests.a */; };
+		04E606ECADFAC119664A80F6 /* libPods-NabtoEdgeClientTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FF5EF34537F43D349172669 /* libPods-NabtoEdgeClientTests.a */; };
+		826201D057A0DE0E6F33884B /* libPods-NabtoEdgeClient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E276E49C72EDB364EA10B19B /* libPods-NabtoEdgeClient.a */; };
 		D42A03BC24CEE19E008E4B2D /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = D42A03BB24CEE19E008E4B2D /* Client.swift */; };
 		D484CF1025A60DC3009DCC1C /* NabtoEdgeClientError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D484CF0F25A60DC3009DCC1C /* NabtoEdgeClientError.swift */; };
 		D4B54C3924D045D500BBC161 /* NabtoEdgeClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B54C3824D045D500BBC161 /* NabtoEdgeClientTests.swift */; };
@@ -72,10 +73,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		622934FB1E627B3A5F2AB44E /* libPods-NabtoEdgeClientTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NabtoEdgeClientTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		8D31C02DF246E014AD48D0F7 /* Pods-NabtoEdgeClient.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClient.debug.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClient/Pods-NabtoEdgeClient.debug.xcconfig"; sourceTree = "<group>"; };
-		AF5DA28303002BD40A3D11DE /* libPods-NabtoEdgeClient.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NabtoEdgeClient.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		CEC53AAFB10E3162AE46F79E /* Pods-NabtoEdgeClient.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClient.release.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClient/Pods-NabtoEdgeClient.release.xcconfig"; sourceTree = "<group>"; };
+		0E16149DD7246660416878CF /* Pods-NabtoEdgeClient.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClient.release.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClient/Pods-NabtoEdgeClient.release.xcconfig"; sourceTree = "<group>"; };
+		14617E39F4CCF8C94FC21378 /* Pods-NabtoEdgeClientTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClientTests.release.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClientTests/Pods-NabtoEdgeClientTests.release.xcconfig"; sourceTree = "<group>"; };
+		49FA027F85DE7F0FF6542145 /* Pods-NabtoEdgeClientTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClientTests.debug.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClientTests/Pods-NabtoEdgeClientTests.debug.xcconfig"; sourceTree = "<group>"; };
+		4FF5EF34537F43D349172669 /* libPods-NabtoEdgeClientTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NabtoEdgeClientTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D42A03B024CEE12D008E4B2D /* NabtoEdgeClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = NabtoEdgeClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D42A03B424CEE12D008E4B2D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D42A03BB24CEE19E008E4B2D /* Client.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
@@ -92,7 +93,7 @@
 		D4D958A326F90DB900A921F3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D4D958A626F90DB900A921F3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D4D958A826F90DB900A921F3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E91E86E49DE48350DEC50EFD /* Pods-NabtoEdgeClientTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClientTests.debug.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClientTests/Pods-NabtoEdgeClientTests.debug.xcconfig"; sourceTree = "<group>"; };
+		E276E49C72EDB364EA10B19B /* libPods-NabtoEdgeClient.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NabtoEdgeClient.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E921D0ADFA95E0D7B453F106 /* ConnectionEventListener.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionEventListener.swift; sourceTree = "<group>"; };
 		E9229B3C89D448937E34F990 /* MdnsScanner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MdnsScanner.swift; sourceTree = "<group>"; };
 		E92365CF645619AA908C6A8B /* CoapRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoapRequest.swift; sourceTree = "<group>"; };
@@ -104,7 +105,7 @@
 		E92C442D4196F3F94E893327 /* Helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		E92C825D705048F208FC54FD /* CoapResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoapResponse.swift; sourceTree = "<group>"; };
 		E92FA199DFA2FC4908ECA3EA /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = SOURCE_ROOT; };
-		EF321C3FFEDE096287A223EB /* Pods-NabtoEdgeClientTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClientTests.release.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClientTests/Pods-NabtoEdgeClientTests.release.xcconfig"; sourceTree = "<group>"; };
+		F4DE7B594975E1285FC700CC /* Pods-NabtoEdgeClient.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClient.debug.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClient/Pods-NabtoEdgeClient.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +113,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				826201D057A0DE0E6F33884B /* libPods-NabtoEdgeClient.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -120,7 +122,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D4B54C3B24D045D500BBC161 /* NabtoEdgeClient.framework in Frameworks */,
-				BE4C087843447C1B19887846 /* libPods-NabtoEdgeClientTests.a in Frameworks */,
+				04E606ECADFAC119664A80F6 /* libPods-NabtoEdgeClientTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -135,11 +137,11 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		9B2468AE849F01914C41B7FD /* Frameworks */ = {
+		9CDB0174E81C173F2CF44496 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				AF5DA28303002BD40A3D11DE /* libPods-NabtoEdgeClient.a */,
-				622934FB1E627B3A5F2AB44E /* libPods-NabtoEdgeClientTests.a */,
+				E276E49C72EDB364EA10B19B /* libPods-NabtoEdgeClient.a */,
+				4FF5EF34537F43D349172669 /* libPods-NabtoEdgeClientTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -147,10 +149,10 @@
 		A6E0D4F7F182EAC675676AA0 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				8D31C02DF246E014AD48D0F7 /* Pods-NabtoEdgeClient.debug.xcconfig */,
-				CEC53AAFB10E3162AE46F79E /* Pods-NabtoEdgeClient.release.xcconfig */,
-				E91E86E49DE48350DEC50EFD /* Pods-NabtoEdgeClientTests.debug.xcconfig */,
-				EF321C3FFEDE096287A223EB /* Pods-NabtoEdgeClientTests.release.xcconfig */,
+				F4DE7B594975E1285FC700CC /* Pods-NabtoEdgeClient.debug.xcconfig */,
+				0E16149DD7246660416878CF /* Pods-NabtoEdgeClient.release.xcconfig */,
+				49FA027F85DE7F0FF6542145 /* Pods-NabtoEdgeClientTests.debug.xcconfig */,
+				14617E39F4CCF8C94FC21378 /* Pods-NabtoEdgeClientTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -163,7 +165,7 @@
 				D4D9589926F90DB700A921F3 /* HostForTests */,
 				D42A03B124CEE12D008E4B2D /* Products */,
 				A6E0D4F7F182EAC675676AA0 /* Pods */,
-				9B2468AE849F01914C41B7FD /* Frameworks */,
+				9CDB0174E81C173F2CF44496 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -239,7 +241,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D42A03B824CEE12D008E4B2D /* Build configuration list for PBXNativeTarget "NabtoEdgeClient" */;
 			buildPhases = (
-				E31302B7F68D16522B9F0211 /* [CP] Check Pods Manifest.lock */,
+				67E49533CCCCC062E2179DD7 /* [CP] Check Pods Manifest.lock */,
 				D42A03AB24CEE12D008E4B2D /* Headers */,
 				D42A03AC24CEE12D008E4B2D /* Sources */,
 				D42A03AD24CEE12D008E4B2D /* Frameworks */,
@@ -258,7 +260,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D4B54C3E24D045D500BBC161 /* Build configuration list for PBXNativeTarget "NabtoEdgeClientTests" */;
 			buildPhases = (
-				99498E5660FB357EA3FE21F9 /* [CP] Check Pods Manifest.lock */,
+				238D8B2A929572190FDE4139 /* [CP] Check Pods Manifest.lock */,
 				D4B54C3224D045D500BBC161 /* Sources */,
 				D4B54C3324D045D500BBC161 /* Frameworks */,
 				D4B54C3424D045D500BBC161 /* Resources */,
@@ -366,7 +368,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		99498E5660FB357EA3FE21F9 /* [CP] Check Pods Manifest.lock */ = {
+		238D8B2A929572190FDE4139 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -388,7 +390,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E31302B7F68D16522B9F0211 /* [CP] Check Pods Manifest.lock */ = {
+		67E49533CCCCC062E2179DD7 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -618,7 +620,7 @@
 		};
 		D42A03B924CEE12D008E4B2D /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8D31C02DF246E014AD48D0F7 /* Pods-NabtoEdgeClient.debug.xcconfig */;
+			baseConfigurationReference = F4DE7B594975E1285FC700CC /* Pods-NabtoEdgeClient.debug.xcconfig */;
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_MODULES = YES;
@@ -649,7 +651,7 @@
 		};
 		D42A03BA24CEE12D008E4B2D /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = CEC53AAFB10E3162AE46F79E /* Pods-NabtoEdgeClient.release.xcconfig */;
+			baseConfigurationReference = 0E16149DD7246660416878CF /* Pods-NabtoEdgeClient.release.xcconfig */;
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_MODULES = YES;
@@ -679,7 +681,7 @@
 		};
 		D4B54C3F24D045D500BBC161 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E91E86E49DE48350DEC50EFD /* Pods-NabtoEdgeClientTests.debug.xcconfig */;
+			baseConfigurationReference = 49FA027F85DE7F0FF6542145 /* Pods-NabtoEdgeClientTests.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -703,7 +705,7 @@
 		};
 		D4B54C4024D045D500BBC161 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = EF321C3FFEDE096287A223EB /* Pods-NabtoEdgeClientTests.release.xcconfig */;
+			baseConfigurationReference = 14617E39F4CCF8C94FC21378 /* Pods-NabtoEdgeClientTests.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;

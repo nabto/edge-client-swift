@@ -20,10 +20,10 @@ DESC
   s.platform = :ios
   s.ios.preserve_paths = 'NabtoEdgeClient.xcframework'
   s.ios.libraries = 'c++', 'stdc++'
-  s.ios.deployment_target = '10.0'
+  s.ios.deployment_target = '10.2'
 
   # no arm64 simulator support yet in core api (https://github.com/CocoaPods/CocoaPods/issues/10104)
-  s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
-  s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+  s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64 i386' }
+  s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64 i386' }
 
 end

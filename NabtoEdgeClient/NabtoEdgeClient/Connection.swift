@@ -48,28 +48,33 @@ internal protocol NativeConnectionWrapper {
  */
 public class Connection: NSObject, NativeConnectionWrapper {
     internal let nativeConnection: OpaquePointer
-    private let client: Client
+    private weak var client: Client?
     private let helper: Helper
     private var apiEventCallBackRegistered: Bool = false
     private var connectionEventListener: ConnectionEventListener? = nil
 
     internal init(client: Client) throws {
-        let p = nabto_client_connection_new(client.nativeClient)
-        if (p != nil) {
-            self.nativeConnection = p!
+        if let p = nabto_client_connection_new(client.nativeClient) {
+            self.nativeConnection = p
         } else {
             throw NabtoEdgeClientError.ALLOCATION_ERROR
         }
-        // keep a swift level reference to client (ie to NativeClientWrapper instance vs raw OpaquePointer) to prevent client
-        // from being freed by ARC if owning app only keeps reference to connection
         self.client = client
-        self.helper = Helper(nabtoClient: self.client)
+        if let client = self.client {
+            self.helper = Helper(nabtoClient: client)
+        } else {
+            throw NabtoEdgeClientError.ALLOCATION_ERROR
+        }
         super.init()
     }
 
     deinit {
-        print(" ***** connection::deinit() *****")
+        NSLog(" ***** Connection::deinit (begin) *****")
+        if let listener = self.connectionEventListener {
+            listener.stop()
+        }
         nabto_client_connection_free(self.nativeConnection)
+        NSLog(" ***** Connection::deinit (end) *****")
     }
 
     /**
@@ -261,7 +266,11 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * @throws ALLOCATION_ERROR if the stream could not be created.
      */
     public func createStream() throws -> Stream {
-        return try Stream(nabtoClient: self.client, nabtoConnection: self)
+        if let client = self.client {
+            return try Stream(nabtoClient: client, nabtoConnection: self)
+        } else {
+            throw NabtoEdgeClientError.ALLOCATION_ERROR
+        }
     }
 
     /**
@@ -271,7 +280,11 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * @throws ALLOCATION_ERROR if the request could not be created.
      */
     public func createCoapRequest(method: String, path: String) throws -> CoapRequest {
-        return try CoapRequest(nabtoClient: self.client, nabtoConnection: self, method: method, path: path)
+        if let client = self.client {
+            return try CoapRequest(nabtoClient: client, nabtoConnection: self, method: method, path: path)
+        } else {
+            throw NabtoEdgeClientError.ALLOCATION_ERROR
+        }
     }
 
     /**
@@ -279,7 +292,11 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * @throws ALLOCATION_ERROR if the tunnel could not be created.
      */
     public func createTcpTunnel() throws -> TcpTunnel {
-        return try TcpTunnel(nabtoClient: self.client, nabtoConnection: self)
+        if let client = self.client {
+            return try TcpTunnel(nabtoClient: client, nabtoConnection: self)
+        } else {
+            throw NabtoEdgeClientError.ALLOCATION_ERROR
+        }
     }
 
     /**
@@ -288,10 +305,13 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * @throws INVALID_STATE if listener could not be added
      */
     public func addConnectionEventsReceiver(cb: ConnectionEventReceiver) throws {
-        if (self.connectionEventListener == nil) {
-            self.connectionEventListener = try ConnectionEventListener(nabtoConnection: self, nabtoClient: self.client)
+        guard let client = self.client else {
+            throw NabtoEdgeClientError.ALLOCATION_ERROR
         }
-        self.connectionEventListener!.addUserCb(cb)
+        if (self.connectionEventListener == nil) {
+            self.connectionEventListener = try ConnectionEventListener(nabtoConnection: self, nabtoClient: client)
+        }
+        try self.connectionEventListener!.addUserCb(cb)
     }
 
     /**

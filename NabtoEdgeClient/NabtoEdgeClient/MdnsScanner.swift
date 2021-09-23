@@ -28,6 +28,7 @@ public class MdnsScanner: NSObject {
     private let subType: String?
     private var result: OpaquePointer? = nil
     private let serialQueue = DispatchQueue(label: "MdnsResultListener.serialQueue")
+    private var aliveSelf: MdnsScanner?
 
     // see comment on set vs hashtable and protocol/delegate vs closure on similar property in
     // ConnectionEventListener class
@@ -63,14 +64,9 @@ public class MdnsScanner: NSObject {
             let ec = nabto_client_mdns_resolver_init_listener(
                     self.client.nativeClient, self.listener, self.subType ?? "" /* nil causes crash (NABTO-2359) */)
             try Helper.throwIfNotOk(ec)
-
-            nabto_client_listener_new_mdns_result(self.listener, self.future, &self.result)
-
-            let rawSelf = Unmanaged.passUnretained(self).toOpaque()
-            nabto_client_future_set_callback(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
-                let mySelf = Unmanaged<MdnsScanner>.fromOpaque(data!).takeUnretainedValue()
-                mySelf.apiEventCallback(ec: ec)
-            }, rawSelf)
+            // prevent ARC reclaim until we get a close event
+            self.aliveSelf = self
+            self.armListener()
         }
     }
 
@@ -115,6 +111,11 @@ public class MdnsScanner: NSObject {
     }
 
     private func apiEventCallback(ec: NabtoClientError) {
+        if (ec == NABTO_CLIENT_EC_STOPPED) {
+            // allow ARC to reclaim us
+            self.aliveSelf = nil
+            return
+        }
         guard (ec == NABTO_CLIENT_EC_OK) else {
             return
         }
@@ -124,6 +125,10 @@ public class MdnsScanner: NSObject {
                 (cb as! MdnsResultReceiver).onResultReady(result: self.createFromResult(res))
             }
         }
+        self.armListener()
+    }
+
+    private func armListener() {
         nabto_client_listener_new_mdns_result(self.listener, self.future, &self.result)
         let rawSelf = Unmanaged.passUnretained(self).toOpaque()
         nabto_client_future_set_callback(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in

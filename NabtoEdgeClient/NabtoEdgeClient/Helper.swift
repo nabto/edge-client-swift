@@ -8,17 +8,18 @@ import Foundation
 
 internal class CallbackWrapper : NSObject {
     let future: OpaquePointer
-    weak var connection: Connection?
+    var connection: Connection?
     var cb: AsyncStatusReceiver?
     var keepMeAlive: CallbackWrapper?
 
     init(future: OpaquePointer, connection: Connection?=nil) {
+        NSLog(" ***** callback wrapper init ***** ")
         self.future = future
         self.connection = connection
     }
 
     deinit {
-        print(" ***** callback wrapper deinit ***** ")
+        NSLog(" ***** callback wrapper deinit ***** ")
     }
 
     public func registerCallback(_ cb: @escaping AsyncStatusReceiver) {
@@ -26,11 +27,13 @@ internal class CallbackWrapper : NSObject {
         let rawSelf = Unmanaged.passUnretained(self).toOpaque()
         self.keepMeAlive = self
         nabto_client_future_set_callback(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
+            NSLog(" ***** callback wrapper nabto callback (begin) *****")
             let mySelf = Unmanaged<CallbackWrapper>.fromOpaque(data!).takeUnretainedValue()
             let wrapperError = mySelf.mapToSwiftError(ec: ec)
             mySelf.invokeUserCallback(wrapperError)
-            print(" ***** Helper::callback done *****")
+            NSLog(" ***** callback wrapper nabto callback nil'ing self to allow deinit *****")
             mySelf.keepMeAlive = nil
+            NSLog(" ***** callback wrapper nabto callback (end) *****")
         }, rawSelf)
     }
 
@@ -46,10 +49,6 @@ internal class CallbackWrapper : NSObject {
             swiftError = Helper.mapSimpleApiStatusToErrorCode(ec)
         }
         return swiftError
-    }
-
-    func setCleanupClosure(cleanupClosure: @escaping () -> Void) {
-        self.cleanupClosure = cleanupClosure
     }
 
     func invokeUserCallback(_ wrapperError: NabtoEdgeClientError) {
@@ -68,6 +67,10 @@ internal class Helper {
     }
 
     deinit {
+    }
+
+    internal static func apiStatusToString(_ status: NabtoClientError) -> String {
+        return String(cString: nabto_client_error_get_string(status))
     }
 
     internal static func mapSimpleApiStatusToErrorCode(_ status: NabtoClientError) -> NabtoEdgeClientError {
@@ -97,8 +100,7 @@ internal class Helper {
         case NABTO_CLIENT_EC_UNKNOWN: return NabtoEdgeClientError.FAILED
 
         default:
-            let str = String(cString: nabto_client_error_get_string(status))
-            NSLog("Unexpected API status \(status): \(str)")
+            NSLog("Unexpected API status \(status): \(apiStatusToString(status))")
             return .UNEXPECTED_API_STATUS
         }
     }
@@ -154,16 +156,7 @@ internal class Helper {
             // invoke actual api function specified by caller (e.g. nabto_client_connection_connect)
             implClosure(future)
 
-            // keep client and connection swift objects alive until future resolves
             let w = CallbackWrapper(future: future, connection: connection)
-            self.activeCallbacks.insert(w)
-
-            // when future resolves, remove reference to client and connection and allow them to be reclaimed
-            w.setCleanupClosure(cleanupClosure: {  [weak w] in
-                if let w = w {
-                    self.activeCallbacks.remove(w)
-                }
-            })
 
             // set callback on future (nabto_client_future_set_callback)
             w.registerCallback(userClosure)

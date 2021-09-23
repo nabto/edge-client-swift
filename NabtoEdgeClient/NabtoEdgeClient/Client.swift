@@ -57,11 +57,11 @@ public class Client: NSObject, NativeClientWrapper {
     }
 
     deinit {
-        print(" ***** Client::deinit (begin) *****")
+        NSLog(" ***** Client::deinit (begin) *****")
         self.stop()
-        print(" ***** Client::deinit (stopped) *****")
+        NSLog(" ***** Client::deinit (stopped) *****")
         nabto_client_free(self.nativeClient)
-        print(" ***** Client::deinit (end) *****")
+        NSLog(" ***** Client::deinit (end) *****")
     }
 
     /**

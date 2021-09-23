@@ -21,7 +21,7 @@ public typealias AsyncDataReceiver = (NabtoEdgeClientError, Data?) -> Void
 public class Stream {
 
     private let connection: NativeConnectionWrapper
-    private let client: Client
+    private weak var client: Client?
     private let stream: OpaquePointer
     private let helper: Helper
     private let chunkSize: Int = 1024
@@ -30,10 +30,13 @@ public class Stream {
     internal init(nabtoClient: Client, nabtoConnection: Connection) throws {
         self.client = nabtoClient
         self.connection = nabtoConnection
-        self.helper = Helper(nabtoClient: self.client)
-        let p = nabto_client_stream_new(self.connection.nativeConnection)
-        if (p != nil) {
-            self.stream = p!
+        if let client = self.client {
+            self.helper = Helper(nabtoClient: client)
+        } else {
+            throw NabtoEdgeClientError.ALLOCATION_ERROR
+        }
+        if let p = nabto_client_stream_new(self.connection.nativeConnection) {
+            self.stream = p
         } else {
             throw NabtoEdgeClientError.ALLOCATION_ERROR
         }
@@ -139,7 +142,11 @@ public class Stream {
      * for possible errors.
      */
     public func readSomeAsync(closure: @escaping AsyncDataReceiver) {
-        let future: OpaquePointer = nabto_client_future_new(self.client.nativeClient)
+        guard let client = self.client else {
+            // todo invoke error handler
+            return
+        }
+        let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: self.chunkSize)
         var readSize: Int = 0
         nabto_client_stream_read_some(self.stream, future, buffer, self.chunkSize, &readSize)
@@ -152,12 +159,6 @@ public class Stream {
             }
             buffer.deallocate()
         }
-        w.setCleanupClosure(cleanupClosure: { [weak w] in
-            if let w = w {
-                self.activeCallbacks.remove(w)
-            }
-        })
-        self.activeCallbacks.insert(w)
     }
 
     /**
@@ -194,17 +195,15 @@ public class Stream {
      * for possible errors.
      */
     public func readAllAsync(length: Int, closure: @escaping AsyncDataReceiver) {
-        let future: OpaquePointer = nabto_client_future_new(self.client.nativeClient)
+        guard let client = self.client else {
+            // todo invoke error handler
+            return
+        }
+        let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: length)
         var readSize: Int = 0
         nabto_client_stream_read_all(self.stream, future, buffer, length, &readSize)
-        let w = CallbackWrapper(future: future, connection: nil)
-        self.activeCallbacks.insert(w)
-        w.setCleanupClosure(cleanupClosure: { [weak w] in
-            if let w = w {
-                self.activeCallbacks.remove(w)
-            }
-        })
+        let w = CallbackWrapper(future: future)
         w.registerCallback { ec in
             if (ec == .OK) {
                 closure(ec, Data(bytes: buffer, count: readSize))
