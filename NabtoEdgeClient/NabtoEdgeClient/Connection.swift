@@ -71,9 +71,13 @@ public class Connection: NSObject, NativeConnectionWrapper {
     deinit {
         NSLog(" ***** Connection::deinit (begin) *****")
         if let listener = self.connectionEventListener {
+//            NSLog(" ***** Connection::deinit (stopping listener) *****")
             listener.stop()
+//            NSLog(" ***** Connection::deinit (stopped listener) *****")
         }
+//        NSLog(" ***** Connection::deinit (freeing connection) *****")
         nabto_client_connection_free(self.nativeConnection)
+//        NSLog(" ***** Connection::deinit (freed connection) *****")
         NSLog(" ***** Connection::deinit (end) *****")
     }
 

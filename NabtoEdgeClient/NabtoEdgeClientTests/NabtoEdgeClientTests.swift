@@ -602,33 +602,38 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func testRepeat_testCoapRequestSyncAfterAsyncConnect() {
         for _ in 1...10 {
-            self.testCoapRequestSyncAfterAsyncConnect()
+            self.testCoapRequestAsyncAfterAsyncConnect()
         }
     }
 
-    func testCoapRequestSyncAfterAsyncConnect() {
+    func testCoapRequestAsyncAfterAsyncConnect() {
+        var connectionKeeper: Connection?
         let client = Client()
-        try! client.setLogLevel(level: "debug")
+        try! client.setLogLevel(level: "info")
         client.enableNsLogLogging()
         let connection = try! client.createConnection()
+        connectionKeeper = connection
         let key = try! client.createPrivateKey()
         try! connection.setPrivateKey(key: key)
         try! connection.updateOptions(json: self.coapDevice.asJson())
         let exp = XCTestExpectation(description: "expect coap done callback")
 
-        connection.connectAsync { ec in
+        connection.connectAsync(closure: { ec in
             NSLog(" ***** swift connect callback (begin), ec=\(ec)")
             XCTAssertEqual(ec, .OK)
             let coap = try! connection.createCoapRequest(method: "GET", path: "/hello-world")
-            let response = try! coap.execute()
-            XCTAssertEqual(response.status, 205)
-            XCTAssertEqual(response.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
-            XCTAssertEqual(String(decoding: response.payload, as: UTF8.self), "Hello world")
-            exp.fulfill()
+            coap.executeAsync { ec, response in
+                NSLog(" *****   swift request callback (begin), ec=\(ec)")
+                XCTAssertEqual(ec, .OK)
+                XCTAssertNotNil(response)
+                XCTAssertEqual(response!.status, 205)
+                XCTAssertEqual(response!.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
+                XCTAssertEqual(String(decoding: response!.payload, as: UTF8.self), "Hello world")
+                NSLog(" *****   swift request callback (end), coap is \(coap)")
+                exp.fulfill()
+            }
             NSLog(" ***** swift connect callback (end)")
-        }
-
-        wait(for: [exp], timeout: 10.0)
+        })
     }
 
     func testCoapRequestAsyncCoap404() {

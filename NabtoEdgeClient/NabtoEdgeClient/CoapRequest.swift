@@ -124,7 +124,7 @@ public class CoapRequest {
         }
         let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
         nabto_client_coap_execute(self.coap, future)
-        let w = CallbackWrapper(future: future)
+        let w = CallbackWrapper(future: future, connection: self.connection)
         w.registerCallback { ec in
             if (ec == .OK) {
                 do {
