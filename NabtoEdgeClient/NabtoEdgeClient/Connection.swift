@@ -71,13 +71,13 @@ public class Connection: NSObject, NativeConnectionWrapper {
     deinit {
         NSLog(" ***** Connection::deinit (begin) *****")
         if let listener = self.connectionEventListener {
-//            NSLog(" ***** Connection::deinit (stopping listener) *****")
+            NSLog(" ***** Connection::deinit (stopping listener) *****")
             listener.stop()
-//            NSLog(" ***** Connection::deinit (stopped listener) *****")
+            NSLog(" ***** Connection::deinit (stopped listener) *****")
         }
-//        NSLog(" ***** Connection::deinit (freeing connection) *****")
+        NSLog(" ***** Connection::deinit (freeing connection) *****")
         nabto_client_connection_free(self.nativeConnection)
-//        NSLog(" ***** Connection::deinit (freed connection) *****")
+        NSLog(" ***** Connection::deinit (freed connection) *****")
         NSLog(" ***** Connection::deinit (end) *****")
     }
 
@@ -118,7 +118,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * @param closure Invoked when the connect attempt succeeds or fails.
      */
     public func connectAsync(closure: @escaping AsyncStatusReceiver) {
-        self.helper.invokeAsync(userClosure: closure, connection: self) { future in
+        self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: self) { future in
             nabto_client_connection_connect(self.nativeConnection, future)
         }
     }
@@ -145,7 +145,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * @param closure Invoked when the connect attempt succeeds or fails.
      */
     public func closeAsync(closure: @escaping AsyncStatusReceiver) {
-        self.helper.invokeAsync(userClosure: closure, connection: nil) { future in
+        self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
             nabto_client_connection_close(self.nativeConnection, future)
         }
     }
@@ -206,7 +206,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * @param password The password (typically the open (global) or invite (per-user) pairing password)
      */
     public func passwordAuthenticateAsync(username: String, password: String, closure: @escaping AsyncStatusReceiver) throws {
-        try helper.invokeAsync(userClosure: closure, connection: self) { future in
+        self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: self) { future in
             nabto_client_connection_password_authenticate(self.nativeConnection, username, password, future)
         }
     }
@@ -313,7 +313,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
             throw NabtoEdgeClientError.ALLOCATION_ERROR
         }
         if (self.connectionEventListener == nil) {
-            self.connectionEventListener = try ConnectionEventListener(nabtoConnection: self, nabtoClient: client)
+            self.connectionEventListener = ConnectionEventListener(nabtoConnection: self, nabtoClient: client)
         }
         try self.connectionEventListener!.addUserCb(cb)
     }

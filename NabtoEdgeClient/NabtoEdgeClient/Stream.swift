@@ -25,7 +25,6 @@ public class Stream {
     private let stream: OpaquePointer
     private let helper: Helper
     private let chunkSize: Int = 1024
-    private var activeCallbacks: Set<CallbackWrapper> = Set<CallbackWrapper>()
 
     internal init(nabtoClient: Client, nabtoConnection: Connection) throws {
         self.client = nabtoClient
@@ -68,7 +67,7 @@ public class Stream {
      * @param closure: Invoked when the stream is opened or an error occurs, see synchronous open() for possible errors.
      */
     public func openAsync(streamPort: UInt32, closure: @escaping AsyncStatusReceiver) {
-        self.helper.invokeAsync(userClosure: closure, connection: nil) { future in
+        self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
             nabto_client_stream_open(self.stream, future, streamPort)
         }
     }
@@ -107,7 +106,7 @@ public class Stream {
      *
      */
     public func writeAsync(data: Data, closure: @escaping AsyncStatusReceiver) {
-        self.helper.invokeAsync(userClosure: closure, connection: nil) { future in
+        self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
             doWrite(data, future)
         }
     }
@@ -150,7 +149,7 @@ public class Stream {
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: self.chunkSize)
         var readSize: Int = 0
         nabto_client_stream_read_some(self.stream, future, buffer, self.chunkSize, &readSize)
-        let w = CallbackWrapper(future: future)
+        let w = CallbackWrapper(debugDescription: "readSomeAsync", future: future, owner: self, connectionForErrorMessage: nil)
         w.registerCallback{ ec in
             if (ec == .OK) {
                 closure(ec, Data(bytes: buffer, count: readSize))
@@ -203,7 +202,7 @@ public class Stream {
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: length)
         var readSize: Int = 0
         nabto_client_stream_read_all(self.stream, future, buffer, length, &readSize)
-        let w = CallbackWrapper(future: future)
+        let w = CallbackWrapper(debugDescription: "readAllAsync", future: future, owner: self, connectionForErrorMessage: nil)
         w.registerCallback { ec in
             if (ec == .OK) {
                 closure(ec, Data(bytes: buffer, count: readSize))
@@ -240,7 +239,7 @@ public class Stream {
      * for possible errors.
      */
     public func closeAsync(closure: @escaping AsyncStatusReceiver) {
-        self.helper.invokeAsync(userClosure: closure, connection: nil) { future in
+        self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
             nabto_client_stream_close(self.stream, future)
         }
     }

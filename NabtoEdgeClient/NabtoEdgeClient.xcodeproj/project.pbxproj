@@ -25,11 +25,12 @@
 		E925C63B8544C672D3B4D09B /* MdnsScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9229B3C89D448937E34F990 /* MdnsScanner.swift */; };
 		E925D05C1F5E162B0381020C /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E923BA86B8DCE94DF9DFF0E0 /* Connection.swift */; };
 		E925FDACA374ED7D03E4995C /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = E92FA199DFA2FC4908ECA3EA /* Podfile */; };
-		E9270FECE2194BD901532109 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92C442D4196F3F94E893327 /* Helper.swift */; };
+		E9275A6C9BA8FE3640D58342 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9267A05B1666E2D878A89A5 /* Helper.swift */; };
 		E9284313828DF404FCB833CC /* TcpTunnel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92AB75FB3AD3FC3E011C088 /* TcpTunnel.swift */; };
 		E928741B07E1D63977D35060 /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9285E9171B6D17274076A7E /* Stream.swift */; };
 		E929285096AB3B80BF5C1A38 /* ConnectionEventListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921D0ADFA95E0D7B453F106 /* ConnectionEventListener.swift */; };
 		E92B785CFDB4C73F3E30EA72 /* CoapRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92365CF645619AA908C6A8B /* CoapRequest.swift */; };
+		E92C60A140836A8092689CA1 /* CallbackWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92333244D84EEB41CF39F13 /* CallbackWrapper.swift */; };
 		E92C76DCF3126FE20550B9EF /* CoapResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92C825D705048F208FC54FD /* CoapResponse.swift */; };
 		E92EF12F25F8DF3116CB8B2B /* module.map in Sources */ = {isa = PBXBuildFile; fileRef = E926B7741A2C63A0353F530E /* module.map */; };
 /* End PBXBuildFile section */
@@ -96,13 +97,14 @@
 		E276E49C72EDB364EA10B19B /* libPods-NabtoEdgeClient.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NabtoEdgeClient.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E921D0ADFA95E0D7B453F106 /* ConnectionEventListener.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionEventListener.swift; sourceTree = "<group>"; };
 		E9229B3C89D448937E34F990 /* MdnsScanner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MdnsScanner.swift; sourceTree = "<group>"; };
+		E92333244D84EEB41CF39F13 /* CallbackWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallbackWrapper.swift; sourceTree = "<group>"; };
 		E92365CF645619AA908C6A8B /* CoapRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoapRequest.swift; sourceTree = "<group>"; };
 		E923BA86B8DCE94DF9DFF0E0 /* Connection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Connection.swift; sourceTree = "<group>"; };
+		E9267A05B1666E2D878A89A5 /* Helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		E926B7741A2C63A0353F530E /* module.map */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = module.map; sourceTree = SOURCE_ROOT; };
 		E92845C3851C3FF4C907E633 /* MdnsResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MdnsResult.swift; sourceTree = "<group>"; };
 		E9285E9171B6D17274076A7E /* Stream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
 		E92AB75FB3AD3FC3E011C088 /* TcpTunnel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TcpTunnel.swift; sourceTree = "<group>"; };
-		E92C442D4196F3F94E893327 /* Helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		E92C825D705048F208FC54FD /* CoapResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoapResponse.swift; sourceTree = "<group>"; };
 		E92FA199DFA2FC4908ECA3EA /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = SOURCE_ROOT; };
 		F4DE7B594975E1285FC700CC /* Pods-NabtoEdgeClient.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClient.debug.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClient/Pods-NabtoEdgeClient.debug.xcconfig"; sourceTree = "<group>"; };
@@ -186,7 +188,6 @@
 				D42A03BB24CEE19E008E4B2D /* Client.swift */,
 				E926B7741A2C63A0353F530E /* module.map */,
 				E923BA86B8DCE94DF9DFF0E0 /* Connection.swift */,
-				E92C442D4196F3F94E893327 /* Helper.swift */,
 				E92365CF645619AA908C6A8B /* CoapRequest.swift */,
 				E921D0ADFA95E0D7B453F106 /* ConnectionEventListener.swift */,
 				E9285E9171B6D17274076A7E /* Stream.swift */,
@@ -196,6 +197,7 @@
 				D484CF0F25A60DC3009DCC1C /* NabtoEdgeClientError.swift */,
 				E92845C3851C3FF4C907E633 /* MdnsResult.swift */,
 				E9229B3C89D448937E34F990 /* MdnsScanner.swift */,
+				E923F884E9480B42C7220F33 /* impl */,
 			);
 			path = NabtoEdgeClient;
 			sourceTree = "<group>";
@@ -222,6 +224,15 @@
 				D4D958A826F90DB900A921F3 /* Info.plist */,
 			);
 			path = HostForTests;
+			sourceTree = "<group>";
+		};
+		E923F884E9480B42C7220F33 /* impl */ = {
+			isa = PBXGroup;
+			children = (
+				E9267A05B1666E2D878A89A5 /* Helper.swift */,
+				E92333244D84EEB41CF39F13 /* CallbackWrapper.swift */,
+			);
+			path = impl;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -422,7 +433,6 @@
 				D42A03BC24CEE19E008E4B2D /* Client.swift in Sources */,
 				E92EF12F25F8DF3116CB8B2B /* module.map in Sources */,
 				E925D05C1F5E162B0381020C /* Connection.swift in Sources */,
-				E9270FECE2194BD901532109 /* Helper.swift in Sources */,
 				E92B785CFDB4C73F3E30EA72 /* CoapRequest.swift in Sources */,
 				D484CF1025A60DC3009DCC1C /* NabtoEdgeClientError.swift in Sources */,
 				E929285096AB3B80BF5C1A38 /* ConnectionEventListener.swift in Sources */,
@@ -431,6 +441,8 @@
 				E92C76DCF3126FE20550B9EF /* CoapResponse.swift in Sources */,
 				E92313C8852752D234D588C4 /* MdnsResult.swift in Sources */,
 				E925C63B8544C672D3B4D09B /* MdnsScanner.swift in Sources */,
+				E9275A6C9BA8FE3640D58342 /* Helper.swift in Sources */,
+				E92C60A140836A8092689CA1 /* CallbackWrapper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

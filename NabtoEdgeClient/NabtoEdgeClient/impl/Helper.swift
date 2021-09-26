@@ -6,61 +6,9 @@
 import Foundation
 @_implementationOnly import NabtoEdgeClientApi
 
-internal class CallbackWrapper : NSObject {
-    let future: OpaquePointer
-    var connection: Connection?
-    var cb: AsyncStatusReceiver?
-    var keepMeAlive: CallbackWrapper?
-
-    init(future: OpaquePointer, connection: Connection?=nil) {
-        NSLog(" ***** callback wrapper init ***** ")
-        self.future = future
-        self.connection = connection
-    }
-
-    deinit {
-        NSLog(" ***** callback wrapper deinit ***** ")
-    }
-
-    public func registerCallback(_ cb: @escaping AsyncStatusReceiver) {
-        self.cb = cb
-        let rawSelf = Unmanaged.passUnretained(self).toOpaque()
-        self.keepMeAlive = self
-        nabto_client_future_set_callback(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
-            NSLog(" ***** callback wrapper nabto callback (begin) *****")
-            let mySelf = Unmanaged<CallbackWrapper>.fromOpaque(data!).takeUnretainedValue()
-            let wrapperError = mySelf.mapToSwiftError(ec: ec)
-            mySelf.invokeUserCallback(wrapperError)
-            NSLog(" ***** callback wrapper nabto callback nil'ing self to allow deinit *****")
-            mySelf.keepMeAlive = nil
-            NSLog(" ***** callback wrapper nabto callback (end) *****")
-        }, rawSelf)
-    }
-
-    private func mapToSwiftError(ec: NabtoClientError) -> NabtoEdgeClientError {
-        let swiftError: NabtoEdgeClientError
-        if (ec == NABTO_CLIENT_EC_NO_CHANNELS) {
-            if let connection = self.connection {
-                swiftError = Helper.createConnectionError(connection: connection)
-            } else {
-                swiftError = NabtoEdgeClientError.UNEXPECTED_API_STATUS
-            }
-        } else {
-            swiftError = Helper.mapSimpleApiStatusToErrorCode(ec)
-        }
-        return swiftError
-    }
-
-    func invokeUserCallback(_ wrapperError: NabtoEdgeClientError) {
-        self.cb?(wrapperError)
-        nabto_client_future_free(self.future)
-    }
-}
-
 internal class Helper {
 
     private weak var client: Client?
-    private var activeCallbacks: Set<CallbackWrapper> = Set<CallbackWrapper>()
 
     init(nabtoClient: Client) {
         self.client = nabtoClient
@@ -103,6 +51,20 @@ internal class Helper {
             NSLog("Unexpected API status \(status): \(apiStatusToString(status))")
             return .UNEXPECTED_API_STATUS
         }
+    }
+
+    internal static func mapToSwiftError(ec: NabtoClientError, connection: Connection?=nil) -> NabtoEdgeClientError {
+        let swiftError: NabtoEdgeClientError
+        if (ec == NABTO_CLIENT_EC_NO_CHANNELS) {
+            if let connection = connection {
+                swiftError = Helper.createConnectionError(connection: connection)
+            } else {
+                swiftError = NabtoEdgeClientError.UNEXPECTED_API_STATUS
+            }
+        } else {
+            swiftError = Helper.mapSimpleApiStatusToErrorCode(ec)
+        }
+        return swiftError
     }
 
     internal static func createConnectionError(connection: NativeConnectionWrapper) -> NabtoEdgeClientError {
@@ -149,14 +111,17 @@ internal class Helper {
     }
 
 
-    func invokeAsync(userClosure: @escaping AsyncStatusReceiver, connection: Connection?, implClosure: (OpaquePointer) -> ()) {
+    func invokeAsync(userClosure: @escaping AsyncStatusReceiver,
+                     owner: Any,
+                     connectionForErrorMessage: Connection?,
+                     implClosure: (OpaquePointer) -> ()) {
         if let client = self.client {
             let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
 
             // invoke actual api function specified by caller (e.g. nabto_client_connection_connect)
             implClosure(future)
 
-            let w = CallbackWrapper(future: future, connection: connection)
+            let w = CallbackWrapper(debugDescription: "Helper.invokeAsync", future: future, owner: owner, connectionForErrorMessage: connectionForErrorMessage)
 
             // set callback on future (nabto_client_future_set_callback)
             w.registerCallback(userClosure)

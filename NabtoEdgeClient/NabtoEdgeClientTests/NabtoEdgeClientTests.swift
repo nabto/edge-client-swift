@@ -609,7 +609,7 @@ class NabtoEdgeClientTests: XCTestCase {
     func testCoapRequestAsyncAfterAsyncConnect() {
         var connectionKeeper: Connection?
         let client = Client()
-        try! client.setLogLevel(level: "info")
+        try! client.setLogLevel(level: "trace")
         client.enableNsLogLogging()
         let connection = try! client.createConnection()
         connectionKeeper = connection
@@ -634,6 +634,8 @@ class NabtoEdgeClientTests: XCTestCase {
             }
             NSLog(" ***** swift connect callback (end)")
         })
+        wait(for: [exp], timeout: 10.0)
+        client.stop()
     }
 
     func testCoapRequestAsyncCoap404() {

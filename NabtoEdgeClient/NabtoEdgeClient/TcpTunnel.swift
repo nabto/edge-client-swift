@@ -29,7 +29,6 @@ public class TcpTunnel {
     private let client: Client
     private let tunnel: OpaquePointer
     private let helper: Helper
-    private var activeCallbacks: Set<CallbackWrapper> = Set<CallbackWrapper>()
 
     internal init(nabtoClient: Client, nabtoConnection: Connection) throws {
         self.client = nabtoClient
@@ -74,7 +73,7 @@ public class TcpTunnel {
     public func openAsync(service: String,
                           localPort: UInt16,
                           closure: @escaping AsyncStatusReceiver) {
-        self.helper.invokeAsync(userClosure: closure, connection: nil) { future in
+        self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
             nabto_client_tcp_tunnel_open(self.tunnel, future, service, localPort)
         }
     }
@@ -105,7 +104,7 @@ public class TcpTunnel {
      * Close this tunnel asynchronously.
      */
     public func closeAsync(closure: @escaping AsyncStatusReceiver) {
-        self.helper.invokeAsync(userClosure: closure, connection: nil) { future in
+        self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
             nabto_client_tcp_tunnel_close(self.tunnel, future)
         }
     }
