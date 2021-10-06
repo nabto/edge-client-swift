@@ -32,11 +32,9 @@ class CallbackWrapper {
         self.future = future
         self.owner = owner
         self.connectionForErrorMessage = connectionForErrorMessage
-        NSLog(" ***** [\(self.desc)] callback wrapper init *****")
     }
 
     deinit {
-        NSLog(" ***** [\(self.desc)] callback wrapper deinit *****")
     }
 
     public func registerCallback(_ cb: @escaping AsyncStatusReceiver) {
@@ -45,12 +43,9 @@ class CallbackWrapper {
         self.keepMeAlive = self
         nabto_client_future_set_callback(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
             let mySelf = Unmanaged<CallbackWrapper>.fromOpaque(data!).takeUnretainedValue()
-            NSLog(" ***** [\(mySelf.desc)] callback wrapper nabto callback (begin) *****")
             let wrapperError = Helper.mapToSwiftError(ec: ec, connection: mySelf.connectionForErrorMessage)
             mySelf.invokeUserCallback(wrapperError)
-            NSLog(" ***** [\(mySelf.desc)] callback wrapper nabto callback nil'ing self to allow deinit *****")
             mySelf.keepMeAlive = nil
-            NSLog(" ***** [\(mySelf.desc)] callback wrapper nabto callback (end) *****")
         }, rawSelf)
     }
 

@@ -53,15 +53,14 @@ public class Client: NSObject, NativeClientWrapper {
      */
     override public init() {
         self.nativeClient = nabto_client_new()
+        print("*** Client.init done, client=\(self.nativeClient)")
         super.init()
     }
 
     deinit {
-        NSLog(" ***** Client::deinit (begin) *****")
         self.stop()
-        NSLog(" ***** Client::deinit (stopped) *****")
         nabto_client_free(self.nativeClient)
-        NSLog(" ***** Client::deinit (end) *****")
+        print("*** Client.deinit done, client=\(self.nativeClient)")
     }
 
     /**

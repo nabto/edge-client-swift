@@ -24,11 +24,11 @@ struct Device {
     var deviceId: String
     var url: String
     var key: String
-    var fp: String
+    var fp: String?
     var sct: String?
     var local: Bool
 
-    init(productId: String, deviceId: String, url: String, key: String, fp: String, sct: String?=nil, local: Bool=false) {
+    init(productId: String, deviceId: String, url: String, key: String, fp: String?=nil, sct: String?=nil, local: Bool=false) {
         self.productId = productId
         self.deviceId = deviceId
         self.url = url
@@ -66,8 +66,7 @@ class NabtoEdgeClientTests: XCTestCase {
             productId: "pr-fatqcwj9",
             deviceId: "de-bdsotcgm",
             url: "https://pr-fatqcwj9.clients.nabto.net",
-            key: "sk-5f3ab4bea7cc2585091539fb950084ce",
-            fp: "19ca7f85c9f4bfc47cffd8564339b897aaaef3225bde5c7b90dfff46b5eaab5b"
+            key: "sk-5f3ab4bea7cc2585091539fb950084ce"
     )
 
     let tunnelDevice = Device(
@@ -75,7 +74,6 @@ class NabtoEdgeClientTests: XCTestCase {
             deviceId: "de-ijrdq47i",
             url: "https://pr-fatqcwj9.clients.nabto.net",
             key: "sk-9c826d2ebb4343a789b280fe22b98305",
-            fp: "0b168a3b714ebe92e56b2514e5424c4c544ab760db547c34b7ff00ff90bd72cb",
             sct: "WzwjoTabnvux"
     )
 
@@ -84,7 +82,6 @@ class NabtoEdgeClientTests: XCTestCase {
             deviceId: "de-fociuotx",
             url: "https://pr-t4qwmuba.clients.nabto.net",
             key: "sk-5f3ab4bea7cc2585091539fb950084ce", // product only configured with tunnel app with sk-9c826d2ebb4343a789b280fe22b98305
-            fp: "d731bc1f41deecafd8368fa865e430339148c16335c5f17d0f7e25025901e182",
             sct: "WzwjoTabnvux"
     )
     
@@ -93,7 +90,6 @@ class NabtoEdgeClientTests: XCTestCase {
             deviceId: "de-ijrdq47i",
             url: "https://pr-fatqcwj9.clients.nabto.net",
             key: "sk-9c826d2ebb4343a789b280fe22b98305",
-            fp: "c25c6a3805af4d8a263541fc0ac32e5909b4cae293b85bea05d81445fed9273c",
             sct: "WzwjoTabnvux"
     )
 
@@ -120,7 +116,6 @@ class NabtoEdgeClientTests: XCTestCase {
             deviceId: mdnsDeviceId,
             url: "https://pr-fatqcwj9.clients.nabto.net",
             key: "none",
-            fp: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
             sct: "none",
             local: true
     )
@@ -145,19 +140,28 @@ class NabtoEdgeClientTests: XCTestCase {
         } catch (NabtoEdgeClientError.INVALID_STATE) {
             // connection probably not opened yet
         }
-        assertNoLeaks(connection)
-        self.connection = nil
-        self.client?.stop()
-        assertNoLeaks(client)
-        self.client = nil
+        if (self.client != nil) {
+            self.client?.stop()
+            assertNoLeaks(client)
+            print("*** NabtoEdgeClientTests.tearDown nil'ing self.client")
+            self.client = nil
+            assertNoLeaks(connection)
+            self.connection = nil
+        }
     }
 
     func assertNoLeaks(_ obj: AnyObject?) {
         if (obj != nil) {
             // refcount should be 3: reference from property + ref passed to this func + ref passed to CFGetRetainCount
-            XCTAssertEqual(CFGetRetainCount(obj), 3)
+            let n = CFGetRetainCount(obj)
+            XCTAssertEqual(n, 2)
         }
 
+    }
+
+    func enableLogging(_ client: Client) {
+        try! client.setLogLevel(level: "trace")
+        client.enableNsLogLogging()
     }
 
     func testVersionString() throws {
@@ -177,8 +181,7 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func testSetLogLevelValid() {
         self.client = Client()
-        try! client.setLogLevel(level: "trace")
-        client.enableNsLogLogging()
+
         let connection = try! client.createConnection()
         try! connection.updateOptions(json: self.coapDevice.asJson())
     }
@@ -229,8 +232,7 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func connect(_ device: Device) throws -> Connection {
         self.client = Client()
-        try! self.client.setLogLevel(level: "info")
-        self.client.enableNsLogLogging()
+        self.enableLogging(self.client)
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
@@ -265,26 +267,35 @@ class NabtoEdgeClientTests: XCTestCase {
         wait(for: [exp], timeout: 0.0)
     }
 
+    func testConnectAsync_repeated() {
+        for i in 1...1000 {
+            print("**************** iteration \(i) ****************")
+            self.testConnectAsync()
+        }
+    }
+
     func testConnectAsync() {
-        self.client = Client()
+        let client = Client()
+        self.enableLogging(client)
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
-        try! self.connection.setPrivateKey(key: key)
-        try! self.connection.updateOptions(json: self.coapDevice.asJson())
+        try! connection.setPrivateKey(key: key)
+        try! connection.updateOptions(json: self.coapDevice.asJson())
         let exp = XCTestExpectation(description: "expect connect callback")
 
-        self.connection.connectAsync { ec in
+        connection.connectAsync { ec in
             XCTAssertEqual(ec, .OK)
+//            connection.closeAsync { ec in
+//                XCTAssertEqual(ec, .OK)
+//            }
             exp.fulfill()
         }
-
-        wait(for: [exp], timeout: 5.0)
+        wait(for: [exp], timeout: 10.0)
     }
 
     func testConnectAsyncFailUnknown() {
         self.client = Client()
-        try! client.setLogLevel(level: "info")
-        client.enableNsLogLogging()
+        self.enableLogging(self.client)
         self.connection = try! client.createConnection()
         let exp = XCTestExpectation(description: "expect connect callback")
         let key = try! client.createPrivateKey()
@@ -304,8 +315,7 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func testConnectAsyncFailOffline() {
         self.client = Client()
-        try! client.setLogLevel(level: "info")
-        client.enableNsLogLogging()
+        self.enableLogging(self.client)
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
@@ -426,8 +436,7 @@ class NabtoEdgeClientTests: XCTestCase {
 //        throw XCTSkip("Needs local device for testing")
         #endif
         self.client = Client()
-        try! client.setLogLevel(level: "info")
-        client.enableNsLogLogging()
+        self.enableLogging(self.client)
         let scanner = client.createMdnsScanner(subType: self.mdnsSubtype)
         let exp = XCTestExpectation(description: "Expected to find local device for discovery, see instructions on how to run simple_mdns_device stub")
         let stub = TestMdnsResultReceiver(exp)
@@ -505,6 +514,7 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func testCoapRequestAsync() {
         self.client = Client()
+        self.enableLogging(self.client)
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
@@ -540,106 +550,76 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testReproduceCrashFreeClientFromCallback_Repeated() {
-        for i in 1...30 {
-            NSLog(" ***********************************************************************")
-            NSLog(" ***********************************************************************")
-            NSLog(" ***********************************************************************")
-            NSLog(" *** iteration \(i)")
-            NSLog(" ***********************************************************************")
-            NSLog(" ***********************************************************************")
-            NSLog(" ***********************************************************************")
-            self.testReproduceCrashFreeClientFromCallback()
+        for _ in 1...30 {
+         //   self.testReproduceCrashFreeClient()
         }
     }
 
-//    func testReproduceCrashFreeClientFromCallback() {
-//        let client = Client()
-//        try! client.setLogLevel(level: "info")
-//        client.enableNsLogLogging()
-//        let connection = try! client.createConnection()
-//        let key = try! client.createPrivateKey()
-//        try! connection.setPrivateKey(key: key)
-//        try! connection.updateOptions(json: self.coapDevice.asJson())
-//        connection.connectAsync { ec in
-//            // very poor test .. just useful for reproducing consistent crash prior to sdk commit bb2021fb8
-//            usleep(1_000_000)
-//            XCTAssertEqual(ec, .STOPPED)
-//        }
-//        // client should wait until all outstanding futures are resolved
-//    }
-
-    func testReproduceCrashFreeClientFromCallback() {
+    func testReproduceCrashFreeClient() {
         let exp1 = XCTestExpectation(description: "expect coap done callback")
-        do {
-            let client = Client()
-            try! client.setLogLevel(level: "info")
-            client.enableNsLogLogging()
-            let connection = try! client.createConnection()
-            let key = try! client.createPrivateKey()
-            try! connection.setPrivateKey(key: key)
-            try! connection.updateOptions(json: self.coapDevice.asJson())
-            var ec: NabtoEdgeClientError = .FAILED
-            connection.connectAsync { ec in
-
-                NSLog(" ***** inside swift connect callback, ec=\(ec)")
-                guard (ec == .OK) else {
-                    XCTFail("Connect error: \(ec)")
+        let client = Client()
+        self.enableLogging(client)
+        let connection = try! client.createConnection()
+        let key = try! client.createPrivateKey()
+        try! connection.setPrivateKey(key: key)
+        try! connection.updateOptions(json: self.coapDevice.asJson())
+        connection.connectAsync { ec in
+            guard (ec == .OK) else { // odd construct to stop early as xctassert sometimes behaves weird in callbacks
+                XCTFail("Connect error: \(ec)")
+                return
+            }
+            let coap = try! connection.createCoapRequest(method: "GET", path: "/hello-world")
+            coap.executeAsync { ec, response in
+                guard (ec == .OK) else { // see above comment
+                    XCTFail("Coap error: \(ec)")
                     return
                 }
-                let coap = try! connection.createCoapRequest(method: "GET", path: "/hello-world")
-                var response: CoapResponse?
-                coap.executeAsync { ec, response in
-                    guard (ec == .OK) else {
-                        XCTFail("Coap error: \(ec)")
-                        return
-                    }
-                    exp1.fulfill()
-                }
+                exp1.fulfill()
             }
         }
+        wait(for: [exp1], timeout: 10.0)
+        client.stop()
     }
 
 
     func testRepeat_testCoapRequestSyncAfterAsyncConnect() {
         for _ in 1...10 {
-            self.testCoapRequestAsyncAfterAsyncConnect()
+         //   self.testCoapRequestAsyncAfterAsyncConnect()
         }
     }
 
     func testCoapRequestAsyncAfterAsyncConnect() {
         var connectionKeeper: Connection?
-        let client = Client()
-        try! client.setLogLevel(level: "trace")
-        client.enableNsLogLogging()
-        let connection = try! client.createConnection()
-        connectionKeeper = connection
-        let key = try! client.createPrivateKey()
-        try! connection.setPrivateKey(key: key)
-        try! connection.updateOptions(json: self.coapDevice.asJson())
-        let exp = XCTestExpectation(description: "expect coap done callback")
+        do {
+            let client = Client()
+            self.enableLogging(client)
+            let connection = try! client.createConnection()
+            connectionKeeper = connection
+            let key = try! client.createPrivateKey()
+            try! connection.setPrivateKey(key: key)
+            try! connection.updateOptions(json: self.coapDevice.asJson())
+            let exp = XCTestExpectation(description: "expect coap done callback")
 
-        connection.connectAsync(closure: { ec in
-            NSLog(" ***** swift connect callback (begin), ec=\(ec)")
-            XCTAssertEqual(ec, .OK)
-            let coap = try! connection.createCoapRequest(method: "GET", path: "/hello-world")
-            coap.executeAsync { ec, response in
-                NSLog(" *****   swift request callback (begin), ec=\(ec)")
+            connection.connectAsync(closure: { ec in
                 XCTAssertEqual(ec, .OK)
-                XCTAssertNotNil(response)
-                XCTAssertEqual(response!.status, 205)
-                XCTAssertEqual(response!.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
-                XCTAssertEqual(String(decoding: response!.payload, as: UTF8.self), "Hello world")
-                NSLog(" *****   swift request callback (end), coap is \(coap)")
-                exp.fulfill()
-            }
-            NSLog(" ***** swift connect callback (end)")
-        })
-        wait(for: [exp], timeout: 10.0)
-        client.stop()
+                let coap = try! connection.createCoapRequest(method: "GET", path: "/hello-world")
+                coap.executeAsync { ec, response in
+                    XCTAssertEqual(ec, .OK)
+                    XCTAssertNotNil(response)
+                    XCTAssertEqual(response!.status, 205)
+                    XCTAssertEqual(response!.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
+                    XCTAssertEqual(String(decoding: response!.payload, as: UTF8.self), "Hello world")
+                    exp.fulfill()
+                }
+            })
+            wait(for: [exp], timeout: 10.0)
+            client.stop()
+        }
     }
 
     func testCoapRequestAsyncCoap404() {
         self.client = Client()
+        self.enableLogging(self.client)
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
@@ -656,11 +636,12 @@ class NabtoEdgeClientTests: XCTestCase {
             }
         }
 
-        wait(for: [exp], timeout: 2.0)
+        wait(for: [exp], timeout: 10.0)
     }
 
     func testCoapRequestAsyncApiFail() {
         self.client = Client()
+        self.enableLogging(self.client)
         self.connection = try! client.createConnection()
         let exp = XCTestExpectation(description: "expect early coap fail")
 
@@ -670,7 +651,7 @@ class NabtoEdgeClientTests: XCTestCase {
             XCTAssertEqual(ec, NabtoEdgeClientError.NOT_CONNECTED)
         }
 
-        wait(for: [exp], timeout: 1.0)
+        wait(for: [exp], timeout: 10.0)
     }
 
     public class TestConnectionEventCallbackReceiver : ConnectionEventReceiver {
@@ -695,8 +676,7 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func testConnectionEventListener() {
         self.client = Client()
-        try! client.setLogLevel(level: "info")
-        client.enableNsLogLogging()
+        self.enableLogging(self.client)
         self.connection = try! client.createConnection()
         let exp = XCTestExpectation(description: "expect event callback")
         let listener = TestConnectionEventCallbackReceiver(exp, exp)
@@ -705,15 +685,14 @@ class NabtoEdgeClientTests: XCTestCase {
         try! connection.setPrivateKey(key: key)
         try! connection.updateOptions(json: self.coapDevice.asJson())
         try! connection.connect()
-        wait(for: [exp], timeout: 2.0)
+        wait(for: [exp], timeout: 10.0)
         XCTAssertEqual(listener.events.count, 1)
         XCTAssertEqual(listener.events[0], .CONNECTED)
     }
 
     func testConnectionEventListenerMultipleEvents() {
         self.client = Client()
-        try! client.setLogLevel(level: "info")
-        client.enableNsLogLogging()
+        self.enableLogging(self.client)
         self.connection = try! client.createConnection()
         let expConnect = XCTestExpectation(description: "expect connect event callback")
         let expClosed = XCTestExpectation(description: "expect close event callback")
@@ -724,12 +703,12 @@ class NabtoEdgeClientTests: XCTestCase {
         try! connection.updateOptions(json: self.coapDevice.asJson())
 
         try! connection.connect()
-        wait(for: [expConnect], timeout: 2.0)
+        wait(for: [expConnect], timeout: 10.0)
         XCTAssertEqual(listener.events.count, 1)
         XCTAssertEqual(listener.events[0], .CONNECTED)
 
         try! connection.close()
-        wait(for: [expClosed], timeout: 2.0)
+        wait(for: [expClosed], timeout: 10.0)
         XCTAssertEqual(listener.events.count, 2)
         XCTAssertEqual(listener.events[0], .CONNECTED)
         XCTAssertEqual(listener.events[1], .CLOSED)
@@ -775,9 +754,6 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func testStreamWriteThenReadSomeAsync() {
         let connection = try! self.connect(self.streamDevice)
-        try! self.client.setLogLevel(level: "info")
-        self.client.enableNsLogLogging()
-
         let stream = try! self.connection.createStream()
         let exp = XCTestExpectation(description: "expect stream echo data read")
         stream.openAsync(streamPort: self.streamPort) { ec in
@@ -798,14 +774,11 @@ class NabtoEdgeClientTests: XCTestCase {
                 }
             }
         }
-        wait(for: [exp], timeout: 2.0)
+        wait(for: [exp], timeout: 10.0)
     }
 
     func testStreamWriteThenReadAllAsync() {
         let connection = try! self.connect(self.streamDevice)
-        try! self.client.setLogLevel(level: "info")
-        self.client.enableNsLogLogging()
-
         let stream = try! self.connection.createStream()
         let exp = XCTestExpectation(description: "expect stream echo data read")
         stream.openAsync(streamPort: self.streamPort) { ec in
@@ -823,7 +796,7 @@ class NabtoEdgeClientTests: XCTestCase {
                 }
             }
         }
-        wait(for: [exp], timeout: 3.0)
+        wait(for: [exp], timeout: 10.0)
     }
 
     func testTunnelGetPortFail() throws {
@@ -862,7 +835,7 @@ class NabtoEdgeClientTests: XCTestCase {
 
         }.resume()
 
-        wait(for: [exp], timeout: 3.0)
+        wait(for: [exp], timeout: 10.0)
     }
 
     func testTunnelOpenError() throws {
@@ -905,7 +878,7 @@ class NabtoEdgeClientTests: XCTestCase {
                 }
             }.resume()
         }
-        wait(for: [exp], timeout: 3.0)
+        wait(for: [exp], timeout: 10.0)
     }
 
     func testTunnelOpenCloseAsyncSimple() throws {
@@ -919,7 +892,7 @@ class NabtoEdgeClientTests: XCTestCase {
                 exp.fulfill()
             }
         }
-        wait(for: [exp], timeout: 3.0)
+        wait(for: [exp], timeout: 10.0)
     }
 
     class K1 {
@@ -985,8 +958,7 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func testPasswordAuthAsyncFail() {
         self.client = Client()
-        try! self.client.setLogLevel(level: "info")
-        self.client.enableNsLogLogging()
+        self.enableLogging(self.client)
 
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
@@ -998,13 +970,12 @@ class NabtoEdgeClientTests: XCTestCase {
             XCTAssertEqual(ec, .UNAUTHORIZED)
             exp.fulfill()
         }
-        wait(for: [exp], timeout: 2.0)
+        wait(for: [exp], timeout: 10.0)
     }
 
     func testPasswordAuthAsyncOk() {
         self.client = Client()
-        try! self.client.setLogLevel(level: "info")
-        self.client.enableNsLogLogging()
+        self.enableLogging(self.client)
 
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
@@ -1016,13 +987,12 @@ class NabtoEdgeClientTests: XCTestCase {
             XCTAssertEqual(ec, .OK)
             exp.fulfill()
         }
-        wait(for: [exp], timeout: 2.0)
+        wait(for: [exp], timeout: 30.0)
     }
 
     func testPasswordOpenPairing() {
         self.client = Client()
-        try! self.client.setLogLevel(level: "info")
-        self.client.enableNsLogLogging()
+        self.enableLogging(self.client)
 
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
@@ -1047,8 +1017,7 @@ class NabtoEdgeClientTests: XCTestCase {
     func testPasswordInvitePairing() throws {
         throw XCTSkip("An invitation only works for a single pairing so this test needs clearing device state")
         self.client = Client()
-        try! self.client.setLogLevel(level: "info")
-        self.client.enableNsLogLogging()
+        self.enableLogging(self.client)
 
         self.connection = try! client.createConnection()
         let key = try! client.createPrivateKey()
@@ -1066,135 +1035,38 @@ class NabtoEdgeClientTests: XCTestCase {
         // in an actual pairing use case, now persist device's fingerprint (obtained with connection.getDeviceFingerprintHex())
         // along with device id etc and compare at subsequent connection attempt
     }
-    
-    func testReproduceCrash() {
-        let exp = XCTestExpectation(description: "wait")
-        try! self.connectPairAndSubscribe()
-        print(" ***********************************************************************")
-        print(" ***********************************************************************")
-        print(" ***********************************************************************")
-        print(" *** done, waiting for crash")
-        print(" ***********************************************************************")
-        print(" ***********************************************************************")
-        print(" ***********************************************************************")
-        wait(for: [exp], timeout: 30)
-    }
-    
-    func invokeCoapWithCbor(
-            method: String,
-            connection: NabtoEdgeClient.Connection,
-            path: String,
-            cbor: [UInt8]) throws -> NabtoEdgeClient.CoapResponse {
-        let coap = try connection.createCoapRequest(method: method, path: path)
-        try! coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: Data(cbor))
-        return try coap.execute()
+
+    func testDoubleClose_Repeated() {
+        for _ in 1...1000 {
+            self.testDoubleClose()
+        }
     }
 
-    func invokeCoapMap(
-            method: String,
-            connection: NabtoEdgeClient.Connection,
-            path: String,
-            map: [String:String]) throws -> NabtoEdgeClient.CoapResponse {
-        return try self.invokeCoapWithCbor(
-                method: method,
-                connection: connection,
-                path: path,
-                cbor: CBOR.encode(map))
-    }
+    func testDoubleClose() {
+        let client = Client()
+        self.enableLogging(client)
+        let connection = try! client.createConnection()
+        let key = try! client.createPrivateKey()
+        try! connection.setPrivateKey(key: key)
+        try! connection.updateOptions(json: self.coapDevice.asJson())
+        let exp = XCTestExpectation(description: "expect coap done callback")
 
-    func invokeCoapArray(
-            method: String,
-            connection: NabtoEdgeClient.Connection,
-            path: String,
-            array: [String]) throws -> NabtoEdgeClient.CoapResponse {
-        return try self.invokeCoapWithCbor(
-                method: method,
-                connection: connection,
-                path: path,
-                cbor: CBOR.encode(array))
-    }
-
-
-    func pairAndSubscribe(_ connection: NabtoEdgeClient.Connection) throws -> Bool {
-        let username = UUID().uuidString.lowercased()
-
-        var response = try self.invokeCoapMap(
-                method: "POST",
-                connection: connection,
-                path: "/iam/pairing/password-open",
-                map: ["Username": username])
-        if (response.status != 201) {
-            NSLog("Pairing failed: \(response)")
-            return false
-        }
-
-        let token = "foo"
-        
-        // coap invoke { "Token": "<token>", "ProjectId": "fir-edge-push" }
-        response = try self.invokeCoapMap(
-                method: "PUT",
-                connection: connection,
-                path: "/iam/users/\(username)/fcm",
-                map: ["Token": token, "ProjectId": "fir-edge-push"])
-
-        if (response.status != 204) {
-            NSLog("Subscribe failed: \(response)")
-            return false
-        }
-
-        response = try self.invokeCoapArray(
-                method: "PUT",
-                connection: connection,
-                path: "/iam/users/\(username)/notification-categories",
-                array: ["Warn", "Alert"])
-        if (response.status != 204) {
-            NSLog("Set categories failed: \(response)")
-            return false
-        }
-        return true
-
-    }
-
-    func connectPairAndSubscribe() throws {
-        var client: NabtoEdgeClient.Client!
-
-        client = Client()
-        try client.setLogLevel(level: "trace")
-        client.enableNsLogLogging()
-
-        let connection = try client.createConnection()
-        let key = try client.createPrivateKey()
-        try connection.setPrivateKey(key: key)
-        try connection.updateOptions(json:
-        """
-        {
-          "ProductId": "pr-fatqcwj9",
-          "DeviceId": "de-wbtro9fp",
-          "ServerUrl": "https://pr-fatqcwj9.clients.nabto.net",
-          "ServerKey": "sk-c132dff0eaf6e2f73a7fb312140616ed",
-          "ServerConnectToken": "kqhpOLQMBdt7"
-        }
-        """)
-        do {
-            try connection.connect()
-        } catch {
-            XCTFail("Connect failed: \(error)")
-        }
-        try connection.passwordAuthenticateAsync(username: "", password: "openPassword") { ec in
-            NSLog("Password auth completed, status is \(ec)")
-            if (ec == .OK) {
-                do {
-                    if (try self.pairAndSubscribe(connection)) {
-                        NSLog("Success!");
-                    } else {
-                        NSLog("High level failure - logged above")
+        connection.connectAsync { ec in
+            XCTAssertEqual(ec, .OK)
+            let coap = try! connection.createCoapRequest(method: "GET", path: "/does-not-exist-trigger-404")
+            coap.executeAsync { ec, response in
+                XCTAssertEqual(ec, .OK)
+                XCTAssertEqual(response!.status, 404)
+                connection.closeAsync { ec in
+                    connection.closeAsync { ec in
+                        XCTAssertEqual(ec, .ABORTED)
                     }
-                } catch {
-                    NSLog("Low level failure: \(error)")
                 }
+                exp.fulfill()
             }
         }
-        print(" *** async func done, no more obj refs in this function")
-    }
 
+        wait(for: [exp], timeout: 10.0)
+
+    }
 }

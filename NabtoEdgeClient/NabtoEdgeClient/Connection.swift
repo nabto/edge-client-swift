@@ -52,9 +52,12 @@ public class Connection: NSObject, NativeConnectionWrapper {
     private let helper: Helper
     private var apiEventCallBackRegistered: Bool = false
     private var connectionEventListener: ConnectionEventListener? = nil
+    private let clientPointerForDebugOutput: OpaquePointer
 
     internal init(client: Client) throws {
         if let p = nabto_client_connection_new(client.nativeClient) {
+            print("*** Connection.init, nativeConnection=\(p)")
+            self.clientPointerForDebugOutput = p
             self.nativeConnection = p
         } else {
             throw NabtoEdgeClientError.ALLOCATION_ERROR
@@ -69,16 +72,12 @@ public class Connection: NSObject, NativeConnectionWrapper {
     }
 
     deinit {
-        NSLog(" ***** Connection::deinit (begin) *****")
         if let listener = self.connectionEventListener {
-            NSLog(" ***** Connection::deinit (stopping listener) *****")
             listener.stop()
-            NSLog(" ***** Connection::deinit (stopped listener) *****")
         }
-        NSLog(" ***** Connection::deinit (freeing connection) *****")
+        print("*** Connection.deinit (begin), nativeConnection=\(self.nativeConnection), client=\(self.clientPointerForDebugOutput)")
         nabto_client_connection_free(self.nativeConnection)
-        NSLog(" ***** Connection::deinit (freed connection) *****")
-        NSLog(" ***** Connection::deinit (end) *****")
+        print("*** Connection.deinit (end), nativeConnection=\(self.nativeConnection), client=\(self.clientPointerForDebugOutput)")
     }
 
     /**
