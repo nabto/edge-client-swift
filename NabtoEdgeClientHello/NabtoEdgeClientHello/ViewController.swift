@@ -17,9 +17,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         let client = NabtoEdgeClient.Client()
         let connection = try! client.createConnection()
-        let options = try! connection.getOptions()
-       // label.text = "Version: " + NabtoEdgeClient.versionString() + "\nOptions: [\(options)]"
-        label.text = "Options: [\(options)]"
+        label.text = "Version: " + NabtoEdgeClient.Client.versionString()
     }
 
 

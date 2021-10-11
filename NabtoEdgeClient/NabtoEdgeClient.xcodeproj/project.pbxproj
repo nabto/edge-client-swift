@@ -33,7 +33,6 @@
 		E92C60A140836A8092689CA1 /* CallbackWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92333244D84EEB41CF39F13 /* CallbackWrapper.swift */; };
 		E92C76DCF3126FE20550B9EF /* CoapResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92C825D705048F208FC54FD /* CoapResponse.swift */; };
 		E92EF12F25F8DF3116CB8B2B /* module.map in Sources */ = {isa = PBXBuildFile; fileRef = E926B7741A2C63A0353F530E /* module.map */; };
-		FEE0D87171060FFC8CFE526C /* libPods-NabtoEdgeClient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2698D0457CBE8BE7C4FBE3D4 /* libPods-NabtoEdgeClient.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -118,7 +117,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FEE0D87171060FFC8CFE526C /* libPods-NabtoEdgeClient.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
