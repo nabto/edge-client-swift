@@ -9,8 +9,6 @@
 import Foundation
 @_implementationOnly import NabtoEdgeClientApi
 
-// useful read: https://www.uraimo.com/2016/04/07/swift-and-c-everything-you-need-to-know
-
 /* TODO nabtodoc
  * Callback function for receiving log messages from the core SDK.
  */
@@ -42,25 +40,20 @@ internal protocol NativeClientWrapper {
  * It enables you to create a connection object, used to connect to a Nabto Edge Embedded device. And it provides misc
  * support functions: Create a private key (mandatory to later connect to a device), control logging, get SDK version.
  */
-public class Client: NSObject, NativeClientWrapper {
+public class Client: NSObject {
 
-    internal let nativeClient: OpaquePointer
-    private var userLogCallBack: LogCallBackReceiver?
-    private var apiLogCallBackRegistered: Bool = false
+    private let impl: ClientImpl
 
     /**
      * Create a new instance of the Nabto Edge client.
      */
     override public init() {
-        self.nativeClient = nabto_client_new()
-        print("*** Client.init done, client=\(self.nativeClient)")
+        self.impl = ClientImpl()
         super.init()
     }
 
     deinit {
-        self.stop()
-        nabto_client_free(self.nativeClient)
-        print("*** Client.deinit done, client=\(self.nativeClient)")
+        self.impl.stop()
     }
 
     /**
@@ -79,7 +72,7 @@ public class Client: NSObject, NativeClientWrapper {
      * @throws NabtoEdgeClientError.ALLOCATION_ERROR if the underlying SDK fails creating a connection object
      */
     public func createConnection() throws -> Connection {
-        return try Connection(client: self)
+        return try self.impl.createConnection()
     }
 
     /**
@@ -91,9 +84,7 @@ public class Client: NSObject, NativeClientWrapper {
      * @return the private key as a pem encoded string.
      */
     public func createPrivateKey() throws -> String {
-        var p: UnsafeMutablePointer<Int8>? = nil
-        let status = nabto_client_create_private_key(self.nativeClient, &p)
-        return try Helper.handleStringResult(status: status, cstring: p)
+        return try self.impl.createPrivateKey()
     }
 
     /**
@@ -105,15 +96,14 @@ public class Client: NSObject, NativeClientWrapper {
      * @return the MdnsScanner
      */
     public func createMdnsScanner(subType: String?=nil) -> MdnsScanner {
-        return MdnsScanner(client: self, subType: subType)
+        return self.impl.createMdnsScanner(subType: subType)
     }
-
 
     /**
      * Enable logging messages from the underlying SDK using NSLog.
      */
     public func enableNsLogLogging() {
-        self.setLogCallBack(cb: Client.nslogLogCallback)
+        return self.impl.enableNsLogLogging()
     }
 
     /**
@@ -134,10 +124,7 @@ public class Client: NSObject, NativeClientWrapper {
      * @throws NabtoEdgeClientError.INVALID_ARGUMENT if invalid level
      */
     public func setLogLevel(level: String) throws {
-        let status: NabtoClientError = nabto_client_set_log_level(self.nativeClient, level)
-        if (status != NABTO_CLIENT_EC_OK) {
-            throw NabtoEdgeClientError.INVALID_ARGUMENT
-        }
+        try self.impl.setLogLevel(level: level)
     }
 
     /**
@@ -146,12 +133,7 @@ public class Client: NSObject, NativeClientWrapper {
      * @param cb: The LogCallBackReceiver invoked by the wrapper with SDK log lines.
      */
     public func setLogCallBack(cb: @escaping LogCallBackReceiver) {
-        self.userLogCallBack = cb
-        if (!self.apiLogCallBackRegistered) {
-            self.registerApiLogCallback()
-        } else {
-            // nabto_client_set_log_callback seems to always succeed
-        }
+        self.impl.setLogCallBack(cb: cb)
     }
 
     /**
@@ -161,42 +143,6 @@ public class Client: NSObject, NativeClientWrapper {
      * If SDK logging has been configured, this function MUST be called, otherwise Client instances are leaked.
      */
     public func stop() {
-        if (self.apiLogCallBackRegistered) {
-            nabto_client_set_log_callback(self.nativeClient, nil, nil)
-        }
-        nabto_client_stop(self.nativeClient)
+        self.impl.stop()
     }
-
-    private static func nslogLogCallback(msg: NabtoEdgeClientLogMessage) {
-        NSLog("Nabto log: \(msg.file):\(msg.line) [\(msg.severity)/\(msg.severityString)]: \(msg.message)")
-    }
-
-    private func apiLogCallback(msg: NabtoClientLogMessage) {
-        guard let cb = self.userLogCallBack else {
-            return
-        }
-        let userMsg = NabtoEdgeClientLogMessage(
-                severity: Int(msg.severity.rawValue),
-                severityString: String(cString: msg.severityString),
-                file: (String(cString: msg.file) as NSString).lastPathComponent,
-                line: Int(msg.line),
-                message: String(cString: msg.message))
-        cb(userMsg)
-    }
-
-    private func registerApiLogCallback() {
-        let rawSelf = Unmanaged.passUnretained(self).toOpaque()
-        let res = nabto_client_set_log_callback(self.nativeClient, { (pmsg: Optional<UnsafePointer<NabtoClientLogMessage>>, data: Optional<UnsafeMutableRawPointer>) -> Void in
-            if (pmsg == nil || data == nil) {
-                return
-            }
-            let msg: NabtoClientLogMessage = pmsg!.pointee
-            let mySelf = Unmanaged<Client>.fromOpaque(data!).takeUnretainedValue()
-            mySelf.apiLogCallback(msg: msg)
-        }, rawSelf)
-        if (res == NABTO_CLIENT_EC_OK) {
-            self.apiLogCallBackRegistered = true
-        }
-    }
-
 }

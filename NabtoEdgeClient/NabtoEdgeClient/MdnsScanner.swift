@@ -21,7 +21,7 @@ import Foundation
  * This class scans for local mDNS enabled devices. It is created with Client.createMdnsScanner().
  */
 public class MdnsScanner: NSObject {
-    private let client: Client
+    private let client: NativeClientWrapper
     private let future: OpaquePointer
     private var listener: OpaquePointer?
     private let helper: Helper
@@ -34,9 +34,9 @@ public class MdnsScanner: NSObject {
     // ConnectionEventListener class
     private var userCbs: NSHashTable<MdnsResultReceiver> = NSHashTable<MdnsResultReceiver>()
 
-    internal init(client: Client, subType: String?) {
+    internal init(client: NativeClientWrapper, subType: String?) {
         self.client = client
-        self.helper = Helper(nabtoClient: self.client)
+        self.helper = Helper(client: self.client)
         self.future = nabto_client_future_new(self.client.nativeClient)
         self.subType = subType
         super.init()

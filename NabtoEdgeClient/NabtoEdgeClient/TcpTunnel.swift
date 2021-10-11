@@ -26,14 +26,14 @@ import Foundation
 public class TcpTunnel {
 
     private let connection: NativeConnectionWrapper
-    private let client: Client
+    private let client: NativeClientWrapper
     private let tunnel: OpaquePointer
     private let helper: Helper
 
-    internal init(nabtoClient: Client, nabtoConnection: Connection) throws {
-        self.client = nabtoClient
-        self.connection = nabtoConnection
-        self.helper = Helper(nabtoClient: self.client)
+    internal init(client: NativeClientWrapper, connection: NativeConnectionWrapper) throws {
+        self.client = client
+        self.connection = connection
+        self.helper = Helper(client: self.client)
         let p = nabto_client_tcp_tunnel_new(self.connection.nativeConnection)
         if (p != nil) {
             self.tunnel = p!

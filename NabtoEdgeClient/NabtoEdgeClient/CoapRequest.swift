@@ -32,30 +32,26 @@ public typealias CoapResponseReceiver = (NabtoEdgeClientError, CoapResponse?) ->
  */
 public class CoapRequest {
 
-    private weak var client: Client?
-    private let connection: Connection
+    private let client: NativeClientWrapper
+    private let connection: NativeConnectionWrapper
     private let coap: OpaquePointer
     private let helper: Helper
 
-    internal init(nabtoClient: Client, nabtoConnection: Connection, method: String, path: String) throws {
+    internal init(client: NativeClientWrapper, connection: NativeConnectionWrapper, method: String, path: String) throws {
         let validMethods = ["GET", "POST", "PUT", "DELETE"]
         if (validMethods.firstIndex(of: method) == nil) {
             throw NabtoEdgeClientError.INVALID_ARGUMENT
         }
-        if let p = nabto_client_coap_new(nabtoConnection.nativeConnection, method, path) {
+        if let p = nabto_client_coap_new(connection.nativeConnection, method, path) {
             self.coap = p
         } else {
             throw NabtoEdgeClientError.ALLOCATION_ERROR
         }
         // keep a swift level connection (ie to NativeConnectionWrapper instance vs
         // raw OpaquePointer) to prevent them from being freed by ARC if owning app only keeps reference to coap obj
-        self.client = nabtoClient
-        self.connection = nabtoConnection
-        if let client = self.client {
-            self.helper = Helper(nabtoClient: client)
-        } else {
-            throw NabtoEdgeClientError.ALLOCATION_ERROR
-        }
+        self.client = client
+        self.connection = connection
+        self.helper = Helper(client: client)
     }
 
     deinit {
@@ -118,10 +114,6 @@ public class CoapRequest {
      * @param closure invoked when async operation completes
      */
     public func executeAsync(closure: @escaping CoapResponseReceiver) {
-        guard let client = self.client else {
-            // TODO invoke closure with error
-            return
-        }
         let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
         nabto_client_coap_execute(self.coap, future)
         let w = CallbackWrapper(debugDescription: "coap.executeAsync", future: future, owner: self, connectionForErrorMessage: self.connection)

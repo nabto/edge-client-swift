@@ -48,26 +48,22 @@ internal protocol NativeConnectionWrapper {
  */
 public class Connection: NSObject, NativeConnectionWrapper {
     internal let nativeConnection: OpaquePointer
-    private weak var client: Client?
+    private let client: NativeClientWrapper
     private let helper: Helper
     private var apiEventCallBackRegistered: Bool = false
     private var connectionEventListener: ConnectionEventListener? = nil
     private let clientPointerForDebugOutput: OpaquePointer
 
-    internal init(client: Client) throws {
+    internal init(client: ClientImpl) throws {
         if let p = nabto_client_connection_new(client.nativeClient) {
-            print("*** Connection.init, nativeConnection=\(p)")
-            self.clientPointerForDebugOutput = p
+            self.clientPointerForDebugOutput = client.nativeClient
             self.nativeConnection = p
+//            print("*** Connection.init, nativeConnection=\(p), nativeClient=\(self.clientPointerForDebugOutput)")
         } else {
             throw NabtoEdgeClientError.ALLOCATION_ERROR
         }
         self.client = client
-        if let client = self.client {
-            self.helper = Helper(nabtoClient: client)
-        } else {
-            throw NabtoEdgeClientError.ALLOCATION_ERROR
-        }
+        self.helper = Helper(client: client)
         super.init()
     }
 
@@ -75,9 +71,9 @@ public class Connection: NSObject, NativeConnectionWrapper {
         if let listener = self.connectionEventListener {
             listener.stop()
         }
-        print("*** Connection.deinit (begin), nativeConnection=\(self.nativeConnection), client=\(self.clientPointerForDebugOutput)")
+//        print("*** Connection.deinit (begin), nativeConnection=\(self.nativeConnection), client=\(self.clientPointerForDebugOutput)")
         nabto_client_connection_free(self.nativeConnection)
-        print("*** Connection.deinit (end), nativeConnection=\(self.nativeConnection), client=\(self.clientPointerForDebugOutput)")
+//        print("*** Connection.deinit (end), nativeConnection=\(self.nativeConnection), client=\(self.clientPointerForDebugOutput)")
     }
 
     /**
@@ -269,11 +265,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * @throws ALLOCATION_ERROR if the stream could not be created.
      */
     public func createStream() throws -> Stream {
-        if let client = self.client {
-            return try Stream(nabtoClient: client, nabtoConnection: self)
-        } else {
-            throw NabtoEdgeClientError.ALLOCATION_ERROR
-        }
+        return try Stream(client: client, connection: self)
     }
 
     /**
@@ -283,11 +275,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * @throws ALLOCATION_ERROR if the request could not be created.
      */
     public func createCoapRequest(method: String, path: String) throws -> CoapRequest {
-        if let client = self.client {
-            return try CoapRequest(nabtoClient: client, nabtoConnection: self, method: method, path: path)
-        } else {
-            throw NabtoEdgeClientError.ALLOCATION_ERROR
-        }
+        return try CoapRequest(client: client, connection: self, method: method, path: path)
     }
 
     /**
@@ -295,11 +283,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * @throws ALLOCATION_ERROR if the tunnel could not be created.
      */
     public func createTcpTunnel() throws -> TcpTunnel {
-        if let client = self.client {
-            return try TcpTunnel(nabtoClient: client, nabtoConnection: self)
-        } else {
-            throw NabtoEdgeClientError.ALLOCATION_ERROR
-        }
+        return try TcpTunnel(client: client, connection: self)
     }
 
     /**
@@ -308,11 +292,8 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * @throws INVALID_STATE if listener could not be added
      */
     public func addConnectionEventsReceiver(cb: ConnectionEventReceiver) throws {
-        guard let client = self.client else {
-            throw NabtoEdgeClientError.ALLOCATION_ERROR
-        }
         if (self.connectionEventListener == nil) {
-            self.connectionEventListener = ConnectionEventListener(nabtoConnection: self, nabtoClient: client)
+            self.connectionEventListener = ConnectionEventListener(client: client, connection: self)
         }
         try self.connectionEventListener!.addUserCb(cb)
     }
@@ -326,6 +307,9 @@ public class Connection: NSObject, NativeConnectionWrapper {
             return
         }
         listener.removeUserCb(cb)
+        if (!listener.hasUserCbs()) {
+            self.connectionEventListener = nil
+        }
     }
 
 }

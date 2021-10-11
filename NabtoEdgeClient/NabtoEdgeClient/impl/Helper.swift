@@ -8,10 +8,10 @@ import Foundation
 
 internal class Helper {
 
-    private weak var client: Client?
+    private let client: NativeClientWrapper
 
-    init(nabtoClient: Client) {
-        self.client = nabtoClient
+    init(client: NativeClientWrapper) {
+        self.client = client
     }
 
     deinit {
@@ -53,7 +53,7 @@ internal class Helper {
         }
     }
 
-    internal static func mapToSwiftError(ec: NabtoClientError, connection: Connection?=nil) -> NabtoEdgeClientError {
+    internal static func mapToSwiftError(ec: NabtoClientError, connection: NativeConnectionWrapper?=nil) -> NabtoEdgeClientError {
         let swiftError: NabtoEdgeClientError
         if (ec == NABTO_CLIENT_EC_NO_CHANNELS) {
             if let connection = connection {
@@ -94,16 +94,12 @@ internal class Helper {
     }
 
     internal func waitNoThrow(closure: (OpaquePointer?) -> Void) -> NabtoClientError {
-        if let client = self.client {
-            let future = nabto_client_future_new(client.nativeClient)
-            closure(future)
-            nabto_client_future_wait(future)
-            let status = nabto_client_future_error_code(future)
-            nabto_client_future_free(future)
-            return status
-        } else {
-            return NABTO_CLIENT_EC_ABORTED
-        }
+        let future = nabto_client_future_new(client.nativeClient)
+        closure(future)
+        nabto_client_future_wait(future)
+        let status = nabto_client_future_error_code(future)
+        nabto_client_future_free(future)
+        return status
     }
 
     internal func wait(closure: (OpaquePointer?) -> Void) throws {
@@ -115,19 +111,15 @@ internal class Helper {
                      owner: Any,
                      connectionForErrorMessage: Connection?,
                      implClosure: (OpaquePointer) -> ()) {
-        if let client = self.client {
-            let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
+        let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
 
-            // invoke actual api function specified by caller (e.g. nabto_client_connection_connect)
-            implClosure(future)
+        // invoke actual api function specified by caller (e.g. nabto_client_connection_connect)
+        implClosure(future)
 
-            let w = CallbackWrapper(debugDescription: "Helper.invokeAsync", future: future, owner: owner, connectionForErrorMessage: connectionForErrorMessage)
+        let w = CallbackWrapper(debugDescription: "Helper.invokeAsync", future: future, owner: owner, connectionForErrorMessage: connectionForErrorMessage)
 
-            // set callback on future (nabto_client_future_set_callback)
-            w.registerCallback(userClosure)
-        } else {
-            abort(userClosure)
-        }
+        // set callback on future (nabto_client_future_set_callback)
+        w.registerCallback(userClosure)
     }
 
     private func abort(_ closure: @escaping (NabtoEdgeClientError) -> ()) {

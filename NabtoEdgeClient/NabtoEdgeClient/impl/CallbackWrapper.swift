@@ -22,12 +22,12 @@ class CallbackWrapper {
     let owner: Any
 
     // for connection specific error message (if available)
-    let connectionForErrorMessage: Connection?
+    let connectionForErrorMessage: NativeConnectionWrapper?
 
     // tmp debug
     let desc: String
 
-    init(debugDescription: String, future: OpaquePointer, owner: Any, connectionForErrorMessage: Connection?=nil) {
+    init(debugDescription: String, future: OpaquePointer, owner: Any, connectionForErrorMessage: NativeConnectionWrapper?=nil) {
         self.desc = debugDescription
         self.future = future
         self.owner = owner

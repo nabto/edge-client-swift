@@ -7,8 +7,8 @@ import Foundation
 @_implementationOnly import NabtoEdgeClientApi
 
 internal class ConnectionEventListener {
-    private weak var connection: Connection?
-    private weak var client: Client?
+    private let client: NativeClientWrapper
+    private let connection: NativeConnectionWrapper
     private let future: OpaquePointer
     private let listener: OpaquePointer
     private let helper: Helper
@@ -19,12 +19,12 @@ internal class ConnectionEventListener {
     private var userCbs: NSHashTable<ConnectionEventReceiver> = NSHashTable<ConnectionEventReceiver>()
     private var event: NabtoClientConnectionEvent = -1
 
-    init(nabtoConnection: Connection, nabtoClient: Client) {
-        self.connection = nabtoConnection
-        self.client = nabtoClient
-        self.helper = Helper(nabtoClient: nabtoClient)
-        self.future = nabto_client_future_new(nabtoClient.nativeClient)
-        self.listener = nabto_client_listener_new(nabtoClient.nativeClient)
+    init(client: NativeClientWrapper, connection: NativeConnectionWrapper) {
+        self.client = client
+        self.connection = connection
+        self.helper = Helper(client: client)
+        self.future = nabto_client_future_new(client.nativeClient)
+        self.listener = nabto_client_listener_new(client.nativeClient)
     }
 
     deinit {
@@ -33,7 +33,7 @@ internal class ConnectionEventListener {
     }
 
     private func start() throws {
-        let ec = nabto_client_connection_events_init_listener(self.connection?.nativeConnection, self.listener)
+        let ec = nabto_client_connection_events_init_listener(self.connection.nativeConnection, self.listener)
         try Helper.throwIfNotOk(ec)
         // prevent ARC reclaim until we get a close event
         self.keepSelfAlive = self
@@ -86,6 +86,10 @@ internal class ConnectionEventListener {
         if (self.userCbs.count == 0) {
             self.stop()
         }
+    }
+
+    internal func hasUserCbs() -> Bool {
+        return self.userCbs.count > 0
     }
 
     internal func stop() {
