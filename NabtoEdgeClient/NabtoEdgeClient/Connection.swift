@@ -58,7 +58,6 @@ public class Connection: NSObject, NativeConnectionWrapper {
         if let p = nabto_client_connection_new(client.nativeClient) {
             self.clientPointerForDebugOutput = client.nativeClient
             self.nativeConnection = p
-//            print("*** Connection.init, nativeConnection=\(p), nativeClient=\(self.clientPointerForDebugOutput)")
         } else {
             throw NabtoEdgeClientError.ALLOCATION_ERROR
         }
@@ -71,9 +70,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
         if let listener = self.connectionEventListener {
             listener.stop()
         }
-//        print("*** Connection.deinit (begin), nativeConnection=\(self.nativeConnection), client=\(self.clientPointerForDebugOutput)")
         nabto_client_connection_free(self.nativeConnection)
-//        print("*** Connection.deinit (end), nativeConnection=\(self.nativeConnection), client=\(self.clientPointerForDebugOutput)")
     }
 
     /**

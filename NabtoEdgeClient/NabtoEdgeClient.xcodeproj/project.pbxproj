@@ -33,6 +33,7 @@
 		E92C60A140836A8092689CA1 /* CallbackWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92333244D84EEB41CF39F13 /* CallbackWrapper.swift */; };
 		E92C76DCF3126FE20550B9EF /* CoapResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92C825D705048F208FC54FD /* CoapResponse.swift */; };
 		E92EF12F25F8DF3116CB8B2B /* module.map in Sources */ = {isa = PBXBuildFile; fileRef = E926B7741A2C63A0353F530E /* module.map */; };
+		FEE0D87171060FFC8CFE526C /* libPods-NabtoEdgeClient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2698D0457CBE8BE7C4FBE3D4 /* libPods-NabtoEdgeClient.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -83,6 +84,7 @@
 		D42A03B024CEE12D008E4B2D /* NabtoEdgeClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = NabtoEdgeClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D42A03B424CEE12D008E4B2D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D42A03BB24CEE19E008E4B2D /* Client.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
+		D477A83327144A8400A59930 /* NabtoEdgeClientTests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = NabtoEdgeClientTests.xctestplan; sourceTree = "<group>"; };
 		D484CF0F25A60DC3009DCC1C /* NabtoEdgeClientError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NabtoEdgeClientError.swift; sourceTree = "<group>"; };
 		D4B54C3624D045D500BBC161 /* NabtoEdgeClientTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NabtoEdgeClientTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4B54C3824D045D500BBC161 /* NabtoEdgeClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NabtoEdgeClientTests.swift; sourceTree = "<group>"; };
@@ -116,6 +118,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FEE0D87171060FFC8CFE526C /* libPods-NabtoEdgeClient.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -206,6 +209,7 @@
 			isa = PBXGroup;
 			children = (
 				D4B54C3824D045D500BBC161 /* NabtoEdgeClientTests.swift */,
+				D477A83327144A8400A59930 /* NabtoEdgeClientTests.xctestplan */,
 				D4B54C3A24D045D500BBC161 /* Info.plist */,
 				D4B54C4324D04DA600BBC161 /* NabtoEdgeClientTests-Bridging-Header.h */,
 			);

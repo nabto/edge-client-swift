@@ -1,0 +1,38 @@
+{
+  "configurations" : [
+    {
+      "id" : "8E6A7F44-2D36-4C54-BB9A-25BA85FC63F9",
+      "name" : "Configuration 1",
+      "options" : {
+        "testRepetitionMode" : "untilFailure"
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false,
+    "environmentVariableEntries" : [
+      {
+        "enabled" : false,
+        "key" : "DYLD_INSERT_LIBRARIES",
+        "value" : "\/Users\/ug\/Library\/Caches\/JetBrains\/AppCode2020.3\/DerivedData\/NabtoEdgeClient-dhoivxpifczylabfkzmjbperjykn\/Build\/Products\/Debug-iphonesimulator\/NabtoEdgeClientTests.xctest\/Frameworks\/libclang_rt.tsan_iossim_dynamic.dylib"
+      }
+    ],
+    "mainThreadCheckerEnabled" : false,
+    "mallocStackLoggingOptions" : {
+      "loggingType" : "liveAllocations"
+    },
+    "repeatInNewRunnerProcess" : true,
+    "testRepetitionMode" : "untilFailure"
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:NabtoEdgeClient.xcodeproj",
+        "identifier" : "D4B54C3524D045D500BBC161",
+        "name" : "NabtoEdgeClientTests"
+      }
+    }
+  ],
+  "version" : 1
+}

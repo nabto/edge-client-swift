@@ -32,14 +32,12 @@ internal class ClientImpl: NSObject, NativeClientWrapper {
      */
     override public init() {
         self.nativeClient = nabto_client_new()
-        print("*** Client.init done, client=\(self.nativeClient)")
         super.init()
     }
 
     deinit {
         self.stop()
         nabto_client_free(self.nativeClient)
-        print("*** Client.deinit done, client=\(self.nativeClient)")
     }
 
     /**
