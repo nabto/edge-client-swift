@@ -651,7 +651,7 @@ class NabtoEdgeClientTests: XCTestCase {
         try! self.connection.updateOptions(json: self.coapDevice.asJson())
         try! self.connection.connect()
         wait(for: [exp], timeout: 10.0)
-        XCTAssertFalse(self.connection.connectionEventListener?.hasUserCbs() ?? false)
+        XCTAssertFalse(self.connection.connectionEventListener?.hasUserCbs() ?? true)
     }
 
 
