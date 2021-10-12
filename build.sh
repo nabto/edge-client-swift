@@ -3,18 +3,16 @@
 set -e
 
 CONFIG=Release
-
 PROJECT_NAME=NabtoEdgeClient
 BUILD_ROOT=`pwd`
 BUILD=$BUILD_ROOT/build-$CONFIG
 ARTIFACTS=$BUILD_ROOT/dist
+PRODUCT_PATH=Products/Library/Frameworks/${PROJECT_NAME}.framework
+WORKSPACE=${PROJECT_NAME}/${PROJECT_NAME}.xcworkspace
 
 rm -rf $ARTIFACTS
-
 mkdir -p $BUILD
 mkdir -p $ARTIFACTS
-
-WORKSPACE=${PROJECT_NAME}/${PROJECT_NAME}.xcworkspace
 
 # iOS
 xcodebuild clean archive \
@@ -36,14 +34,10 @@ xcodebuild clean archive \
     SKIP_INSTALL=NO \
     BUILD_LIBRARIES_FOR_DISTRIBUTION=YES
 
-PRODUCT_PATH=Products/Library/Frameworks/${PROJECT_NAME}.framework
-
 xcodebuild -create-xcframework \
            -framework "$BUILD/ios.xcarchive/$PRODUCT_PATH" \
            -framework "$BUILD/ios-sim.xcarchive/$PRODUCT_PATH" \
            -output "$ARTIFACTS/$PROJECT_NAME.xcframework"
-
-cd $ARTIFACTS
 
 cd $ARTIFACTS
 cp ../LICENSE ../README.md ${PROJECT_NAME}.xcframework

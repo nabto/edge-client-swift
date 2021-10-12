@@ -9,7 +9,7 @@ Use the following Podfile to install through cocoapods:
 ```
 target 'NabtoEdgeClientHello' do
     use_frameworks!
-    pod 'NabtoEdgeClientSwift', '0.9.4'
+    pod 'NabtoEdgeClientSwift'
 end
 ```
 
