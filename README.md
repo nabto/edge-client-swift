@@ -13,6 +13,14 @@ target 'NabtoEdgeClientHello' do
 end
 ```
 
+For more installation instructions, see the [iOS getting started guide](https://docs.nabto.com/developer/guides/get-started/ios/intro.html).
+
+## Usage
+
+See the [API intro](https://docs.nabto.com/developer/api-reference/ios-sdk/intro.html) to learn how to use the wrapper to invoke Nabto Edge devices.
+
+Until a full example app is ready, take a look at the [integration tests](https://github.com/nabto/edge-client-swift/blob/master/NabtoEdgeClient/NabtoEdgeClientTests/NabtoEdgeClientTests.swift) for examples of how each SDK feature is used.
+
 ## Development of wrapper
 
 To build the wrapper, retrieving dependencies through CocoaPods:
