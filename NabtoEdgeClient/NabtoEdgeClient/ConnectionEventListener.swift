@@ -18,10 +18,6 @@ internal class ConnectionEventListener {
     // to override api methods - so a simple objc hashtable seems best (see https://stackoverflow.com/questions/29278624/pure-swift-set-with-protocol-objects)
     private var userCbs: NSHashTable<ConnectionEventReceiver> = NSHashTable<ConnectionEventReceiver>()
 
-    // handle adding/removing callbacks from callbacks (hashtable cannot be mutated when enumerating)
-    private var pendingAddedCbs: [ConnectionEventReceiver] = []
-    private var pendingRemovedCbs: [ConnectionEventReceiver] = []
-
     init(client: ClientImpl, connection: Connection) {
         self.client = client
         self.connection = connection
@@ -30,7 +26,6 @@ internal class ConnectionEventListener {
     }
 
     deinit {
-        self.syncCbs()
         nabto_client_listener_free(self.listener)
         nabto_client_future_free(self.future)
     }
@@ -55,8 +50,8 @@ internal class ConnectionEventListener {
         guard (ec == NABTO_CLIENT_EC_OK) else {
             return
         }
-        self.syncCbs()
-        let enumerator = self.userCbs.objectEnumerator()
+        let cbs = self.userCbs.copy() as! NSHashTable<ConnectionEventReceiver>
+        let enumerator = cbs.objectEnumerator()
         while let cb = enumerator.nextObject() {
             let mappedEvent: NabtoEdgeClientConnectionEvent = lastEdgeClientConnectionEvent()
             (cb as! ConnectionEventReceiver).onEvent(event: mappedEvent)
@@ -83,31 +78,20 @@ internal class ConnectionEventListener {
         }
     }
 
-    internal func syncCbs() {
-        for cb in self.pendingAddedCbs {
-            self.userCbs.add(cb)
-        }
-        self.pendingAddedCbs.removeAll()
-        for cb in self.pendingRemovedCbs {
-            self.userCbs.remove(cb)
-        }
-        self.pendingRemovedCbs.removeAll()
+    internal func addUserCb(_ cb: ConnectionEventReceiver) throws {
+        self.userCbs.add(cb)
+        try self.start()
+    }
+
+    internal func removeUserCb(_ cb: ConnectionEventReceiver) {
+        self.userCbs.remove(cb)
         if (self.userCbs.count == 0) {
             self.stop()
         }
     }
 
-    internal func addUserCb(_ cb: ConnectionEventReceiver) throws {
-        self.pendingAddedCbs.append(cb)
-        try self.start()
-    }
-
-    internal func removeUserCb(_ cb: ConnectionEventReceiver) {
-        self.pendingRemovedCbs.append(cb)
-    }
-
     internal func hasUserCbs() -> Bool {
-        return self.userCbs.count + self.pendingAddedCbs.count - self.pendingRemovedCbs.count > 0
+        return self.userCbs.count > 0
     }
 
     internal func stop() {

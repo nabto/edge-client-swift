@@ -646,12 +646,14 @@ class NabtoEdgeClientTests: XCTestCase {
         let exp = XCTestExpectation(description: "expect event callback")
         let listener = CrashInducingConnectionEventCallbackReceiver(exp, self.connection)
         try! self.connection.addConnectionEventsReceiver(cb: listener)
+        XCTAssertNotNil(self.connection.connectionEventListener)
+        XCTAssertTrue(self.connection.connectionEventListener!.hasUserCbs())
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
         try! self.connection.updateOptions(json: self.coapDevice.asJson())
         try! self.connection.connect()
         wait(for: [exp], timeout: 10.0)
-        XCTAssertFalse(self.connection.connectionEventListener?.hasUserCbs() ?? true)
+        XCTAssertNil(self.connection.connectionEventListener)
     }
 
 
