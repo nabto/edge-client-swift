@@ -11,6 +11,7 @@ import Foundation
 
 // useful read: https://www.uraimo.com/2016/04/07/swift-and-c-everything-you-need-to-know
 
+
 /**
  * This class allows inferior objects (e.g. connections, streams) to keep a client reference without
  * triggering nabto_client_stop from an SDK callback (forbidden and wreaks havoc) when the last such client
@@ -20,6 +21,12 @@ import Foundation
  * blocks until all SDK callbacks are done (pending callbacks are triggered with abort status), ie
  * no nabto_client_stop or nabto_client_free is triggered from callbacks indirectly through deinit
  * invocations.
+ *
+ * Note: Until ticket sc-759 is fixed, the last statement is not true - these CAN be triggered (as
+ * it (erroneously) is possible to start an async operation after client stop), but these subsequent stop calls will
+ * have no effect as the swift Client instance always triggers the first stop: Subsequent stop invocations
+ * are ignored in the SDK and free just decrements a reference counter in SDK impl). See testcase
+ * testAsyncConnectionCloseAfterClientStop.
  */
 internal class ClientImpl: NSObject, NativeClientWrapper {
 
