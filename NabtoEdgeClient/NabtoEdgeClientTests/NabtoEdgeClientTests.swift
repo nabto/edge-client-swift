@@ -7,7 +7,7 @@
 //
 
 import XCTest
-import NabtoEdgeClient
+@testable import NabtoEdgeClient
 import Foundation
 import CBOR
 
@@ -153,7 +153,7 @@ class NabtoEdgeClientTests: XCTestCase {
             // connection probably not opened yet
         }
         if (self.connection != nil) {
-            //XCTAssertEqual(self.connectionRefCount, CFGetRetainCount(self.connection))
+            XCTAssertEqual(self.connectionRefCount, CFGetRetainCount(self.connection))
             self.connection = nil
         }
         if (self.client != nil) {
@@ -623,6 +623,40 @@ class NabtoEdgeClientTests: XCTestCase {
         self.connection = nil // prevent extra close in teardown
     }
 
+    public class CrashInducingConnectionEventCallbackReceiver : ConnectionEventReceiver {
+        let exp: XCTestExpectation
+        weak var connection: Connection?
+
+        public init(_ exp: XCTestExpectation, _ connection: Connection) {
+            self.exp = exp
+            self.connection = connection
+        }
+
+        func onEvent(event: NabtoEdgeClientConnectionEvent) {
+            if let c = self.connection {
+                c.removeConnectionEventsReceiver(cb: self)
+            } else {
+                XCTFail("connection gone")
+            }
+            self.exp.fulfill()
+        }
+    }
+
+    func testRemoveConnectionEventListenerFromCallback() {
+        let exp = XCTestExpectation(description: "expect event callback")
+        let listener = CrashInducingConnectionEventCallbackReceiver(exp, self.connection)
+        try! self.connection.addConnectionEventsReceiver(cb: listener)
+        XCTAssertNotNil(self.connection.connectionEventListener)
+        XCTAssertTrue(self.connection.connectionEventListener!.hasUserCbs())
+        let key = try! client.createPrivateKey()
+        try! self.connection.setPrivateKey(key: key)
+        try! self.connection.updateOptions(json: self.coapDevice.asJson())
+        try! self.connection.connect()
+        wait(for: [exp], timeout: 10.0)
+        XCTAssertNil(self.connection.connectionEventListener)
+    }
+
+
     func testStreamWriteThenReadSome() {
         try! self.connect(self.streamDevice)
         let coap = try! self.connection.createCoapRequest(method: "GET", path: "/hello-world")
@@ -1030,5 +1064,4 @@ class NabtoEdgeClientTests: XCTestCase {
 
         wait(for: [exp], timeout: 10)
     }
-
 }

@@ -7,22 +7,20 @@ import Foundation
 @_implementationOnly import NabtoEdgeClientApi
 
 internal class ConnectionEventListener {
-    private let client: NativeClientWrapper
-    private let connection: NativeConnectionWrapper
+    private weak var client: ClientImpl?
+    private weak var connection: Connection?
     private let future: OpaquePointer
     private let listener: OpaquePointer
-    private let helper: Helper
     private var keepSelfAlive: ConnectionEventListener?
+    private var event: NabtoClientConnectionEvent = -1
 
     // simple set<> is a mess due to massive swift protocol quirks and an "abstract" class is not possible as it is not possible
     // to override api methods - so a simple objc hashtable seems best (see https://stackoverflow.com/questions/29278624/pure-swift-set-with-protocol-objects)
     private var userCbs: NSHashTable<ConnectionEventReceiver> = NSHashTable<ConnectionEventReceiver>()
-    private var event: NabtoClientConnectionEvent = -1
 
-    init(client: NativeClientWrapper, connection: NativeConnectionWrapper) {
+    init(client: ClientImpl, connection: Connection) {
         self.client = client
         self.connection = connection
-        self.helper = Helper(client: client)
         self.future = nabto_client_future_new(client.nativeClient)
         self.listener = nabto_client_listener_new(client.nativeClient)
     }
@@ -33,7 +31,10 @@ internal class ConnectionEventListener {
     }
 
     private func start() throws {
-        let ec = nabto_client_connection_events_init_listener(self.connection.nativeConnection, self.listener)
+        guard let c = self.connection else {
+            throw NabtoEdgeClientError.ALLOCATION_ERROR
+        }
+        let ec = nabto_client_connection_events_init_listener(c.nativeConnection, self.listener)
         try Helper.throwIfNotOk(ec)
         // prevent ARC reclaim until we get a close event
         self.keepSelfAlive = self
@@ -49,7 +50,8 @@ internal class ConnectionEventListener {
         guard (ec == NABTO_CLIENT_EC_OK) else {
             return
         }
-        let enumerator = self.userCbs.objectEnumerator()
+        let cbs = self.userCbs.copy() as! NSHashTable<ConnectionEventReceiver>
+        let enumerator = cbs.objectEnumerator()
         while let cb = enumerator.nextObject() {
             let mappedEvent: NabtoEdgeClientConnectionEvent = lastEdgeClientConnectionEvent()
             (cb as! ConnectionEventReceiver).onEvent(event: mappedEvent)

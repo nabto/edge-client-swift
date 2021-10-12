@@ -48,10 +48,10 @@ internal protocol NativeConnectionWrapper {
  */
 public class Connection: NSObject, NativeConnectionWrapper {
     internal let nativeConnection: OpaquePointer
-    private let client: NativeClientWrapper
+    private let client: ClientImpl
     private let helper: Helper
     private var apiEventCallBackRegistered: Bool = false
-    private var connectionEventListener: ConnectionEventListener? = nil
+    internal var connectionEventListener: ConnectionEventListener? = nil
     private let clientPointerForDebugOutput: OpaquePointer
 
     internal init(client: ClientImpl) throws {
@@ -290,7 +290,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
      */
     public func addConnectionEventsReceiver(cb: ConnectionEventReceiver) throws {
         if (self.connectionEventListener == nil) {
-            self.connectionEventListener = ConnectionEventListener(client: client, connection: self)
+            self.connectionEventListener = ConnectionEventListener(client: self.client, connection: self)
         }
         try self.connectionEventListener!.addUserCb(cb)
     }
