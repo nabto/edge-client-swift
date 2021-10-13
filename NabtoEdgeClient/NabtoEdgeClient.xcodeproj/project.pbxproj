@@ -20,6 +20,7 @@
 		D4D958A726F90DB900A921F3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D4D958A526F90DB900A921F3 /* LaunchScreen.storyboard */; };
 		D4D958AE26F90E8A00A921F3 /* NabtoEdgeClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42A03B024CEE12D008E4B2D /* NabtoEdgeClient.framework */; };
 		D4D958AF26F90E8A00A921F3 /* NabtoEdgeClient.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D42A03B024CEE12D008E4B2D /* NabtoEdgeClient.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E06F5A701256D33A8E12AC4D /* libPods-NabtoEdgeClient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2698D0457CBE8BE7C4FBE3D4 /* libPods-NabtoEdgeClient.a */; };
 		E92313C8852752D234D588C4 /* MdnsResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92845C3851C3FF4C907E633 /* MdnsResult.swift */; };
 		E925C63B8544C672D3B4D09B /* MdnsScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9229B3C89D448937E34F990 /* MdnsScanner.swift */; };
 		E925D05C1F5E162B0381020C /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E923BA86B8DCE94DF9DFF0E0 /* Connection.swift */; };
@@ -117,6 +118,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E06F5A701256D33A8E12AC4D /* libPods-NabtoEdgeClient.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -278,6 +280,7 @@
 				D4B54C3224D045D500BBC161 /* Sources */,
 				D4B54C3324D045D500BBC161 /* Frameworks */,
 				D4B54C3424D045D500BBC161 /* Resources */,
+				D5B7AF925B98A6BD6C96B5E2 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -424,6 +427,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D5B7AF925B98A6BD6C96B5E2 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-NabtoEdgeClientTests/Pods-NabtoEdgeClientTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-NabtoEdgeClientTests/Pods-NabtoEdgeClientTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NabtoEdgeClientTests/Pods-NabtoEdgeClientTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

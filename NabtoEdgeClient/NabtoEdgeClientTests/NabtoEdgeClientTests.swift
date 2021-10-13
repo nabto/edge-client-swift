@@ -8,6 +8,7 @@
 
 import XCTest
 @testable import NabtoEdgeClient
+import NabtoClient
 import Foundation
 import CBOR
 
@@ -733,7 +734,6 @@ class NabtoEdgeClientTests: XCTestCase {
                     } catch {
                         XCTFail("Test failed due to unexpected exception: \(error)")
                     }
-                    self.client.stop()
                     exp.fulfill()
                 }
             }
@@ -1063,5 +1063,12 @@ class NabtoEdgeClientTests: XCTestCase {
         }
 
         wait(for: [exp], timeout: 10)
+    }
+
+    // make sure nabto4 symbols are present in test executable: some nabto5 tests crashed prior to 5.7 if binary was
+    // linked with nabto4
+    func testNabto4() {
+        let nabto4 = NabtoClient.instance() as! NabtoClient
+        XCTAssertEqual("4.", nabto4.nabtoVersionString().prefix(2))
     }
 }
