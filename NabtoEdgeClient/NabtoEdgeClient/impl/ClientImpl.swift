@@ -44,8 +44,7 @@ internal class ClientImpl: NSObject, NativeClientWrapper {
 
     deinit {
         self.stop()
-        print("*** client impl deinit, free \(self.nativeClient), thread: \(Thread.current)")
-        nabto_client_free(self.nativeClient)
+        nabto_client_free2(self.nativeClient)
     }
 
     /**

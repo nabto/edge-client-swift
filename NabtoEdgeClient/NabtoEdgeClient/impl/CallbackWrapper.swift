@@ -42,18 +42,17 @@ class CallbackWrapper {
         self.cb = cb
         let rawSelf = Unmanaged.passUnretained(self).toOpaque()
         self.keepMeAlive = self
-        let status = NABTO_CLIENT_EC_STOPPED
-        nabto_client_future_set_callback(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
+        let status = nabto_client_future_set_callback2(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
             let mySelf = Unmanaged<CallbackWrapper>.fromOpaque(data!).takeUnretainedValue()
             let wrapperError = Helper.mapToSwiftError(ec: ec, connection: mySelf.connectionForErrorMessage)
             mySelf.invokeUserCallback(wrapperError)
             mySelf.keepMeAlive = nil
         }, rawSelf)
-//        if (status == NABTO_CLIENT_EC_STOPPED) {
-//            self.keepMeAlive = nil
-//            nabto_client_future_free(self.future)
-//            throw NabtoEdgeClientError.STOPPED
-//        }
+        if (status == NABTO_CLIENT_EC_STOPPED) {
+            self.keepMeAlive = nil
+            nabto_client_future_free(self.future)
+            throw NabtoEdgeClientError.STOPPED
+        }
     }
 
     func invokeUserCallback(_ wrapperError: NabtoEdgeClientError) {

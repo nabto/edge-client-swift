@@ -62,7 +62,7 @@ internal class ConnectionEventListener {
     private func armListener() {
         nabto_client_listener_connection_event(self.listener, self.future, &self.event)
         let rawSelf = Unmanaged.passUnretained(self).toOpaque()
-        nabto_client_future_set_callback(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
+        nabto_client_future_set_callback2(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
             let mySelf = Unmanaged<ConnectionEventListener>.fromOpaque(data!).takeUnretainedValue()
             mySelf.apiEventCallback(ec: ec)
         }, rawSelf)

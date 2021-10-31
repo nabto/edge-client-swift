@@ -110,7 +110,7 @@ internal class Helper {
     func invokeAsync(userClosure: @escaping AsyncStatusReceiver,
                      owner: Any,
                      connectionForErrorMessage: Connection?,
-                     implClosure: (OpaquePointer) -> ()) {
+                     implClosure: (OpaquePointer) -> ()) throws {
         let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
 
         // invoke actual api function specified by caller (e.g. nabto_client_connection_connect)
@@ -119,7 +119,7 @@ internal class Helper {
         let w = CallbackWrapper(debugDescription: "Helper.invokeAsync", future: future, owner: owner, connectionForErrorMessage: connectionForErrorMessage)
 
         // set callback on future (nabto_client_future_set_callback)
-        try! w.registerCallback(userClosure)
+        try w.registerCallback(userClosure)
     }
 
 }

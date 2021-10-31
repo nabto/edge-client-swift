@@ -109,9 +109,11 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * the `connect()` function for details about error codes.
      *
      * @param closure Invoked when the connect attempt succeeds or fails.
+     *
+     " @throws STOPPED if the Client instance was stopped
      */
-    public func connectAsync(closure: @escaping AsyncStatusReceiver) {
-        self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: self) { future in
+    public func connectAsync(closure: @escaping AsyncStatusReceiver) throws {
+        try self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: self) { future in
             nabto_client_connection_connect(self.nativeConnection, future)
         }
     }
@@ -136,9 +138,11 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * error codes.
      *
      * @param closure Invoked when the connect attempt succeeds or fails.
+     *
+     " @throws STOPPED if the Client instance was stopped
      */
-    public func closeAsync(closure: @escaping AsyncStatusReceiver) {
-        self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
+    public func closeAsync(closure: @escaping AsyncStatusReceiver) throws {
+        try self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
             nabto_client_connection_close(self.nativeConnection, future)
         }
     }
@@ -197,9 +201,11 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * the `passwordAuthenticate()` function for details about error codes.
      * @param username The username (note: use the empty string if using for Password Open Pairing, see https://docs.nabto.com/developer/guides/iam/pairing.html)
      * @param password The password (typically the open (global) or invite (per-user) pairing password)
+     *
+     * @throws STOPPED if the Client instance was stopped
      */
     public func passwordAuthenticateAsync(username: String, password: String, closure: @escaping AsyncStatusReceiver) throws {
-        self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: self) { future in
+        try self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: self) { future in
             nabto_client_connection_password_authenticate(self.nativeConnection, username, password, future)
         }
     }
