@@ -70,6 +70,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
         if let listener = self.connectionEventListener {
             listener.stop()
         }
+        print("*** connect deinit, invoking free")
         nabto_client_connection_free(self.nativeConnection)
     }
 

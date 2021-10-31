@@ -44,6 +44,7 @@ internal class ClientImpl: NSObject, NativeClientWrapper {
 
     deinit {
         self.stop()
+        print("*** client impl deinit, free \(self.nativeClient), thread: \(Thread.current)")
         nabto_client_free(self.nativeClient)
     }
 
@@ -148,7 +149,9 @@ internal class ClientImpl: NSObject, NativeClientWrapper {
         if (self.apiLogCallBackRegistered) {
             nabto_client_set_log_callback(self.nativeClient, nil, nil)
         }
+        print("*** impl invoking client stop")
         nabto_client_stop(self.nativeClient)
+        print("*** impl invoked client stop")
     }
 
     private static func nslogLogCallback(msg: NabtoEdgeClientLogMessage) {

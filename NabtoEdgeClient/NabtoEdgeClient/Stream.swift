@@ -136,19 +136,24 @@ public class Stream {
      * @param closure: Invoked when the operation completes, see synchronous readSome()
      * for possible errors.
      */
-    public func readSomeAsync(closure: @escaping AsyncDataReceiver) {
+    public func readSomeAsync(closure: @escaping AsyncDataReceiver) throws {
         let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: self.chunkSize)
         var readSize: Int = 0
         nabto_client_stream_read_some(self.stream, future, buffer, self.chunkSize, &readSize)
         let w = CallbackWrapper(debugDescription: "readSomeAsync", future: future, owner: self, connectionForErrorMessage: nil)
-        w.registerCallback{ ec in
-            if (ec == .OK) {
-                closure(ec, Data(bytes: buffer, count: readSize))
-            } else {
-                closure(ec, nil)
+        do {
+            try w.registerCallback { ec in
+                if (ec == .OK) {
+                    closure(ec, Data(bytes: buffer, count: readSize))
+                } else {
+                    closure(ec, nil)
+                }
+                buffer.deallocate()
             }
+        } catch {
             buffer.deallocate()
+            throw error
         }
     }
 
@@ -191,7 +196,7 @@ public class Stream {
         var readSize: Int = 0
         nabto_client_stream_read_all(self.stream, future, buffer, length, &readSize)
         let w = CallbackWrapper(debugDescription: "readAllAsync", future: future, owner: self, connectionForErrorMessage: nil)
-        w.registerCallback { ec in
+        try! w.registerCallback { ec in
             if (ec == .OK) {
                 closure(ec, Data(bytes: buffer, count: readSize))
             } else {

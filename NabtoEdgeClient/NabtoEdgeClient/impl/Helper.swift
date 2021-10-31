@@ -119,15 +119,7 @@ internal class Helper {
         let w = CallbackWrapper(debugDescription: "Helper.invokeAsync", future: future, owner: owner, connectionForErrorMessage: connectionForErrorMessage)
 
         // set callback on future (nabto_client_future_set_callback)
-        w.registerCallback(userClosure)
+        try! w.registerCallback(userClosure)
     }
 
-    private func abort(_ closure: @escaping (NabtoEdgeClientError) -> ()) {
-        // Do not invoke user callback in same callstack. Use a background queue (vs main) as caller can have no
-        // expectations about callback should happen on main thread; under normal circumstances, callback would happen
-        // in a thread started by the native client SDK.
-        DispatchQueue.global().async {
-            closure(.ABORTED)
-        }
-    }
 }
