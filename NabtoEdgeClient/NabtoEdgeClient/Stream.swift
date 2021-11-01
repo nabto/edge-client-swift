@@ -61,9 +61,6 @@ public class Stream {
      * @param streamPort: The listening id/port to use for the stream. This is used to
      * distinguish streams in the other end, like a port number.
      * @param closure: Invoked when the stream is opened or an error occurs, see synchronous open() for possible errors.
-     *
-     * @throws STOPPED if the Client instance was stopped
-     *
      */
     public func openAsync(streamPort: UInt32, closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
@@ -102,9 +99,6 @@ public class Stream {
      * @param data: the data to write
      * @param closure: Invoked when the operation completes, see synchronous write()
      * for possible errors.
-     *
-     * @throws STOPPED if the Client instance was stopped
-     *
      */
     public func writeAsync(data: Data, closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
@@ -242,8 +236,6 @@ public class Stream {
      *
      * @param closure: Invoked when the operation completes, see synchronous close()
      * for possible errors.
-     *
-     * @throws STOPPED if the Client instance was stopped
      */
     public func closeAsync(closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in

@@ -136,8 +136,6 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * error codes.
      *
      * @param closure Invoked when the connect attempt succeeds or fails.
-     *
-     " @throws STOPPED if the Client instance was stopped
      */
     public func closeAsync(closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
