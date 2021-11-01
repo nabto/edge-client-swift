@@ -70,8 +70,6 @@ public class TcpTunnel {
      * @param localPort The local port to listen on. If 0 is specified, an ephemeral port is used,
      * it can be retrieved with `getLocalPort()` when the tunnel has been opened successfully.
      * @param closure Invoked when the tunnel is opened or an error occurs.
-     *
-     * @throws STOPPED if the Client instance was stopped
      */
     public func openAsync(service: String,
                           localPort: UInt16,
@@ -105,8 +103,6 @@ public class TcpTunnel {
 
     /**
      * Close this tunnel asynchronously.
-     *
-     * @throws STOPPED if the Client instance was stopped
      */
     public func closeAsync(closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
