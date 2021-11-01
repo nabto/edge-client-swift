@@ -70,7 +70,6 @@ public class Connection: NSObject, NativeConnectionWrapper {
         if let listener = self.connectionEventListener {
             listener.stop()
         }
-        print("*** connect deinit, invoking free")
         nabto_client_connection_free(self.nativeConnection)
     }
 
@@ -83,6 +82,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * @throws UNAUTHORIZED if the authentication options do not match the basestation configuration
      * for this
      * @throws TOKEN_REJECTED if the basestation could not validate the specified token
+     * @throws STOPPED if the client instance was stopped
      * @throws NO_CHANNELS if all parameters input were accepted but a connection could not be
      * established. Details about what went wrong are available as the
      * associated remoteError.
@@ -109,11 +109,9 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * the `connect()` function for details about error codes.
      *
      * @param closure Invoked when the connect attempt succeeds or fails.
-     *
-     " @throws STOPPED if the Client instance was stopped
      */
-    public func connectAsync(closure: @escaping AsyncStatusReceiver) throws {
-        try self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: self) { future in
+    public func connectAsync(closure: @escaping AsyncStatusReceiver) {
+        self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: self) { future in
             nabto_client_connection_connect(self.nativeConnection, future)
         }
     }
@@ -141,8 +139,8 @@ public class Connection: NSObject, NativeConnectionWrapper {
      *
      " @throws STOPPED if the Client instance was stopped
      */
-    public func closeAsync(closure: @escaping AsyncStatusReceiver) throws {
-        try self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
+    public func closeAsync(closure: @escaping AsyncStatusReceiver) {
+        self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
             nabto_client_connection_close(self.nativeConnection, future)
         }
     }
@@ -176,6 +174,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * @throws NOT_CONNECTED if the connection is not open
      * @throws OPERATION_IN_PROGRESS if a password authentication request is already in progress on the connection
      * @throws TOO_MANY_REQUESTS if too many password attempts has been made
+     * @throws STOPPED if the client is stopped
      */
     public func passwordAuthenticate(username: String, password: String) throws {
         try helper.wait { future in
@@ -201,11 +200,9 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * the `passwordAuthenticate()` function for details about error codes.
      * @param username The username (note: use the empty string if using for Password Open Pairing, see https://docs.nabto.com/developer/guides/iam/pairing.html)
      * @param password The password (typically the open (global) or invite (per-user) pairing password)
-     *
-     * @throws STOPPED if the Client instance was stopped
      */
-    public func passwordAuthenticateAsync(username: String, password: String, closure: @escaping AsyncStatusReceiver) throws {
-        try self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: self) { future in
+    public func passwordAuthenticateAsync(username: String, password: String, closure: @escaping AsyncStatusReceiver) {
+        self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: self) { future in
             nabto_client_connection_password_authenticate(self.nativeConnection, username, password, future)
         }
     }

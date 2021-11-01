@@ -53,9 +53,7 @@ public class Client: NSObject {
     }
 
     deinit {
-        print("*** client deinit begin")
         self.impl.stop()
-        print("*** client deinit end, thread: \(Thread.current)")
     }
 
     /**

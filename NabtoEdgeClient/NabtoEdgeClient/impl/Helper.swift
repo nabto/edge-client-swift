@@ -25,7 +25,6 @@ internal class Helper {
         switch (status) {
         case NABTO_CLIENT_EC_OK: return NabtoEdgeClientError.OK
 
-        case NABTO_CLIENT_EC_ABORTED: return NabtoEdgeClientError.ABORTED
         case NABTO_CLIENT_EC_CONNECTION_REFUSED: return NabtoEdgeClientError.CONNECTION_REFUSED
         case NABTO_CLIENT_EC_DNS: return NabtoEdgeClientError.DNS
         case NABTO_CLIENT_EC_EOF: return NabtoEdgeClientError.EOF
@@ -53,7 +52,7 @@ internal class Helper {
         }
     }
 
-    internal static func mapToSwiftError(ec: NabtoClientError, connection: NativeConnectionWrapper?=nil) -> NabtoEdgeClientError {
+    internal static func mapToSwiftError(ec: NabtoClientError, connection: NativeConnectionWrapper? = nil) -> NabtoEdgeClientError {
         let swiftError: NabtoEdgeClientError
         if (ec == NABTO_CLIENT_EC_NO_CHANNELS) {
             if let connection = connection {
@@ -110,7 +109,7 @@ internal class Helper {
     func invokeAsync(userClosure: @escaping AsyncStatusReceiver,
                      owner: Any,
                      connectionForErrorMessage: Connection?,
-                     implClosure: (OpaquePointer) -> ()) throws {
+                     implClosure: (OpaquePointer) -> ()) {
         let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
 
         // invoke actual api function specified by caller (e.g. nabto_client_connection_connect)
@@ -118,8 +117,20 @@ internal class Helper {
 
         let w = CallbackWrapper(debugDescription: "Helper.invokeAsync", future: future, owner: owner, connectionForErrorMessage: connectionForErrorMessage)
 
-        // set callback on future (nabto_client_future_set_callback)
-        try w.registerCallback(userClosure)
+        let status: NabtoClientError = w.registerCallback(userClosure)
+        if (status != NABTO_CLIENT_EC_OK) {
+            self.invokeUserClosureAsyncFail(status, userClosure)
+        }
     }
 
+    internal func invokeUserClosureAsyncFail(_ status: NabtoClientError, _ closure: @escaping (NabtoEdgeClientError) -> ()) {
+        // Do not invoke user callback in same callstack. Use a background queue (vs main) as caller can have no
+        // expectations about callback should happen on main thread; under normal circumstances, callback would happen
+        // in a thread started by the native client SDK.
+        DispatchQueue.global().async {
+            let ec = Self.mapSimpleApiStatusToErrorCode(status)
+            closure(ec)
+        }
+    }
 }
+

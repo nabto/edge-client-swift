@@ -148,7 +148,7 @@ class NabtoEdgeClientTests: XCTestCase {
     override func tearDownWithError() throws {
         do {
             try self.connection?.close()
-        } catch (NabtoEdgeClientError.ABORTED) {
+        } catch (NabtoEdgeClientError.STOPPED) {
             // client stopped
         } catch (NabtoEdgeClientError.INVALID_STATE) {
             // connection probably not opened yet
@@ -531,11 +531,8 @@ class NabtoEdgeClientTests: XCTestCase {
             wait(for: [exp], timeout: 10.0)
             cli.stop()
         }
-        try XCTExpectFailure {
-            // XXX sc-759 - currently close after client stop is ok
-            XCTAssertThrowsError(try conn.close()) { error in
-                XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.ABORTED)
-            }
+        XCTAssertThrowsError(try conn.close()) { error in
+            XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.STOPPED)
         }
         conn = nil
     }
@@ -701,7 +698,7 @@ class NabtoEdgeClientTests: XCTestCase {
         try! stream.write(data: input.data(using: .utf8)!)
         self.client.stop()
         XCTAssertThrowsError(try stream.readAll(length: len)) { error in
-            XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.ABORTED)
+            XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.STOPPED)
         }
         self.client = nil
     }
@@ -1027,14 +1024,11 @@ class NabtoEdgeClientTests: XCTestCase {
         cli.stop()
         cli = nil
 
-        // Nabto Client SDK currently returns OK after client stop, await sc-759 fix
-        try XCTExpectFailure {
-            XCTAssertThrowsError(try conn.createCoapRequest(method: "GET", path: "/foo")) { error in
-                XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.ABORTED)
-            }
-            XCTAssertThrowsError(try conn.close()) { error in
-                XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.ABORTED)
-            }
+        XCTAssertThrowsError(try conn.createCoapRequest(method: "GET", path: "/foo")) { error in
+            XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.STOPPED)
+        }
+        XCTAssertThrowsError(try conn.close()) { error in
+            XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.STOPPED)
         }
     }
 

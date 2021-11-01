@@ -35,10 +35,9 @@ class CallbackWrapper {
     }
 
     deinit {
-        print("*** cb wrapper deinit end, thread: \(Thread.current)")
     }
 
-    public func registerCallback(_ cb: @escaping AsyncStatusReceiver) throws {
+    public func registerCallback(_ cb: @escaping AsyncStatusReceiver) -> NabtoClientError {
         self.cb = cb
         let rawSelf = Unmanaged.passUnretained(self).toOpaque()
         self.keepMeAlive = self
@@ -48,11 +47,11 @@ class CallbackWrapper {
             mySelf.invokeUserCallback(wrapperError)
             mySelf.keepMeAlive = nil
         }, rawSelf)
-        if (status == NABTO_CLIENT_EC_STOPPED) {
+        if (status != NABTO_CLIENT_EC_OK) {
             self.keepMeAlive = nil
             nabto_client_future_free(self.future)
-            throw NabtoEdgeClientError.STOPPED
         }
+        return status
     }
 
     func invokeUserCallback(_ wrapperError: NabtoEdgeClientError) {

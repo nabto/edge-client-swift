@@ -14,7 +14,6 @@ import Foundation
 public indirect enum NabtoEdgeClientError: Error, Equatable {
     case OK
 
-    case ABORTED
     case ALLOCATION_ERROR
     case CONNECTION_REFUSED
     case DNS

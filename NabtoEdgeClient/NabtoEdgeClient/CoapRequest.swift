@@ -113,11 +113,11 @@ public class CoapRequest {
      *
      * @param closure invoked when async operation completes
      */
-    public func executeAsync(closure: @escaping CoapResponseReceiver) throws {
+    public func executeAsync(closure: @escaping CoapResponseReceiver) {
         let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
         nabto_client_coap_execute(self.coap, future)
         let w = CallbackWrapper(debugDescription: "coap.executeAsync", future: future, owner: self, connectionForErrorMessage: self.connection)
-        try w.registerCallback { ec in
+        let status = w.registerCallback { ec in
             if (ec == .OK) {
                 do {
                     let coapResponse = try CoapResponse(self.coap)
@@ -129,6 +129,11 @@ public class CoapRequest {
             } else {
                 closure(ec, nil)
             }
+        }
+        if (status != NABTO_CLIENT_EC_OK) {
+            self.helper.invokeUserClosureAsyncFail(status, { asyncInvokeEc in
+                closure(asyncInvokeEc, nil)
+            })
         }
     }
 }

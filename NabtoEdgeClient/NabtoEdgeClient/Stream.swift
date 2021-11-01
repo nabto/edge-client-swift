@@ -65,8 +65,8 @@ public class Stream {
      * @throws STOPPED if the Client instance was stopped
      *
      */
-    public func openAsync(streamPort: UInt32, closure: @escaping AsyncStatusReceiver) throws {
-        try self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
+    public func openAsync(streamPort: UInt32, closure: @escaping AsyncStatusReceiver) {
+        self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
             nabto_client_stream_open(self.stream, future, streamPort)
         }
     }
@@ -106,8 +106,8 @@ public class Stream {
      * @throws STOPPED if the Client instance was stopped
      *
      */
-    public func writeAsync(data: Data, closure: @escaping AsyncStatusReceiver) throws {
-        try self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
+    public func writeAsync(data: Data, closure: @escaping AsyncStatusReceiver) {
+        self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
             doWrite(data, future)
         }
     }
@@ -141,24 +141,25 @@ public class Stream {
      * @param closure: Invoked when the operation completes, see synchronous readSome()
      * for possible errors.
      */
-    public func readSomeAsync(closure: @escaping AsyncDataReceiver) throws {
+    public func readSomeAsync(closure: @escaping AsyncDataReceiver) {
         let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: self.chunkSize)
         var readSize: Int = 0
         nabto_client_stream_read_some(self.stream, future, buffer, self.chunkSize, &readSize)
         let w = CallbackWrapper(debugDescription: "readSomeAsync", future: future, owner: self, connectionForErrorMessage: nil)
-        do {
-            try w.registerCallback { ec in
-                if (ec == .OK) {
-                    closure(ec, Data(bytes: buffer, count: readSize))
-                } else {
-                    closure(ec, nil)
-                }
-                buffer.deallocate()
+        let status = w.registerCallback { ec in
+            if (ec == .OK) {
+                closure(ec, Data(bytes: buffer, count: readSize))
+            } else {
+                closure(ec, nil)
             }
-        } catch {
             buffer.deallocate()
-            throw error
+        }
+        if (status != NABTO_CLIENT_EC_OK) {
+            self.helper.invokeUserClosureAsyncFail(status, { error in
+                closure(error, nil)
+            })
+            buffer.deallocate()
         }
     }
 
@@ -195,18 +196,24 @@ public class Stream {
      * @param closure: Invoked when the operation completes, see synchronous readAll()
      * for possible errors.
      */
-    public func readAllAsync(length: Int, closure: @escaping AsyncDataReceiver) throws {
+    public func readAllAsync(length: Int, closure: @escaping AsyncDataReceiver) {
         let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: length)
         var readSize: Int = 0
         nabto_client_stream_read_all(self.stream, future, buffer, length, &readSize)
         let w = CallbackWrapper(debugDescription: "readAllAsync", future: future, owner: self, connectionForErrorMessage: nil)
-        try w.registerCallback { ec in
+        let status = w.registerCallback { ec in
             if (ec == .OK) {
                 closure(ec, Data(bytes: buffer, count: readSize))
             } else {
                 closure(ec, nil)
             }
+            buffer.deallocate()
+        }
+        if (status != NABTO_CLIENT_EC_OK) {
+            self.helper.invokeUserClosureAsyncFail(status, { error in
+                closure(error, nil)
+            })
             buffer.deallocate()
         }
     }
@@ -238,8 +245,8 @@ public class Stream {
      *
      * @throws STOPPED if the Client instance was stopped
      */
-    public func closeAsync(closure: @escaping AsyncStatusReceiver) throws {
-        try self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
+    public func closeAsync(closure: @escaping AsyncStatusReceiver) {
+        self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
             nabto_client_stream_close(self.stream, future)
         }
     }

@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name         = 'NabtoEdgeClientSwift'
   s.version      = "1.1.2"
-  s.summary      = "Nabto Edge Client for Swift"
+  s.summary      = "Nabto 5/Edge Client for Swift"
   s.description  = <<-DESC
 This pod installs the high level Nabto Edge Client for Swift: It wraps the most common functionality of the low-level ANSI C Nabto Edge Client SDK (provided in the NabtoEdgeClientApi pod).
 
