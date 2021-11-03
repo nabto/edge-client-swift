@@ -464,6 +464,46 @@ class NabtoEdgeClientTests: XCTestCase {
         wait(for: [expConn, expCoap], timeout: 10.0)
     }
 
+    // XXX: poor test - expect random failures
+    func testStopAsyncConnect() {
+        let key = try! client.createPrivateKey()
+        self.prepareConnection(self.coapDevice)
+        let expConn = XCTestExpectation(description: "expect connect done callback")
+
+        self.connection.connectAsync { ec in
+            XCTAssertEqual(ec, .STOPPED)
+            expConn.fulfill()
+        }
+
+        // very poor test... depends on the following being executed before connection is complete
+        self.connection.stop()
+
+        wait(for: [expConn], timeout: 10.0)
+    }
+
+    // XXX: poor test - expect random failures
+    func testStopAsyncCoapRequest() {
+        let key = try! client.createPrivateKey()
+        self.prepareConnection(self.coapDevice)
+        let expConn = XCTestExpectation(description: "expect connect done callback")
+        let expCoap = XCTestExpectation(description: "expect coap done callback")
+
+        self.connection.connectAsync { ec in
+            XCTAssertEqual(ec, .OK)
+            let coap = try! self.connection.createCoapRequest(method: "GET", path: "/hello-world")
+            coap.executeAsync { ec, response in
+                XCTAssertEqual(ec, .STOPPED)
+                expCoap.fulfill()
+            }
+            // very poor test... depends on the following being executed before coap execution is complete
+            coap.stop()
+            expConn.fulfill()
+        }
+
+        wait(for: [expConn, expCoap], timeout: 10.0)
+    }
+
+
 //    func testReproduceCrashFreeClientFromCallback_Repeated() {
 //        for _ in 1...30 {
 //            self.testReproduceCrashFreeClient()

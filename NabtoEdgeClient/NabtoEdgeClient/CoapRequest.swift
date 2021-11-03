@@ -136,4 +136,13 @@ public class CoapRequest {
             })
         }
     }
+
+    /**
+     * Stop any pending async request executions.
+     *
+     * The request should not be used after it has been stopped.
+     */
+    public func stop() {
+        nabto_client_coap_stop(self.coap)
+    }
 }

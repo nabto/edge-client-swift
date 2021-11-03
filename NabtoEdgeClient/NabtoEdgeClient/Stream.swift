@@ -244,12 +244,22 @@ public class Stream {
     }
 
     /**
+     * @deprecated Use stop() (renamed for consistency with similar functions in other contexts)
      * Abort a stream.
      *
      * All pending read operations are aborted. The write direction is also closed.
      */
     public func abort() {
         nabto_client_stream_abort(self.stream)
+    }
+
+    /**
+     * Stop a stream.
+     *
+     * All pending read operations are aborted. The write direction is also closed.
+     */
+    public func stop() {
+        nabto_client_stream_stop(self.stream)
     }
 
     private func doWrite(_ data: Data, _ future: OpaquePointer?) {

@@ -129,6 +129,17 @@ public class Connection: NSObject, NativeConnectionWrapper {
     }
 
     /**
+     * Stop pending connect or close on a connection.
+     *
+     * After stop has been called the connection should not be used any more.
+     *
+     * Stop can be used if the user cancels a connect/close request.
+     */
+    public func stop() {
+        nabto_client_connection_stop(self.nativeConnection)
+    }
+
+    /**
      * Close this connection asynchronously.
      *
      * The specified AsyncStatusReceiver closure is

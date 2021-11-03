@@ -110,4 +110,14 @@ public class TcpTunnel {
         }
     }
 
+    /**
+     * Stop this tunnel. Stop can be used to cancel async functions like
+     * open and close. But the tunnel cannot be used after it has been
+     * stopped. So you cannot call open, then stop and then resume the
+     * open again.
+     */
+     public func stop() {
+         nabto_client_tcp_tunnel_stop(self.tunnel)
+     }
+
 }
