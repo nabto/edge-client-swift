@@ -150,7 +150,7 @@ class NabtoEdgeClientTests: XCTestCase {
             try self.connection?.close()
         } catch (NabtoEdgeClientError.STOPPED) {
             // client stopped
-        } catch (NabtoEdgeClientError.INVALID_STATE) {
+        } catch (NabtoEdgeClientError.NOT_CONNECTED) {
             // connection probably not opened yet
         }
         if (self.connection != nil) {
@@ -172,7 +172,10 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func testVersionString() throws {
-        XCTAssertEqual("5.", Client.versionString().prefix(2))
+        let prefix = Client.versionString().prefix(2)
+        let isBranch = prefix == "5."
+        let isMaster = prefix == "0."
+        XCTAssertTrue(isBranch || isMaster)
     }
 
     func testDefaultLog() {
@@ -331,7 +334,7 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func testGetDeviceFingerprintHexFail() {
         XCTAssertThrowsError(try connection.getDeviceFingerprintHex()) { error in
-            XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.INVALID_STATE)
+            XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.NOT_CONNECTED)
         }
     }
 
@@ -391,7 +394,7 @@ class NabtoEdgeClientTests: XCTestCase {
 
     // ./examples/simple_mdns/simple_mdns_device pr-mdns de-mdns swift-test-subtype swift-txt-key swift-txt-val
     func testMdnsDiscovery() throws {
-        throw XCTSkip("Needs local device for testing")
+//        throw XCTSkip("Needs local device for testing")
         #if !targetEnvironment(simulator)
         throw XCTSkip("mDNS forbidden on iOS 14.5+ physical device, awaiting apple app approval of container app")
         #endif
@@ -475,7 +478,7 @@ class NabtoEdgeClientTests: XCTestCase {
             expConn.fulfill()
         }
 
-        // very poor test... depends on the following being executed before connection is complete
+        // poor test... depends on the following being executed before connection is complete
         self.connection.stop()
 
         wait(for: [expConn], timeout: 10.0)
@@ -495,7 +498,7 @@ class NabtoEdgeClientTests: XCTestCase {
                 XCTAssertEqual(ec, .STOPPED)
                 expCoap.fulfill()
             }
-            // very poor test... depends on the following being executed before coap execution is complete
+            // poor test... depends on the following being executed before coap execution is complete
             coap.stop()
             expConn.fulfill()
         }
@@ -589,6 +592,39 @@ class NabtoEdgeClientTests: XCTestCase {
             coap.executeAsync { ec, response in
                 XCTAssertEqual(ec, .OK)
                 XCTAssertEqual(response!.status, 404)
+                exp.fulfill()
+            }
+        }
+
+        wait(for: [exp], timeout: 10.0)
+    }
+
+    func testDoubleClose_Repeated() {
+        for _ in 1...1000 {
+            self.testDoubleClose()
+        }
+    }
+
+    func testDoubleClose() {
+        let client = Client()
+        self.enableLogging(client)
+        let connection = try! client.createConnection()
+        let key = try! client.createPrivateKey()
+        try! connection.setPrivateKey(key: key)
+        try! connection.updateOptions(json: self.coapDevice.asJson())
+        let exp = XCTestExpectation(description: "expect coap done callback")
+
+        connection.connectAsync { ec in
+            XCTAssertEqual(ec, .OK)
+            let coap = try! connection.createCoapRequest(method: "GET", path: "/does-not-exist-trigger-404")
+            coap.executeAsync { ec, response in
+                XCTAssertEqual(ec, .OK)
+                XCTAssertEqual(response!.status, 404)
+                connection.closeAsync { ec in
+                    connection.closeAsync { ec in
+                        XCTAssertEqual(ec, .STOPPED)
+                    }
+                }
                 exp.fulfill()
             }
         }
@@ -1064,9 +1100,9 @@ class NabtoEdgeClientTests: XCTestCase {
         cli.stop()
         cli = nil
 
-        XCTAssertThrowsError(try conn.createCoapRequest(method: "GET", path: "/foo")) { error in
-            XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.STOPPED)
-        }
+        // with 5.8, it is ok to create (but not execute) coap request after stop
+        let _ = try conn.createCoapRequest(method: "GET", path: "/foo")
+
         XCTAssertThrowsError(try conn.close()) { error in
             XCTAssertEqual(error as! NabtoEdgeClientError, NabtoEdgeClientError.STOPPED)
         }
@@ -1109,7 +1145,7 @@ class NabtoEdgeClientTests: XCTestCase {
         try self.tearDownWithError()
 
         var connection: Connection!
-        let exp = XCTestExpectation()
+        let exp = XCTestExpectation(description: "callback waits until end of scope of this function")
         do {
             var client: Client!
             do {
@@ -1125,14 +1161,12 @@ class NabtoEdgeClientTests: XCTestCase {
                 client.stop()
 
                 // with pre-sc764 implementation, below does not fail but triggers leak
-                let exp2 = XCTestExpectation()
                 coap.executeAsync { error, response in
                     self.wait(for: [exp], timeout: 10.0)
                     XCTAssertEqual(error, .STOPPED)
                     XCTAssertNil(response)
-                    exp2.fulfill()
+                    connection = nil
                 }
-                wait(for: [exp2], timeout: 10.0)
             }
             client = nil
         }

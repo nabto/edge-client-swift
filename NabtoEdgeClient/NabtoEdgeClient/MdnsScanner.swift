@@ -112,12 +112,9 @@ public class MdnsScanner: NSObject {
     }
 
     private func apiEventCallback(ec: NabtoClientError) {
-        if (ec == NABTO_CLIENT_EC_STOPPED) {
+        guard (ec == NABTO_CLIENT_EC_OK) else {
             // allow ARC to reclaim us
             self.selfReference = nil
-            return
-        }
-        guard (ec == NABTO_CLIENT_EC_OK) else {
             return
         }
         let enumerator = self.userCbs.objectEnumerator()
