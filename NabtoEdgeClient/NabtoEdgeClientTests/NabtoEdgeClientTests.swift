@@ -175,7 +175,7 @@ class NabtoEdgeClientTests: XCTestCase {
         let prefix = Client.versionString().prefix(2)
         let isBranch = prefix == "5."
         let isMaster = prefix == "0."
-        XCTAssertTrue(isBranch || isMaster)
+        XCTAssertTrue(isBranch || isMaster, "version prefix: \(prefix)")
     }
 
     func testDefaultLog() {
@@ -407,7 +407,8 @@ class NabtoEdgeClientTests: XCTestCase {
         XCTAssertEqual(stub.results.count, 1)
         XCTAssertEqual(stub.results[0].deviceId, self.mdnsDevice.deviceId)
         XCTAssertEqual(stub.results[0].productId, self.mdnsDevice.productId)
-        XCTAssertEqual(stub.results[0].txtItems["nabto_version"]!.prefix(2), "5.")
+        let versionPrefix = stub.results[0].txtItems["nabto_version"]!.prefix(2)
+        XCTAssertTrue(versionPrefix == "5." || versionPrefix == "0.")
         XCTAssertEqual(stub.results[0].txtItems[self.mdnsTxtKey], self.mdnsTxtVal)
         XCTAssertEqual(stub.results[0].action, .ADD)
         scanner.stop()
@@ -599,13 +600,16 @@ class NabtoEdgeClientTests: XCTestCase {
         wait(for: [exp], timeout: 10.0)
     }
 
+    // see comment below regarding #828 and #834
     func testDoubleClose_Repeated() {
-        for _ in 1...1000 {
+        for i in 1...10 {
+            print(" === iteration \(i) ==================================================")
             self.testDoubleClose()
         }
     }
 
-    func testDoubleClose() {
+    // this function was the one invoked in tickets #828 and #834 - but the test is bad: exp fulfilled in wrong place
+    func testDoubleClose_crash() {
         let client = Client()
         self.enableLogging(client)
         let connection = try! client.createConnection()
@@ -629,6 +633,33 @@ class NabtoEdgeClientTests: XCTestCase {
             }
         }
 
+        wait(for: [exp], timeout: 10.0)
+    }
+
+    // see comment above regarding #828 and #834
+    func testDoubleClose() {
+        let client = Client()
+        self.enableLogging(client)
+        let connection = try! client.createConnection()
+        let key = try! client.createPrivateKey()
+        try! connection.setPrivateKey(key: key)
+        try! connection.updateOptions(json: self.coapDevice.asJson())
+        let exp = XCTestExpectation(description: "expect coap done callback")
+
+        connection.connectAsync { ec in
+            XCTAssertEqual(ec, .OK)
+            let coap = try! connection.createCoapRequest(method: "GET", path: "/does-not-exist-trigger-404")
+            coap.executeAsync { ec, response in
+                XCTAssertEqual(ec, .OK)
+                XCTAssertEqual(response!.status, 404)
+                connection.closeAsync { ec in
+                    connection.closeAsync { ec in
+                        XCTAssertEqual(ec, .STOPPED)
+                        exp.fulfill()
+                    }
+                }
+            }
+        }
         wait(for: [exp], timeout: 10.0)
     }
 
