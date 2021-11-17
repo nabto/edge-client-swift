@@ -53,8 +53,9 @@ public class TcpTunnel {
      * configuration), e.g. "http", "http-admin", "ssh", "rtsp".
      * @param localPort The local port to listen on. If 0 is specified, an ephemeral port is used,
      * it can be retrieved with `getLocalPort()`.
-     * @throws NABTO_CLIENT_EC_NOT_FOUND if requesting an unknown service.
-     * @throws NABTO_CLIENT_EC_FORBIDDEN if target device did not allow opening a tunnel to specified service for the current client
+     * @throws STOPPED if the connection
+     * @throws NOT_FOUND if requesting an unknown service.
+     * @throws FORBIDDEN if target device did not allow opening a tunnel to specified service for the current client
      */
     public func open(service: String, localPort: UInt16) throws {
         try self.helper.wait { future in
@@ -108,5 +109,15 @@ public class TcpTunnel {
             nabto_client_tcp_tunnel_close(self.tunnel, future)
         }
     }
+
+    /**
+     * Stop this tunnel. Stop can be used to cancel async functions like
+     * open and close. But the tunnel cannot be used after it has been
+     * stopped. So you cannot call open, then stop and then resume the
+     * open again.
+     */
+     public func stop() {
+         nabto_client_tcp_tunnel_stop(self.tunnel)
+     }
 
 }

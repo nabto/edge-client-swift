@@ -11,7 +11,7 @@ internal class ConnectionEventListener {
     private weak var connection: Connection?
     private let future: OpaquePointer
     private let listener: OpaquePointer
-    private var keepSelfAlive: ConnectionEventListener?
+    private var selfReference: ConnectionEventListener?
     private var event: NabtoClientConnectionEvent = -1
 
     // simple set<> is a mess due to massive swift protocol quirks and an "abstract" class is not possible as it is not possible
@@ -37,17 +37,14 @@ internal class ConnectionEventListener {
         let ec = nabto_client_connection_events_init_listener(c.nativeConnection, self.listener)
         try Helper.throwIfNotOk(ec)
         // prevent ARC reclaim until we get a close event
-        self.keepSelfAlive = self
+        self.selfReference = self
         self.armListener()
     }
 
     private func apiEventCallback(ec: NabtoClientError) {
-        if (ec == NABTO_CLIENT_EC_STOPPED) {
-            // allow ARC to reclaim us
-            self.keepSelfAlive = nil
-            return
-        }
         guard (ec == NABTO_CLIENT_EC_OK) else {
+            // allow ARC to reclaim us
+            self.selfReference = nil
             return
         }
         let cbs = self.userCbs.copy() as! NSHashTable<ConnectionEventReceiver>
@@ -62,7 +59,7 @@ internal class ConnectionEventListener {
     private func armListener() {
         nabto_client_listener_connection_event(self.listener, self.future, &self.event)
         let rawSelf = Unmanaged.passUnretained(self).toOpaque()
-        nabto_client_future_set_callback(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
+        nabto_client_future_set_callback2(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
             let mySelf = Unmanaged<ConnectionEventListener>.fromOpaque(data!).takeUnretainedValue()
             mySelf.apiEventCallback(ec: ec)
         }, rawSelf)

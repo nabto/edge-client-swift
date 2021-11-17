@@ -117,7 +117,7 @@ public class CoapRequest {
         let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
         nabto_client_coap_execute(self.coap, future)
         let w = CallbackWrapper(debugDescription: "coap.executeAsync", future: future, owner: self, connectionForErrorMessage: self.connection)
-        w.registerCallback { ec in
+        let status = w.registerCallback { ec in
             if (ec == .OK) {
                 do {
                     let coapResponse = try CoapResponse(self.coap)
@@ -130,5 +130,19 @@ public class CoapRequest {
                 closure(ec, nil)
             }
         }
+        if (status != NABTO_CLIENT_EC_OK) {
+            self.helper.invokeUserClosureAsyncFail(status, { asyncInvokeEc in
+                closure(asyncInvokeEc, nil)
+            })
+        }
+    }
+
+    /**
+     * Stop any pending async request executions.
+     *
+     * The request should not be used after it has been stopped.
+     */
+    public func stop() {
+        nabto_client_coap_stop(self.coap)
     }
 }

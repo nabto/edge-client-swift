@@ -47,7 +47,7 @@ public class Stream {
      *
      * @param streamPort: The listening id/port to use for the stream. This is used to
      * distinguish streams in the other end, like a port number.
-     * @throws ABORTED: the stream could not be opened as the handshake was aborted - this includes  an invalid port specified and access denied due to insufficient permissions
+     * @throws STOPPED: the stream could not be opened as the handshake was aborted - this includes  an invalid port specified and access denied due to insufficient permissions
      */
     public func open(streamPort: UInt32) throws {
         try self.helper.wait { future in
@@ -99,7 +99,6 @@ public class Stream {
      * @param data: the data to write
      * @param closure: Invoked when the operation completes, see synchronous write()
      * for possible errors.
-     *
      */
     public func writeAsync(data: Data, closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
@@ -111,7 +110,7 @@ public class Stream {
      * Read some bytes from a stream. Blocks until at least 1 byte is read or the stream is
      * closed or end of file is reached.
      * @throws EOF if end of file is reached
-     * @throws ABORTED if the stream is aborted
+     * @throws STOPPED if the stream is stopped
      * @throws OPERATION_IN_PROGRESS if another read is in progress
      * @return the data read
      */
@@ -142,7 +141,7 @@ public class Stream {
         var readSize: Int = 0
         nabto_client_stream_read_some(self.stream, future, buffer, self.chunkSize, &readSize)
         let w = CallbackWrapper(debugDescription: "readSomeAsync", future: future, owner: self, connectionForErrorMessage: nil)
-        w.registerCallback{ ec in
+        let status = w.registerCallback { ec in
             if (ec == .OK) {
                 closure(ec, Data(bytes: buffer, count: readSize))
             } else {
@@ -150,17 +149,23 @@ public class Stream {
             }
             buffer.deallocate()
         }
+        if (status != NABTO_CLIENT_EC_OK) {
+            self.helper.invokeUserClosureAsyncFail(status, { error in
+                closure(error, nil)
+            })
+            buffer.deallocate()
+        }
     }
 
     /**
      * Read exactly the specified amount of bytes. Blocks until all bytes read.
      *
-     * If all bytes could not be read (EOF or an error occurs or stream is aborted), an error is
+     * If all bytes could not be read (EOF or an error occurs or stream is stopped), an error is
      * thrown.
      *
      * @param length: The number of bytes to read
      * @throws EOF if end of file is reached
-     * @throws ABORTED if the stream is aborted
+     * @throws STOPPED if the stream is stopped
      * @throws OPERATION_IN_PROGRESS if another read is in progress
      * @return the data read
      */
@@ -180,7 +185,7 @@ public class Stream {
      * Read exactly the specified amount of bytes asynchronously.
      *
      * Closure is invoked with a success indication when all bytes are read. Or an error if all
-     * bytes could not be read (EOF or an error occurs or stream is aborted).
+     * bytes could not be read (EOF or an error occurs or stream is stopped).
      * @param length: The number of bytes to read
      * @param closure: Invoked when the operation completes, see synchronous readAll()
      * for possible errors.
@@ -191,12 +196,18 @@ public class Stream {
         var readSize: Int = 0
         nabto_client_stream_read_all(self.stream, future, buffer, length, &readSize)
         let w = CallbackWrapper(debugDescription: "readAllAsync", future: future, owner: self, connectionForErrorMessage: nil)
-        w.registerCallback { ec in
+        let status = w.registerCallback { ec in
             if (ec == .OK) {
                 closure(ec, Data(bytes: buffer, count: readSize))
             } else {
                 closure(ec, nil)
             }
+            buffer.deallocate()
+        }
+        if (status != NABTO_CLIENT_EC_OK) {
+            self.helper.invokeUserClosureAsyncFail(status, { error in
+                closure(error, nil)
+            })
             buffer.deallocate()
         }
     }
@@ -233,12 +244,22 @@ public class Stream {
     }
 
     /**
+     * @deprecated Use stop() (renamed for consistency with similar functions in other contexts)
      * Abort a stream.
      *
      * All pending read operations are aborted. The write direction is also closed.
      */
     public func abort() {
         nabto_client_stream_abort(self.stream)
+    }
+
+    /**
+     * Stop a stream.
+     *
+     * All pending read operations are stopped. The write direction is also closed.
+     */
+    public func stop() {
+        nabto_client_stream_stop(self.stream)
     }
 
     private func doWrite(_ data: Data, _ future: OpaquePointer?) {

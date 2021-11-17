@@ -16,7 +16,7 @@ class CallbackWrapper {
     var cb: AsyncStatusReceiver?
 
     // keep this CallbackWrapper instance alive until the Nabto SDK level callback finishes
-    var keepMeAlive: CallbackWrapper?
+    var selfReference: CallbackWrapper?
 
     // owner is kept alive for the duration of the Nabto SDK level callback
     let owner: Any
@@ -37,16 +37,21 @@ class CallbackWrapper {
     deinit {
     }
 
-    public func registerCallback(_ cb: @escaping AsyncStatusReceiver) {
+    public func registerCallback(_ cb: @escaping AsyncStatusReceiver) -> NabtoClientError {
         self.cb = cb
         let rawSelf = Unmanaged.passUnretained(self).toOpaque()
-        self.keepMeAlive = self
-        nabto_client_future_set_callback(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
+        self.selfReference = self
+        let status = nabto_client_future_set_callback2(self.future, { (future: OpaquePointer?, ec: NabtoClientError, data: Optional<UnsafeMutableRawPointer>) -> Void in
             let mySelf = Unmanaged<CallbackWrapper>.fromOpaque(data!).takeUnretainedValue()
             let wrapperError = Helper.mapToSwiftError(ec: ec, connection: mySelf.connectionForErrorMessage)
             mySelf.invokeUserCallback(wrapperError)
-            mySelf.keepMeAlive = nil
+            mySelf.selfReference = nil
         }, rawSelf)
+        if (status != NABTO_CLIENT_EC_OK) {
+            self.selfReference = nil
+            nabto_client_future_free(self.future)
+        }
+        return status
     }
 
     func invokeUserCallback(_ wrapperError: NabtoEdgeClientError) {

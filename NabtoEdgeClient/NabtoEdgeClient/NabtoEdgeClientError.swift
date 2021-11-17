@@ -14,19 +14,22 @@ import Foundation
 public indirect enum NabtoEdgeClientError: Error, Equatable {
     case OK
 
-    case ABORTED
     case ALLOCATION_ERROR
     case CONNECTION_REFUSED
     case DNS
     case EOF
     case FORBIDDEN
     case INVALID_ARGUMENT
-    case INVALID_STATE
+    case INVALID_STATE           // did you set private key on connection? is connection open before invoking coap?
     case NONE
-    case NOT_ATTACHED
+    case NOT_ATTACHED            // device not running or has no internet connection (and you are on a remote net)
     case NOT_CONNECTED
     case NOT_FOUND
+
+    // not possible to establish connection to requested device either locally or remotely,
+    // detailed reason in localError / remoteError parameters
     case NO_CHANNELS(localError: NabtoEdgeClientError, remoteError: NabtoEdgeClientError)
+
     case NO_DATA
     case OPERATION_IN_PROGRESS
     case STOPPED

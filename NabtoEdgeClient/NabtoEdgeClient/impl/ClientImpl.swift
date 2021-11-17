@@ -18,15 +18,9 @@ import Foundation
  * reference goes out of scope.
  *
  * When the swift Client instance goes out of scope, ClientImpl invokes nabto_client_stop which
- * blocks until all SDK callbacks are done (pending callbacks are triggered with abort status), ie
+ * blocks until all SDK callbacks are done (pending callbacks are triggered with STOPPED status), ie
  * no nabto_client_stop or nabto_client_free is triggered from callbacks indirectly through deinit
  * invocations.
- *
- * Note: Until ticket sc-759 is fixed, the last statement is not true - these CAN be triggered (as
- * it (erroneously) is possible to start an async operation after client stop), but these subsequent stop calls will
- * have no effect as the swift Client instance always triggers the first stop: Subsequent stop invocations
- * are ignored in the SDK and free just decrements a reference counter in SDK impl). See testcase
- * testAsyncConnectionCloseAfterClientStop.
  */
 internal class ClientImpl: NSObject, NativeClientWrapper {
 
@@ -44,7 +38,7 @@ internal class ClientImpl: NSObject, NativeClientWrapper {
 
     deinit {
         self.stop()
-        nabto_client_free(self.nativeClient)
+        nabto_client_free2(self.nativeClient)
     }
 
     /**

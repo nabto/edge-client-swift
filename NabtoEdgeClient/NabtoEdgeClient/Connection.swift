@@ -82,6 +82,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * @throws UNAUTHORIZED if the authentication options do not match the basestation configuration
      * for this
      * @throws TOKEN_REJECTED if the basestation could not validate the specified token
+     * @throws STOPPED if the client instance was stopped
      * @throws NO_CHANNELS if all parameters input were accepted but a connection could not be
      * established. Details about what went wrong are available as the
      * associated remoteError.
@@ -128,6 +129,17 @@ public class Connection: NSObject, NativeConnectionWrapper {
     }
 
     /**
+     * Stop pending connect or close on a connection.
+     *
+     * After stop has been called the connection should not be used any more.
+     *
+     * Stop can be used if the user cancels a connect/close request.
+     */
+    public func stop() {
+        nabto_client_connection_stop(self.nativeConnection)
+    }
+
+    /**
      * Close this connection asynchronously.
      *
      * The specified AsyncStatusReceiver closure is
@@ -171,6 +183,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * @throws NOT_CONNECTED if the connection is not open
      * @throws OPERATION_IN_PROGRESS if a password authentication request is already in progress on the connection
      * @throws TOO_MANY_REQUESTS if too many password attempts has been made
+     * @throws STOPPED if the client is stopped
      */
     public func passwordAuthenticate(username: String, password: String) throws {
         try helper.wait { future in
@@ -197,7 +210,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * @param username The username (note: use the empty string if using for Password Open Pairing, see https://docs.nabto.com/developer/guides/iam/pairing.html)
      * @param password The password (typically the open (global) or invite (per-user) pairing password)
      */
-    public func passwordAuthenticateAsync(username: String, password: String, closure: @escaping AsyncStatusReceiver) throws {
+    public func passwordAuthenticateAsync(username: String, password: String, closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: self) { future in
             nabto_client_connection_password_authenticate(self.nativeConnection, username, password, future)
         }
