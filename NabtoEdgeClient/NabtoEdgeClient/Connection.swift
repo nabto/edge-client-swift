@@ -85,11 +85,12 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * @throws STOPPED if the client instance was stopped
      * @throws NO_CHANNELS if all parameters input were accepted but a connection could not be
      * established. Details about what went wrong are available as the
-     * associated remoteError.
+     * associated localError and remoteError.
      * @throws NO_CHANNELS.remoteError.NOT_ATTACHED if the target remote device is not attached to the basestation
      * @throws NO_CHANNELS.remoteError.FORBIDDEN if the basestation request is rejected
      * @throws NO_CHANNELS.remoteError.NONE if remote relay was not enabled
      * @throws NO_CHANNELS.localError.NONE if mDNS discovery was not enabled
+     * @throws NO_CHANNELS.localError.NOT_FOUND if no local device was found
      */
     public func connect() throws {
         let status = self.helper.waitNoThrow { future in
