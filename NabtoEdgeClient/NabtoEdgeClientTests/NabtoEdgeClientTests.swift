@@ -8,9 +8,10 @@
 
 import XCTest
 @testable import NabtoEdgeClient
-import NabtoClient
+
+//import NabtoClient
 import Foundation
-import CBOR
+import SwiftCBOR
 
 // test org: or-3uhjvwuh (https://console.cloud.nabto.com/#/dashboard/organizations/or-3uhjvwuh)
 // test device source: nabto-embedded-sdk/examples/simple_coap
@@ -1162,12 +1163,12 @@ class NabtoEdgeClientTests: XCTestCase {
         wait(for: [exp], timeout: 10.0)
     }
 
-    // make sure nabto4 symbols are present in test executable: some nabto5 tests crashed prior to 5.7 if binary was
-    // linked with nabto4
-    func testNabto4() {
-        let nabto4 = NabtoClient.instance() as! NabtoClient
-        XCTAssertEqual("4.", nabto4.nabtoVersionString().prefix(2))
-    }
+//    // make sure nabto4 symbols are present in test executable: some nabto5 tests crashed prior to 5.7 if binary was
+//    // linked with nabto4
+//    func testNabto4() {
+//        let nabto4 = NabtoClient.instance() as! NabtoClient
+//        XCTAssertEqual("4.", nabto4.nabtoVersionString().prefix(2))
+//    }
 
 // reproduce leak caused by pre-sc764 stop behavior: it was possible to invoke free from a callback
 // initiated after client stop - and this free was ignored (test requires instrumented
