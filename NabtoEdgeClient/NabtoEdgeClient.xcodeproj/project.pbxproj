@@ -10,7 +10,6 @@
 		36B250CE5ECEE3A3E53DCAF7 /* Pods_NabtoEdgeClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF3D5D46B113CF70CBD3399F /* Pods_NabtoEdgeClient.framework */; };
 		D4655D4C27C57CD1001F9AF6 /* NabtoEdgeClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4655D4327C57CD1001F9AF6 /* NabtoEdgeClient.framework */; };
 		D4655D5127C57CD1001F9AF6 /* NabtoEdgeClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4655D5027C57CD1001F9AF6 /* NabtoEdgeClientTests.swift */; };
-		D4655D5227C57CD1001F9AF6 /* NabtoEdgeClient.h in Headers */ = {isa = PBXBuildFile; fileRef = D4655D4627C57CD1001F9AF6 /* NabtoEdgeClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D479084027C5803300790A51 /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = D479083427C5803300790A51 /* Stream.swift */; };
 		D479084227C5803300790A51 /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = D479083627C5803300790A51 /* Client.swift */; };
 		D479084327C5803300790A51 /* MdnsScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D479083727C5803300790A51 /* MdnsScanner.swift */; };
@@ -44,7 +43,6 @@
 		813CFC17326320AAFC94FF7E /* Pods-NabtoEdgeClient.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClient.debug.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClient/Pods-NabtoEdgeClient.debug.xcconfig"; sourceTree = "<group>"; };
 		BF3D5D46B113CF70CBD3399F /* Pods_NabtoEdgeClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NabtoEdgeClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4655D4327C57CD1001F9AF6 /* NabtoEdgeClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = NabtoEdgeClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D4655D4627C57CD1001F9AF6 /* NabtoEdgeClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NabtoEdgeClient.h; sourceTree = "<group>"; };
 		D4655D4B27C57CD1001F9AF6 /* NabtoEdgeClientTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NabtoEdgeClientTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4655D5027C57CD1001F9AF6 /* NabtoEdgeClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NabtoEdgeClientTests.swift; sourceTree = "<group>"; };
 		D479083427C5803300790A51 /* Stream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
@@ -140,7 +138,6 @@
 				D479083A27C5803300790A51 /* NabtoEdgeClientError.swift */,
 				D479083427C5803300790A51 /* Stream.swift */,
 				D479083827C5803300790A51 /* TcpTunnel.swift */,
-				D4655D4627C57CD1001F9AF6 /* NabtoEdgeClient.h */,
 			);
 			path = NabtoEdgeClient;
 			sourceTree = "<group>";
@@ -170,7 +167,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D4655D5227C57CD1001F9AF6 /* NabtoEdgeClient.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -564,7 +560,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F6A91DD14AB1C2318A089A9A /* Pods-NabtoEdgeClientTests.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = E55K8RCV2E;
@@ -582,7 +577,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 14025282BC82D9AC3E53A747 /* Pods-NabtoEdgeClientTests.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = E55K8RCV2E;
