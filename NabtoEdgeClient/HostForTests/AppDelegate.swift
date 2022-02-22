@@ -2,8 +2,7 @@
 //  AppDelegate.swift
 //  HostForTests
 //
-//  Created by Ulrik Gammelby on 20/09/2021.
-//  Copyright © 2021 Nabto. All rights reserved.
+//  Created by Ulrik Gammelby on 22/02/2022.
 //
 
 import UIKit
