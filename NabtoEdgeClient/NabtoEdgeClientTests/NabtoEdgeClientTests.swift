@@ -229,7 +229,7 @@ class NabtoEdgeClientTests: XCTestCase {
     }
 
     func connect(_ device: Device) throws{
-        try self.prepareConnection(device)
+        self.prepareConnection(device)
         try self.connection.connect()
     }
 
@@ -471,7 +471,6 @@ class NabtoEdgeClientTests: XCTestCase {
 
     // XXX: poor test - expect random failures
     func testStopAsyncConnect() {
-        let key = try! client.createPrivateKey()
         self.prepareConnection(self.coapDevice)
         let expConn = XCTestExpectation(description: "expect connect done callback")
 
@@ -488,7 +487,6 @@ class NabtoEdgeClientTests: XCTestCase {
 
     // XXX: poor test - expect random failures
     func testStopAsyncCoapRequest() {
-        let key = try! client.createPrivateKey()
         self.prepareConnection(self.coapDevice)
         let expConn = XCTestExpectation(description: "expect connect done callback")
         let expCoap = XCTestExpectation(description: "expect coap done callback")
@@ -1101,17 +1099,17 @@ class NabtoEdgeClientTests: XCTestCase {
 
     func testPasswordInvitePairing() throws {
         throw XCTSkip("An invitation only works for a single pairing so this test needs clearing device state")
-        let key = try! client.createPrivateKey()
-        try! self.connection.setPrivateKey(key: key)
-        try! self.connection.updateOptions(json: passwordProtectedDevice.asJson())
-        try! self.connection.connect()
-        try! self.connection.passwordAuthenticate(username: "admin", password: "admin-password")
-
-        let coap = try! self.connection.createCoapRequest(method: "POST", path: "/iam/pairing/password-invite")
-        let response = try! coap.execute()
-        XCTAssertEqual(response.status, 201)
-        XCTAssertEqual(response.contentFormat, nil)
-        XCTAssertEqual(response.payload, nil)
+//        let key = try! client.createPrivateKey()
+//        try! self.connection.setPrivateKey(key: key)
+//        try! self.connection.updateOptions(json: passwordProtectedDevice.asJson())
+//        try! self.connection.connect()
+//        try! self.connection.passwordAuthenticate(username: "admin", password: "admin-password")
+//
+//        let coap = try! self.connection.createCoapRequest(method: "POST", path: "/iam/pairing/password-invite")
+//        let response = try! coap.execute()
+//        XCTAssertEqual(response.status, 201)
+//        XCTAssertEqual(response.contentFormat, nil)
+//        XCTAssertEqual(response.payload, nil)
 
         // in an actual pairing use case, now persist device's fingerprint (obtained with connection.getDeviceFingerprintHex())
         // along with device id etc and compare at subsequent connection attempt
@@ -1123,7 +1121,7 @@ class NabtoEdgeClientTests: XCTestCase {
 
         var cli: Client! = Client()
         self.enableLogging(cli)
-        var conn: Connection! = try! cli.createConnection()
+        let conn: Connection! = try! cli.createConnection()
         let key = try! cli.createPrivateKey()
         try! conn.setPrivateKey(key: key)
         try! conn.updateOptions(json: self.coapDevice.asJson())

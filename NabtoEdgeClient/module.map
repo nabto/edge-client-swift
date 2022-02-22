@@ -1,7 +1,0 @@
-// kudos to https://colindrake.me/post/wrapping-a-c-library-in-a-swift-framework/
-
-module NabtoEdgeClientApi [system][extern_c] {
-  // the below is already setup by CocoaPods as a header search path, but it is not found by clang - but it works if entering explicitly
-  header "Pods/Headers/Public/NabtoEdgeClientApi/nabto_client.h"
-  export *
-}
