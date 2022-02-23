@@ -32,6 +32,7 @@
 		D479085027C581E400790A51 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D479084D27C581E400790A51 /* Helper.swift */; };
 		D479085127C581E400790A51 /* CallbackWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D479084E27C581E400790A51 /* CallbackWrapper.swift */; };
 		E2FB5D4F1AA78AC7D4FAEA68 /* Pods_NabtoEdgeClientTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28C850E1A5507E6CEBD10099 /* Pods_NabtoEdgeClientTests.framework */; };
+		E92302F614DFF1CE2D44AF7A /* PairingUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92E1F3B78BE7B59AA656356 /* PairingUtil.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -103,6 +104,7 @@
 		D479084C27C581E400790A51 /* ClientImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClientImpl.swift; sourceTree = "<group>"; };
 		D479084D27C581E400790A51 /* Helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		D479084E27C581E400790A51 /* CallbackWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallbackWrapper.swift; sourceTree = "<group>"; };
+		E92E1F3B78BE7B59AA656356 /* PairingUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairingUtil.swift; sourceTree = "<group>"; };
 		F6A91DD14AB1C2318A089A9A /* Pods-NabtoEdgeClientTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClientTests.debug.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClientTests/Pods-NabtoEdgeClientTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -192,6 +194,7 @@
 				D479083A27C5803300790A51 /* NabtoEdgeClientError.swift */,
 				D479083427C5803300790A51 /* Stream.swift */,
 				D479083827C5803300790A51 /* TcpTunnel.swift */,
+				E92E1F3B78BE7B59AA656356 /* PairingUtil.swift */,
 			);
 			path = NabtoEdgeClient;
 			sourceTree = "<group>";
@@ -452,6 +455,7 @@
 				D479084A27C5803300790A51 /* MdnsResult.swift in Sources */,
 				D479084927C5803300790A51 /* CoapResponse.swift in Sources */,
 				D479085027C581E400790A51 /* Helper.swift in Sources */,
+				E92302F614DFF1CE2D44AF7A /* PairingUtil.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
