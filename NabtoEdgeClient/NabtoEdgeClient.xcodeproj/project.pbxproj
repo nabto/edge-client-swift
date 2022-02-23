@@ -639,6 +639,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 813CFC17326320AAFC94FF7E /* Pods-NabtoEdgeClient.debug.xcconfig */;
 			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -671,6 +672,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 707C37EB0760BD9A8601AAB7 /* Pods-NabtoEdgeClient.release.xcconfig */;
 			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;

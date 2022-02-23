@@ -22,7 +22,7 @@ xcodebuild clean archive \
     -configuration $CONFIG \
     -sdk iphoneos \
     SKIP_INSTALL=NO \
-    BUILD_LIBRARIES_FOR_DISTRIBUTION=YES
+    BUILD_LIBRARY_FOR_DISTRIBUTION=YES
 
 # iOS sim
 xcodebuild clean archive \
@@ -32,7 +32,7 @@ xcodebuild clean archive \
     -configuration $CONFIG \
     -sdk iphonesimulator \
     SKIP_INSTALL=NO \
-    BUILD_LIBRARIES_FOR_DISTRIBUTION=YES
+    BUILD_LIBRARY_FOR_DISTRIBUTION=YES
 
 xcodebuild -create-xcframework \
            -framework "$BUILD/ios.xcarchive/$PRODUCT_PATH" \
