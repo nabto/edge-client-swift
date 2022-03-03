@@ -1,9 +1,9 @@
 PODS:
-  - NabtoEdgeClientApiFW (5.8.1)
+  - NabtoEdgeClientApiFW (5.8.2)
   - SwiftCBOR (0.4.4)
 
 DEPENDENCIES:
-  - NabtoEdgeClientApiFW (= 5.8.1)
+  - NabtoEdgeClientApiFW (= 5.8.2)
   - SwiftCBOR
 
 SPEC REPOS:
@@ -12,9 +12,9 @@ SPEC REPOS:
     - SwiftCBOR
 
 SPEC CHECKSUMS:
-  NabtoEdgeClientApiFW: 5cd491a34565d8b75b75cd1d84d05de64e3c4bab
+  NabtoEdgeClientApiFW: 127eeefaedecbd4769e71a2e27c2c9775933381a
   SwiftCBOR: ce5354ec8b660da2d6fc754462881119dbe1f963
 
-PODFILE CHECKSUM: 90ac367528d26e3d88e0cfda849d3b4fc1494469
+PODFILE CHECKSUM: ff96245cdc3f33a850f1a54fe4d3c9487d00b61d
 
 COCOAPODS: 1.11.2

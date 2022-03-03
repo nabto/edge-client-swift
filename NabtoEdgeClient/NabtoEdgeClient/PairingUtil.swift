@@ -3,8 +3,17 @@
 //
 
 import Foundation
-import NabtoEdgeClient
+import SwiftCBOR
 
+public enum PairingError: Error, Equatable {
+    case INVALID_USERNAME
+    case USERNAME_EXISTS
+    case AUTHENTICATION_ERROR
+    case LOCAL_PAIRING_ATTEMPTED_REMOTE
+    case PAIRING_MODE_DISABLED
+    case API_ERROR(cause: NabtoEdgeClientError)
+    case FAILED
+}
 
 class PairingUtil {
 
@@ -31,54 +40,113 @@ class PairingUtil {
         case PasswordInvite
     }
 
-    private let connection: Connection
-
-    init(connection: Connection) {
-        self.connection = connection
-    }
-
-    public func attemptBestPossiblePairing(username: String?, password: String?) throws {
-        // todo based on the user's input and the available pairing modes on the device, try the best pairing mode:
-        //   if username and password specified, try to authenticate and password-invite pair
-        //   else if password specified and password open pairing is available, try password open pairing
-        //   else if username specified and connection is local (query type - how?? todo!) and local open pairing is available, try local open pairing
-        //   else if connection is local (query type - how?? todo!) and local initial pairing is available, try local initial pairing
-        //   else fail
-    }
-
-    public func pair(usingPairingString: String) {
+    static public func pair(connection: Connection, usingPairingString: String) {
         // todo parse string and invoke appropriate pairing function
     }
 
-    public func pairLocalOpen(desiredUsername: String) {
+    static public func pairLocalOpen(connection: Connection, desiredUsername: String) throws {
         // todo invoke CoAP POST /iam/pairing/local-open
+
+        let json: [String:String] = ["Username": desiredUsername]
+        let cbor = CBOR.encode(json)
+//        201: Pairing completed successfully.
+//        201: Already paired.
+//        400: Bad request (likely invalid username).
+//        403: Blocked by IAM configuration.
+//        404: Pairing mode disabled.
+//        409: Username exists.
+        do {
+            let coap = try connection.createCoapRequest(method: "POST", path: "/iam/pairing/local-open")
+            try coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: Data(cbor))
+            let response = try! coap.execute()
+            switch (response.status) {
+            case 201: break
+            case 400: throw PairingError.INVALID_USERNAME
+            case 401: throw PairingError.FAILED // never here
+            case 403: throw PairingError.PAIRING_MODE_DISABLED
+            case 404: throw PairingError.PAIRING_MODE_DISABLED
+            case 409: throw PairingError.USERNAME_EXISTS
+            default: throw PairingError.FAILED
+            }
+        } catch {
+            if let pairingError = error as? PairingError {
+                throw pairingError
+            } else if let apiError = error as? NabtoEdgeClientError {
+                throw PairingError.API_ERROR(cause: apiError)
+            } else {
+                throw PairingError.FAILED
+            }
+        }
     }
 
-    public func pairLocalInitial() {
+    static public func pairLocalInitial(connection: Connection) {
         // todo invoke CoAP POST /iam/pairing/local-initial
     }
 
-    public func pairPasswordOpen(desiredUsername: String, password: String) throws {
-        try self.connection.passwordAuthenticate(username: "", password: password)
-        // todo invoke CoAP POST /iam/pairing/password-open
+    static public func pairPasswordOpen(connection: Connection, desiredUsername: String, password: String) throws {
+        let json: [String:String] = ["Username": desiredUsername]
+        let cbor = CBOR.encode(json)
+//        201: Pairing completed successfully.
+//        201: Already paired.
+//        400: Bad request (likely invalid username).
+//        401: Missing password authentication.
+//        403: Blocked by IAM configuration.
+//        404: Pairing mode disabled. (not possible as we always password authenticate first and this would fail with auth error if disabled)
+//        409: Username exists.
+        do {
+            try connection.passwordAuthenticate(username: "", password: password)
+            let coap = try connection.createCoapRequest(method: "POST", path: "/iam/pairing/password-open")
+            try coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: Data(cbor))
+            let response = try! coap.execute()
+            switch (response.status) {
+            case 201: break
+            case 400: throw PairingError.INVALID_USERNAME
+            case 401: throw PairingError.FAILED // never here
+            case 403: throw PairingError.PAIRING_MODE_DISABLED
+            case 409: throw PairingError.USERNAME_EXISTS
+            default: throw PairingError.FAILED
+            }
+        } catch {
+            if let pairingError = error as? PairingError {
+                throw pairingError
+            } else if let apiError = error as? NabtoEdgeClientError {
+                if (apiError == .UNAUTHORIZED) {
+                    throw PairingError.AUTHENTICATION_ERROR
+                } else {
+                    throw PairingError.API_ERROR(cause: apiError)
+                }
+            } else {
+                throw PairingError.FAILED
+            }
+        }
     }
 
-    public func pairPasswordInvite(invitedUser: String, password: String) throws {
-        try self.connection.passwordAuthenticate(username: invitedUser, password: password)
+    static public func pairPasswordInvite(connection: Connection, invitedUser: String, password: String) throws {
+        try connection.passwordAuthenticate(username: invitedUser, password: password)
         // todo invoke CoAP POST /iam/pairing/password-invite
     }
 
-    public func isCurrentUserPaired() throws -> Bool {
+    static public func isCurrentUserPaired(connection: Connection) throws -> Bool {
+//        205: On success.
+//        404: The client is not paired.
+        do {
+            let coap = try connection.createCoapRequest(method: "GET", path: "/iam/me")
+            let response = try! coap.execute()
+            return response.status == 205
+        } catch {
+            // todo
+        }
+
         // todo CoAP GET /iam/me .status == 205 ?
         return false
     }
 
-    public func getCurrentUser() throws -> User {
+    static public func getCurrentUser(connection: Connection) throws -> User {
         // todo CoAP GET /iam/me
         return User(username: "foo", displayName: "bar", fingerprint: "baz", sct: "qux", role: "zyx")
     }
 
-    public func getAvailablePairingModes() throws -> [PairingMode] {
+    static public func getAvailablePairingModes(connection: Connection) throws -> [PairingMode] {
         // todo CoAP GET /iam/pairing
         return []
     }
