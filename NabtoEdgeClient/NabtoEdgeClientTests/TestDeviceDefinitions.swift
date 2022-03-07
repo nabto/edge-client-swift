@@ -76,7 +76,8 @@ struct TestDevices {
             deviceId: "de-ijrdq47i",
             url: "https://pr-fatqcwj9.clients.nabto.net",
             key: "sk-9c826d2ebb4343a789b280fe22b98305",
-            sct: "WzwjoTabnvux"
+            sct: "WzwjoTabnvux",
+            password: "open-password"
     )
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

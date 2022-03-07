@@ -9,6 +9,18 @@ import XCTest
 
 class PairingUtilTests_HostedTestDevices : NabtoEdgeClientTestBase {
 
+    func testPasswordOpen_Success_SameConnection() {
+        let key = try! client.createPrivateKey()
+        try! self.connection.setPrivateKey(key: key)
+        try! self.connection.updateOptions(json: testDevices.passwordProtectedDevice.asJson())
+        try! self.connection.connect()
+
+        XCTAssertFalse(try! PairingUtil.isCurrentUserPaired(connection: connection))
+        let username = UUID().uuidString.lowercased()
+        try! PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: username, password: "open-password")
+        XCTAssertTrue(try! PairingUtil.isCurrentUserPaired(connection: connection))
+    }
+
     func testPasswordOpen_Success_DifferentConnections() {
         let key = try! client.createPrivateKey()
         try! self.connection.setPrivateKey(key: key)
@@ -24,18 +36,6 @@ class PairingUtilTests_HostedTestDevices : NabtoEdgeClientTestBase {
         try! self.connection.setPrivateKey(key: key)
         try! self.connection.updateOptions(json: testDevices.passwordProtectedDevice.asJson())
         try! self.connection.connect()
-        XCTAssertTrue(try! PairingUtil.isCurrentUserPaired(connection: connection))
-    }
-
-    func testPasswordOpen_Success_SameConnection() {
-        let key = try! client.createPrivateKey()
-        try! self.connection.setPrivateKey(key: key)
-        try! self.connection.updateOptions(json: testDevices.passwordProtectedDevice.asJson())
-        try! self.connection.connect()
-
-        XCTAssertFalse(try! PairingUtil.isCurrentUserPaired(connection: connection))
-        let username = UUID().uuidString.lowercased()
-        try! PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: username, password: "open-password")
         XCTAssertTrue(try! PairingUtil.isCurrentUserPaired(connection: connection))
     }
 

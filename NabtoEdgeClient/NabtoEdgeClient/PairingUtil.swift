@@ -44,9 +44,8 @@ class PairingUtil {
         // todo parse string and invoke appropriate pairing function
     }
 
+    // https://docs.nabto.com/developer/api-reference/coap/iam/pairing-local-open.html
     static public func pairLocalOpen(connection: Connection, desiredUsername: String) throws {
-        // todo invoke CoAP POST /iam/pairing/local-open
-
         let json: [String:String] = ["Username": desiredUsername]
         let cbor = CBOR.encode(json)
 //        201: Pairing completed successfully.
@@ -62,7 +61,6 @@ class PairingUtil {
             switch (response.status) {
             case 201: break
             case 400: throw PairingError.INVALID_USERNAME
-            case 401: throw PairingError.FAILED // never here
             case 403: throw PairingError.PAIRING_MODE_DISABLED
             case 404: throw PairingError.PAIRING_MODE_DISABLED
             case 409: throw PairingError.USERNAME_EXISTS
@@ -83,13 +81,14 @@ class PairingUtil {
         // todo invoke CoAP POST /iam/pairing/local-initial
     }
 
+    // https://docs.nabto.com/developer/api-reference/coap/iam/pairing-password-open.html
     static public func pairPasswordOpen(connection: Connection, desiredUsername: String, password: String) throws {
         let json: [String:String] = ["Username": desiredUsername]
         let cbor = CBOR.encode(json)
 //        201: Pairing completed successfully.
 //        201: Already paired.
 //        400: Bad request (likely invalid username).
-//        401: Missing password authentication.
+//        401: Missing password authentication. (not possible as impl always auths first)
 //        403: Blocked by IAM configuration.
 //        404: Pairing mode disabled. (not possible as we always password authenticate first and this would fail with auth error if disabled)
 //        409: Username exists.
@@ -101,8 +100,9 @@ class PairingUtil {
             switch (response.status) {
             case 201: break
             case 400: throw PairingError.INVALID_USERNAME
-            case 401: throw PairingError.FAILED // never here
+            case 401: throw PairingError.FAILED                // never here
             case 403: throw PairingError.PAIRING_MODE_DISABLED
+            case 404: throw PairingError.PAIRING_MODE_DISABLED // never here
             case 409: throw PairingError.USERNAME_EXISTS
             default: throw PairingError.FAILED
             }
@@ -151,9 +151,4 @@ class PairingUtil {
         return []
     }
 
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private func authenticate(username: String, password: String) throws {
-    }
 }

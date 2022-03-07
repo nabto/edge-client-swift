@@ -110,6 +110,7 @@
 		D479084C27C581E400790A51 /* ClientImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClientImpl.swift; sourceTree = "<group>"; };
 		D479084D27C581E400790A51 /* Helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		D479084E27C581E400790A51 /* CallbackWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallbackWrapper.swift; sourceTree = "<group>"; };
+		D4BA975B27D60A2100012902 /* TestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestPlan.xctestplan; sourceTree = "<group>"; };
 		E9221D728E77EBE65E3D5868 /* TestDeviceDefinitions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestDeviceDefinitions.swift; sourceTree = "<group>"; };
 		E92CE3DEF30197BFA961376C /* PairingUtilTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairingUtilTests.swift; sourceTree = "<group>"; };
 		E92E1F3B78BE7B59AA656356 /* PairingUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairingUtil.swift; sourceTree = "<group>"; };
@@ -217,6 +218,7 @@
 				D4655D5027C57CD1001F9AF6 /* NabtoEdgeClientTests.swift */,
 				E9221D728E77EBE65E3D5868 /* TestDeviceDefinitions.swift */,
 				E92CE3DEF30197BFA961376C /* PairingUtilTests.swift */,
+				D4BA975B27D60A2100012902 /* TestPlan.xctestplan */,
 			);
 			path = NabtoEdgeClientTests;
 			sourceTree = "<group>";
