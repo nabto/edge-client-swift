@@ -42,7 +42,7 @@ class PairingUtilTests_HostedTestDevices : NabtoEdgeClientTestBase {
     func testPasswordOpen_InvalidUsername() {
         try! super.connect(self.testDevices.passwordProtectedDevice)
         XCTAssertThrowsError(try PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: "foo bar baz", password: "open-password")) { error in
-            XCTAssertEqual(error as! PairingError, PairingError.INVALID_USERNAME)
+            XCTAssertEqual(error as! PairingError, PairingError.INVALID_INPUT)
         }
     }
 
@@ -92,7 +92,7 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
     func testLocalOpen_InvalidUsername() {
         try! self.connect(self.testDevices.localPairLocalOpen)
         XCTAssertThrowsError(try PairingUtil.pairLocalOpen(connection: self.connection, desiredUsername: "foo bar baz")) { error in
-            XCTAssertEqual(error as! PairingError, PairingError.INVALID_USERNAME)
+            XCTAssertEqual(error as! PairingError, PairingError.INVALID_INPUT)
         }
     }
 
@@ -112,6 +112,28 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
         XCTAssertThrowsError(try PairingUtil.pairLocalOpen(connection: self.connection, desiredUsername: UUID().uuidString.lowercased())) { error in
             XCTAssertEqual(error as! PairingError, PairingError.PAIRING_MODE_DISABLED)
         }
+    }
+
+    func testPasswordInvite_Success() {
+        let device = self.testDevices.localPasswordInvite
+        let admin = UUID().uuidString.lowercased()
+        try! super.connect(device)
+        try! PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: admin, password: device.password)
+
+        let guest = UUID().uuidString.lowercased()
+        try! PairingUtil.createNewUserForInvitePairing(
+                        connection: self.connection,
+                        username: guest,
+                        password: "guestpassword",
+                        role: "guest")
+    }
+
+    func testCodableUser() {
+        let user = PairingUtil.User(username: "username-foobarbaz", sct: "sct-qux")
+        let cbor = try! user.encode()
+        let decoded = try! PairingUtil.User.decode(cbor: cbor)
+        XCTAssertEqual(user.Username, decoded.Username)
+        XCTAssertEqual(user.Sct, decoded.Sct)
     }
 
 }

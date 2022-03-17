@@ -11,7 +11,7 @@ import XCTest
 
 //import NabtoClient
 import Foundation
-import SwiftCBOR
+import CBORCoding
 
 // test org: or-3uhjvwuh (https://console.cloud.nabto.com/#/dashboard/organizations/or-3uhjvwuh)
 // test device source: nabto-embedded-sdk/examples/simple_coap
@@ -986,9 +986,9 @@ class NabtoEdgeClientTests: NabtoEdgeClientTestBase {
         try! self.connection.passwordAuthenticate(username: "", password: "open-password")
 
         let coap = try! self.connection.createCoapRequest(method: "POST", path: "/iam/pairing/password-open")
-        let json: [String:String] = ["Username": UUID().uuidString.lowercased()]
-        let cbor = CBOR.encode(json)
-        try! coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: Data(cbor))
+        let user = PairingUtil.User(username: UUID().uuidString.lowercased())
+        let cbor = try! user.encode()
+        try! coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: cbor)
         let response = try! coap.execute()
         XCTAssertEqual(response.status, 201)
         XCTAssertEqual(response.contentFormat, nil)

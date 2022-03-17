@@ -1,8 +1,8 @@
 [
    {
-      "Host" : "127.0.0.1",
-      "Id" : "ssh",
-      "Port" : 22,
-      "Type" : "ssh"
+      "Host" : "8.8.8.8",
+      "Id" : "devnull",
+      "Port" : 9999,
+      "Type" : "devnull"
    }
 ]

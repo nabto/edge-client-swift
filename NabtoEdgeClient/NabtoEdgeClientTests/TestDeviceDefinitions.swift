@@ -124,6 +124,16 @@ struct TestDevices {
             password: ""
     )
 
+    let localPasswordInvite = TestDevice(
+            productId: "pr-fatqcwj9",
+            deviceId: "de-vma9qrox",
+            url: "https://pr-fatqcwj9.clients.nabto.net",
+            key: "sk-9c826d2ebb4343a789b280fe22b98305",
+            local: true,
+            password: "buKVmisdxETM"
+    )
+
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // local mDNS test device
     //

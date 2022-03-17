@@ -1,1 +1,8 @@
-[{"Id":"ssh","Type":"ssh","Host":"127.0.0.1","Port":22}]
+[
+   {
+      "Host" : "8.8.8.8",
+      "Id" : "devnull",
+      "Port" : 9999,
+      "Type" : "devnull"
+   }
+]
