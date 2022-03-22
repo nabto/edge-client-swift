@@ -256,7 +256,7 @@ class PairingUtil {
             try coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: cborRequest)
             let response = try coap.execute()
             switch (response.status) {
-            case 201: break
+            case 204: break
             case 400: throw PairingError.INVALID_INPUT
             case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
             default: throw PairingError.FAILED
