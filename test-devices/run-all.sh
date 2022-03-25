@@ -16,8 +16,6 @@ run localPasswordPairingDisabledConfig &
 run localPasswordProtectedDevice &
 run localPasswordInvite &
 
-#git checkout ./config/passwordInvitePairing/state
-
 ./simple_mdns_device_macos pr-mdns de-mdns swift-test-subtype swift-txt-key swift-txt-val
 
 wait
