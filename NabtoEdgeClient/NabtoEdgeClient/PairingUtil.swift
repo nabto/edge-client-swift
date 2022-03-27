@@ -9,9 +9,9 @@ public enum PairingError: Error, Equatable {
     case INVALID_INPUT
     case USERNAME_EXISTS
     case USER_DOES_NOT_EXIST
+    case USER_IS_NOT_PAIRED
     case ROLE_DOES_NOT_EXIST
     case AUTHENTICATION_ERROR
-    case LOCAL_PAIRING_ATTEMPTED_REMOTE
     case PAIRING_MODE_DISABLED
     case BLOCKED_BY_DEVICE_CONFIGURATION
     case INVALID_RESPONSE(error: String)
@@ -123,7 +123,10 @@ class PairingUtil {
                 )
     }
 
-    // https://docs.nabto.com/developer/api-reference/coap/iam/pairing-password-invite.html
+    /**
+     * Perform Password Invite pairing.
+     * @throws AUTHENTICATION_ERROR if not possible to authenticate using the specified username and password
+     */
     static public func pairPasswordInvite(connection: Connection, username: String, password: String) throws {
         try invokePasswordBasedPairing(
                 connection: connection,
@@ -139,7 +142,7 @@ class PairingUtil {
                                                    data: Data?=nil) throws {
         do {
             try connection.passwordAuthenticate(username: username, password: password)
-            let coap = try connection.createCoapRequest(method: "POST", path: "/iam/pairing/password-open")
+            let coap = try connection.createCoapRequest(method: "POST", path: path)
             if let data = data {
                 try coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: data)
             }
@@ -169,24 +172,52 @@ class PairingUtil {
     }
 
     static public func isCurrentUserPaired(connection: Connection) throws -> Bool {
-//        205: On success.
-//        404: The client is not paired.
         do {
-            let coap = try connection.createCoapRequest(method: "GET", path: "/iam/me")
-            let response = try! coap.execute()
-            return response.status == 205
+            try self.getCurrentUser(connection: connection)
         } catch {
-            // todo
+            if let pairingError = error as? PairingError {
+                if (pairingError == .USER_IS_NOT_PAIRED) {
+                    return false
+                }
+            }
+            try rethrowPairingError(error)
         }
+        return true
+    }
 
-        // todo CoAP GET /iam/me .status == 205 ?
-        return false
+    static public func getUser(connection: Connection, username: String) throws -> User {
+        do {
+            let coap = try connection.createCoapRequest(method: "GET", path: "/iam/users/\(username)")
+            let response = try coap.execute()
+            switch (response.status) {
+            case 205: break
+            case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
+            case 404: throw PairingError.USER_DOES_NOT_EXIST
+            default: throw PairingError.FAILED
+            }
+            return try User.decode(cbor: response.payload)
+        } catch {
+            try rethrowPairingError(error)
+            return User(username: "swift 5.6 compiler error about missing return if not including this line")
+        }
     }
 
     static public func getCurrentUser(connection: Connection) throws -> User {
-        // todo CoAP GET /iam/me
-        return User(username: "foo")
+        do {
+            let coap = try connection.createCoapRequest(method: "GET", path: "/iam/me")
+            let response = try coap.execute()
+            switch (response.status) {
+            case 205: break
+            case 404: throw PairingError.USER_IS_NOT_PAIRED
+            default: throw PairingError.FAILED
+            }
+            return try User.decode(cbor: response.payload)
+        } catch {
+            try rethrowPairingError(error)
+            return User(username: "swift 5.6 compiler error about missing return if not including this line")
+        }
     }
+
 
     static public func deleteUser(connection: Connection, username: String) throws {
         do {
@@ -235,15 +266,11 @@ class PairingUtil {
                 username: username,
                 password: password)
         if let role = role {
-//            try updateUserSetRole(
-//                    connection: connection,
-//                    username: username,
-//                    role: role)
+            try updateUserSetRole(
+                    connection: connection,
+                    username: username,
+                    role: role)
         }
-    }
-
-    static func invokeCoap(connection: Connection, method: String, path: String, cborPayload: Data) throws {
-
     }
 
     static private func updateUserSetPassword(connection: Connection,
@@ -259,6 +286,31 @@ class PairingUtil {
             case 204: break
             case 400: throw PairingError.INVALID_INPUT
             case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
+            case 404: throw PairingError.USER_DOES_NOT_EXIST
+            default: throw PairingError.FAILED
+            }
+        } catch {
+            try rethrowPairingError(error)
+        }
+    }
+
+    static private func updateUserSetRole(connection: Connection,
+                                          username: String,
+                                          role: String) throws{
+        let encoder = CBOREncoder()
+        let cborRequest: Data = try encoder.encode(role)
+        do {
+            let coap = try connection.createCoapRequest(method: "PUT", path: "/iam/users/\(username)/role")
+            try coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: cborRequest)
+            let response = try coap.execute()
+            switch (response.status) {
+            case 204: break
+            case 400: throw PairingError.INVALID_INPUT
+            case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
+
+            // user was just created - so ambiguous 404 is most likely due to missing role (... unless race condition)
+            case 404: throw PairingError.ROLE_DOES_NOT_EXIST
+
             default: throw PairingError.FAILED
             }
         } catch {
@@ -271,9 +323,8 @@ class PairingUtil {
             throw pairingError
         } else if let apiError = error as? NabtoEdgeClientError {
             throw PairingError.API_ERROR(cause: apiError)
-        } else {
-            throw PairingError.FAILED
         }
+        throw PairingError.FAILED
     }
 
     static public func getAvailablePairingModes(connection: Connection) throws -> [PairingMode] {

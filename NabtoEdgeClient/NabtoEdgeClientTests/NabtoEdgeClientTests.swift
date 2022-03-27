@@ -29,6 +29,10 @@ class NabtoEdgeClientTestBase: XCTestCase {
     var connectionRefCount: Int?
     let streamPort: UInt32 = 42
 
+    func uniqueUser() -> String {
+        String(UUID().uuidString.lowercased().prefix(16))
+    }
+
     override func setUpWithError() throws {
         print(Client.versionString())
         setbuf(__stdoutp, nil)

@@ -16,7 +16,7 @@ class PairingUtilTests_HostedTestDevices : NabtoEdgeClientTestBase {
         try! self.connection.connect()
 
         XCTAssertFalse(try! PairingUtil.isCurrentUserPaired(connection: connection))
-        let username = UUID().uuidString.lowercased()
+        let username = uniqueUser()
         try! PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: username, password: "open-password")
         XCTAssertTrue(try! PairingUtil.isCurrentUserPaired(connection: connection))
     }
@@ -28,7 +28,7 @@ class PairingUtilTests_HostedTestDevices : NabtoEdgeClientTestBase {
         try! self.connection.connect()
 
         XCTAssertFalse(try! PairingUtil.isCurrentUserPaired(connection: connection))
-        let username = UUID().uuidString.lowercased()
+        let username = uniqueUser()
         try! PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: username, password: "open-password")
 
         try! self.connection.close()
@@ -49,7 +49,7 @@ class PairingUtilTests_HostedTestDevices : NabtoEdgeClientTestBase {
     func testPasswordOpen_UsernameExists() {
         let device = self.testDevices.passwordProtectedDevice
         try! super.connect(device)
-        let username = UUID().uuidString.lowercased()
+        let username = uniqueUser()
         try! PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: username, password: device.password)
         XCTAssertThrowsError(try PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: username, password: device.password)) { error in
             XCTAssertEqual(error as! PairingError, PairingError.USERNAME_EXISTS)
@@ -58,7 +58,7 @@ class PairingUtilTests_HostedTestDevices : NabtoEdgeClientTestBase {
 
     func testPasswordOpen_InvalidPassword() {
         try! super.connect(self.testDevices.passwordProtectedDevice)
-        XCTAssertThrowsError(try PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: UUID().uuidString.lowercased(), password: "wrong-password")) { error in
+        XCTAssertThrowsError(try PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: uniqueUser(), password: "wrong-password")) { error in
             XCTAssertEqual(error as! PairingError, PairingError.AUTHENTICATION_ERROR)
         }
     }
@@ -70,13 +70,13 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
     func testPasswordOpen_Success() {
         let device = self.testDevices.localPasswordProtectedDevice
         try! super.connect(device)
-        try! PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: UUID().uuidString.lowercased(), password: device.password)
+        try! PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: uniqueUser(), password: device.password)
     }
 
     func testPasswordOpen_BlockedByDeviceIamConfig() {
         let device = self.testDevices.localPasswordPairingDisabledConfig
         try! super.connect(device)
-        XCTAssertThrowsError(try PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: UUID().uuidString.lowercased(), password: device.password)) { error in
+        XCTAssertThrowsError(try PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: uniqueUser(), password: device.password)) { error in
             XCTAssertEqual(error as! PairingError, PairingError.PAIRING_MODE_DISABLED)
         }
     }
@@ -85,7 +85,7 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
         let device = self.testDevices.localPairLocalOpen
         try! self.connect(device)
         XCTAssertFalse(try! PairingUtil.isCurrentUserPaired(connection: connection))
-        try! PairingUtil.pairLocalOpen(connection: self.connection, desiredUsername: UUID().uuidString.lowercased())
+        try! PairingUtil.pairLocalOpen(connection: self.connection, desiredUsername: uniqueUser())
         XCTAssertTrue(try! PairingUtil.isCurrentUserPaired(connection: connection))
     }
 
@@ -99,7 +99,7 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
     func testLocalOpen_UsernameExists() {
         let device = self.testDevices.localPairLocalOpen
         try! self.connect(device)
-        let username = UUID().uuidString.lowercased()
+        let username = uniqueUser()
         try! PairingUtil.pairLocalOpen(connection: self.connection, desiredUsername: username)
         XCTAssertThrowsError(try PairingUtil.pairLocalOpen(connection: self.connection, desiredUsername: username)) { error in
             XCTAssertEqual(error as! PairingError, PairingError.USERNAME_EXISTS)
@@ -109,23 +109,114 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
     func testLocalOpen_BlockedByDeviceIamConfig() {
         let device = self.testDevices.localPasswordPairingDisabledConfig
         try! super.connect(device)
-        XCTAssertThrowsError(try PairingUtil.pairLocalOpen(connection: self.connection, desiredUsername: UUID().uuidString.lowercased())) { error in
+        XCTAssertThrowsError(try PairingUtil.pairLocalOpen(connection: self.connection, desiredUsername: uniqueUser())) { error in
             XCTAssertEqual(error as! PairingError, PairingError.PAIRING_MODE_DISABLED)
         }
     }
 
     func testPasswordInvite_Success() {
         let device = self.testDevices.localPasswordInvite
-        let admin = UUID().uuidString.lowercased()
+        let admin = uniqueUser()
         try! super.connect(device)
         try! PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: admin, password: device.password)
 
-        let guest = UUID().uuidString.lowercased()
+        let guest = uniqueUser()
+        let guestPassword = "guestpassword"
         try! PairingUtil.createNewUserForInvitePairing(
                         connection: self.connection,
                         username: guest,
-                        password: "guestpassword",
-                        role: "guest")
+                        password: guestPassword,
+                        role: "Guest")
+
+        // currently connected as admin - connect as new user
+        try! self.connection.close()
+        self.connection = try! client.createConnection()
+        try! self.connect(device)
+        XCTAssertFalse(try! PairingUtil.isCurrentUserPaired(connection: connection))
+        try! PairingUtil.pairPasswordInvite(connection: self.connection, username: guest, password: guestPassword)
+        XCTAssertTrue(try! PairingUtil.isCurrentUserPaired(connection: connection))
+    }
+
+    func testPasswordInvite_WrongUser() {
+        let device = self.testDevices.localPasswordInvite
+        let admin = uniqueUser()
+        try! super.connect(device)
+        try! PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: admin, password: device.password)
+
+        let guest = uniqueUser()
+        let guestPassword = "guestpassword"
+        try! PairingUtil.createNewUserForInvitePairing(
+                        connection: self.connection,
+                        username: guest,
+                        password: guestPassword,
+                        role: "Guest")
+
+        // currently connected as admin - connect as new user
+        try! self.connection.close()
+        self.connection = try! client.createConnection()
+        try! self.connect(device)
+        XCTAssertThrowsError(try PairingUtil.pairPasswordInvite(connection: self.connection, username: "wrongusername", password: guestPassword))  { error in
+            XCTAssertEqual(error as! PairingError, PairingError.AUTHENTICATION_ERROR)
+        }
+    }
+
+    func testCreateUser_BadRole() {
+        let device = self.testDevices.localPasswordInvite
+        let admin = uniqueUser()
+        try! super.connect(device)
+        try! PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: admin, password: device.password)
+
+        let guest = uniqueUser()
+        let guestPassword = "guestpassword"
+        XCTAssertThrowsError(try PairingUtil.createNewUserForInvitePairing(
+                        connection: self.connection,
+                        username: guest,
+                        password: guestPassword,
+                        role: "unexistingrole"))
+        { error in
+            XCTAssertEqual(error as! PairingError, PairingError.ROLE_DOES_NOT_EXIST)
+        }
+    }
+
+    func testCheckUnpairedUser() throws {
+        let device = self.testDevices.localPasswordInvite
+        try! super.connect(device)
+        XCTAssertFalse(try PairingUtil.isCurrentUserPaired(connection: self.connection))
+        XCTAssertThrowsError(try PairingUtil.getCurrentUser(connection: self.connection)) { error in
+            XCTAssertEqual(error as! PairingError, PairingError.USER_IS_NOT_PAIRED)
+        }
+    }
+
+    func testCreateUser_and_GetUser() throws {
+        let device = self.testDevices.localPasswordInvite
+        let admin = uniqueUser()
+        try! super.connect(device)
+        try! PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: admin, password: device.password)
+        XCTAssertTrue(try PairingUtil.isCurrentUserPaired(connection: self.connection))
+
+        let guest = uniqueUser()
+        let guestPassword = "guestpassword"
+        try PairingUtil.createNewUserForInvitePairing(
+                        connection: self.connection,
+                        username: guest,
+                        password: guestPassword,
+                        role: "Guest")
+
+        // currently connected as admin - connect as new user
+        try! self.connection.close()
+        self.connection = try! client.createConnection()
+        try! self.connect(device)
+        try! PairingUtil.pairPasswordInvite(connection: self.connection, username: guest, password: guestPassword)
+
+        // guest is not allowed to get admin user
+        XCTAssertThrowsError(try PairingUtil.getUser(connection: self.connection, username: admin)) { error in
+            XCTAssertEqual(error as! PairingError, PairingError.BLOCKED_BY_DEVICE_CONFIGURATION)
+        }
+
+        // guest can get self
+        let me = try PairingUtil.getUser(connection: self.connection, username: guest)
+        XCTAssertEqual(me.Username, guest)
+        XCTAssertEqual(me.Role, "Guest")
     }
 
     func testCodableUser() {
