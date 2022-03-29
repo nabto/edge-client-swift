@@ -12,6 +12,7 @@ function run {
 find ./config -type d -name state -exec git checkout {} || true \;
 
 run localPairLocalOpen &
+run localPairLocalInitial &
 run localPasswordPairingDisabledConfig &
 run localPasswordProtectedDevice &
 run localPasswordInvite &

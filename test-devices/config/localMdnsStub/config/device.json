@@ -1,1 +1,4 @@
-{"ProductId":"pr-mdns","DeviceId":"de-mdns"}
+{
+   "DeviceId" : "de-mdns",
+   "ProductId" : "pr-mdns"
+}

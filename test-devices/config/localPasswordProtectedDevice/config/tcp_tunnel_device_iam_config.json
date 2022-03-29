@@ -1,1 +1,116 @@
-{"Version":1,"Policies":[{"Id":"Pairing","Statements":[{"Effect":"Allow","Actions":["IAM:GetPairing","IAM:PairingPasswordInvite","IAM:PairingLocalInitial","IAM:PairingLocalOpen","IAM:PairingPasswordOpen"]}]},{"Id":"Tunnelling","Statements":[{"Effect":"Allow","Actions":["TcpTunnel:GetService","TcpTunnel:Connect","TcpTunnel:ListServices"]}]},{"Id":"ManageIAM","Statements":[{"Effect":"Allow","Actions":["IAM:ListUsers","IAM:GetUser","IAM:DeleteUser","IAM:SetUserRole","IAM:ListRoles","IAM:CreateUser","IAM:SetUserPassword","IAM:SetUserDisplayName","IAM:SetSettings","IAM:GetSettings"]}]},{"Id":"ManageOwnUser","Statements":[{"Effect":"Allow","Actions":["IAM:GetUser","IAM:DeleteUser","IAM:SetUserFriendlyName"],"Conditions":[{"StringEquals":{"IAM:Username":["${Connection:Username}"]}}]},{"Effect":"Allow","Actions":["IAM:ListRoles","IAM:ListUsers"]}]}],"Roles":[{"Id":"Unpaired","Policies":["Pairing"]},{"Id":"Administrator","Policies":["ManageIAM","Tunnelling","Pairing"]},{"Id":"Standard","Policies":["Tunnelling","Pairing","ManageOwnUser"]},{"Id":"Guest","Policies":["Pairing","ManageOwnUser"]}],"Config":{"UnpairedRole":"Unpaired"}}
+{
+   "Config" : {
+      "UnpairedRole" : "Unpaired"
+   },
+   "Policies" : [
+      {
+         "Id" : "Pairing",
+         "Statements" : [
+            {
+               "Actions" : [
+                  "IAM:GetPairing",
+                  "IAM:PairingPasswordInvite",
+                  "IAM:PairingLocalInitial",
+                  "IAM:PairingLocalOpen",
+                  "IAM:PairingPasswordOpen"
+               ],
+               "Effect" : "Allow"
+            }
+         ]
+      },
+      {
+         "Id" : "Tunnelling",
+         "Statements" : [
+            {
+               "Actions" : [
+                  "TcpTunnel:GetService",
+                  "TcpTunnel:Connect",
+                  "TcpTunnel:ListServices"
+               ],
+               "Effect" : "Allow"
+            }
+         ]
+      },
+      {
+         "Id" : "ManageIAM",
+         "Statements" : [
+            {
+               "Actions" : [
+                  "IAM:ListUsers",
+                  "IAM:GetUser",
+                  "IAM:DeleteUser",
+                  "IAM:SetUserRole",
+                  "IAM:ListRoles",
+                  "IAM:CreateUser",
+                  "IAM:SetUserPassword",
+                  "IAM:SetUserDisplayName",
+                  "IAM:SetSettings",
+                  "IAM:GetSettings"
+               ],
+               "Effect" : "Allow"
+            }
+         ]
+      },
+      {
+         "Id" : "ManageOwnUser",
+         "Statements" : [
+            {
+               "Actions" : [
+                  "IAM:GetUser",
+                  "IAM:DeleteUser",
+                  "IAM:SetUserFriendlyName"
+               ],
+               "Conditions" : [
+                  {
+                     "StringEquals" : {
+                        "IAM:Username" : [
+                           "${Connection:Username}"
+                        ]
+                     }
+                  }
+               ],
+               "Effect" : "Allow"
+            },
+            {
+               "Actions" : [
+                  "IAM:ListRoles",
+                  "IAM:ListUsers"
+               ],
+               "Effect" : "Allow"
+            }
+         ]
+      }
+   ],
+   "Roles" : [
+      {
+         "Id" : "Unpaired",
+         "Policies" : [
+            "Pairing"
+         ]
+      },
+      {
+         "Id" : "Administrator",
+         "Policies" : [
+            "ManageIAM",
+            "Tunnelling",
+            "Pairing"
+         ]
+      },
+      {
+         "Id" : "Standard",
+         "Policies" : [
+            "Tunnelling",
+            "Pairing",
+            "ManageOwnUser"
+         ]
+      },
+      {
+         "Id" : "Guest",
+         "Policies" : [
+            "Pairing",
+            "ManageOwnUser"
+         ]
+      }
+   ],
+   "Version" : 1
+}

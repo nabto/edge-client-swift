@@ -10,6 +10,7 @@ public enum PairingError: Error, Equatable {
     case USERNAME_EXISTS
     case USER_DOES_NOT_EXIST
     case USER_IS_NOT_PAIRED
+    case INITIAL_USER_ALREADY_PAIRED
     case ROLE_DOES_NOT_EXIST
     case AUTHENTICATION_ERROR
     case PAIRING_MODE_DISABLED
@@ -75,6 +76,11 @@ class PairingUtil {
         // todo parse string and invoke appropriate pairing function
     }
 
+    static public func getAvailablePairingModes(connection: Connection) throws -> [PairingMode] {
+        // todo CoAP GET /iam/pairing
+        return []
+    }
+
     // https://docs.nabto.com/developer/api-reference/coap/iam/pairing-local-open.html
     static public func pairLocalOpen(connection: Connection, desiredUsername: String) throws {
 //        201: Pairing completed successfully.
@@ -97,18 +103,28 @@ class PairingUtil {
             default: throw PairingError.FAILED
             }
         } catch {
-            if let pairingError = error as? PairingError {
-                throw pairingError
-            } else if let apiError = error as? NabtoEdgeClientError {
-                throw PairingError.API_ERROR(cause: apiError)
-            } else {
-                throw PairingError.FAILED
-            }
+            try rethrowPairingError(error)
         }
     }
 
-    static public func pairLocalInitial(connection: Connection) {
-        // todo invoke CoAP POST /iam/pairing/local-initial
+    static public func pairLocalInitial(connection: Connection) throws {
+//            201: Pairing completed successfully.
+//            403: Blocked by IAM configuration.
+//            404: Pairing mode disabled.
+//            409: Initial user already paired.
+        do {
+            let coap = try connection.createCoapRequest(method: "POST", path: "/iam/pairing/local-initial")
+            let response = try! coap.execute()
+            switch (response.status) {
+            case 201: break
+            case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
+            case 404: throw PairingError.PAIRING_MODE_DISABLED
+            case 409: throw PairingError.INITIAL_USER_ALREADY_PAIRED
+            default: throw PairingError.FAILED
+            }
+        } catch {
+            try rethrowPairingError(error)
+        }
     }
 
     // https://docs.nabto.com/developer/api-reference/coap/iam/pairing-password-open.html
@@ -151,7 +167,7 @@ class PairingUtil {
             case 201: break
             case 400: throw PairingError.INVALID_INPUT
             case 401: throw PairingError.FAILED                // never here
-            case 403: throw PairingError.PAIRING_MODE_DISABLED
+            case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
             case 404: throw PairingError.PAIRING_MODE_DISABLED // never here
             case 409: throw PairingError.USERNAME_EXISTS
             default: throw PairingError.FAILED
@@ -325,11 +341,6 @@ class PairingUtil {
             throw PairingError.API_ERROR(cause: apiError)
         }
         throw PairingError.FAILED
-    }
-
-    static public func getAvailablePairingModes(connection: Connection) throws -> [PairingMode] {
-        // todo CoAP GET /iam/pairing
-        return []
     }
 
 }

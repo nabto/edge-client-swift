@@ -113,10 +113,21 @@ struct TestDevices {
             password: "pff3wUnbs7V7"
     )
 
-    // open local enabled device
+    // local open enabled device
     let localPairLocalOpen = TestDevice(
             productId: "pr-fatqcwj9",
             deviceId: "de-ysymtcbh",
+            url: "https://pr-fatqcwj9.clients.nabto.net",
+            key: "sk-9c826d2ebb4343a789b280fe22b98305",
+            sct: "",
+            local: true,
+            password: ""
+    )
+
+    // local initial enabled device
+    let localPairLocalInitial = TestDevice(
+            productId: "pr-fatqcwj9",
+            deviceId: "de-i9dqsmif",
             url: "https://pr-fatqcwj9.clients.nabto.net",
             key: "sk-9c826d2ebb4343a789b280fe22b98305",
             sct: "",

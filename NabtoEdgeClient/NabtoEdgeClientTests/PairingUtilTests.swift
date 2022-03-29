@@ -160,6 +160,14 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
         }
     }
 
+    func testLocalInitial_Success() {
+        let device = self.testDevices.localPairLocalInitial
+        try! self.connect(device)
+        XCTAssertFalse(try! PairingUtil.isCurrentUserPaired(connection: connection))
+        try! PairingUtil.pairLocalInitial(connection: self.connection)
+        XCTAssertTrue(try! PairingUtil.isCurrentUserPaired(connection: connection))
+    }
+
     func testCreateUser_BadRole() {
         let device = self.testDevices.localPasswordInvite
         let admin = uniqueUser()

@@ -1,1 +1,19 @@
-{"Version":1,"OpenPairingPassword":"VcMNwEcFksFH","OpenPairingSct":"rKxajfzadfth","LocalOpenPairing":false,"PasswordOpenPairing":false,"PasswordInvitePairing":true,"LocalInitialPairing":false,"OpenPairingRole":"Guest","InitialPairingUsername":"admin","Users":[{"Username":"admin","ServerConnectToken":"j3xymsdW9kyu","Password":"tJHUgEstNFTj","Role":"Administrator"}]}
+{
+   "InitialPairingUsername" : "admin",
+   "LocalInitialPairing" : false,
+   "LocalOpenPairing" : false,
+   "OpenPairingPassword" : "VcMNwEcFksFH",
+   "OpenPairingRole" : "Guest",
+   "OpenPairingSct" : "rKxajfzadfth",
+   "PasswordInvitePairing" : true,
+   "PasswordOpenPairing" : false,
+   "Users" : [
+      {
+         "Password" : "tJHUgEstNFTj",
+         "Role" : "Administrator",
+         "ServerConnectToken" : "j3xymsdW9kyu",
+         "Username" : "admin"
+      }
+   ],
+   "Version" : 1
+}
