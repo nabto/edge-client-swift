@@ -246,6 +246,15 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
 
     }
 
+    func testGetDeviceDetails() throws {
+        let device = self.testDevices.localPairLocalInitial
+        try super.connect(device)
+        let details = try PairingUtil.getDeviceDetails(connection: connection)
+        XCTAssertEqual(details.ProductId, device.productId)
+        XCTAssertEqual(details.DeviceId, device.deviceId)
+        XCTAssertEqual(details.Modes, ["LocalInitial"])
+    }
+
     func testCodableUser() {
         let user = PairingUtil.User(username: "username-foobarbaz", sct: "sct-qux")
         let cbor = try! user.encode()

@@ -65,6 +65,46 @@ class PairingUtil {
 
     }
 
+    // upper camelcase field names breaks standard Swift style - they match
+    // the key names in the CBOR string map for the "CoAP GET /iam/pairing" service
+    // https://docs.nabto.com/developer/api-reference/coap/iam/pairing.html
+    public struct DeviceDetails : Codable {
+        let Modes: [String]
+        let NabtoVersion: String
+        let AppVersion: String?
+        let AppName: String?
+        let ProductId: String
+        let DeviceId: String
+
+        public init(Modes: [String], NabtoVersion: String, AppVersion: String, AppName: String, ProductId: String, DeviceId: String) {
+            self.Modes = Modes
+            self.NabtoVersion = NabtoVersion
+            self.AppVersion = AppVersion
+            self.AppName = AppName
+            self.ProductId = ProductId
+            self.DeviceId = DeviceId
+        }
+
+        static func decode(cbor: Data) throws -> DeviceDetails {
+            let decoder = CBORDecoder()
+            do {
+                return try decoder.decode(DeviceDetails.self, from: cbor)
+            } catch {
+                throw PairingError.INVALID_RESPONSE(error: "\(error)")
+            }
+        }
+
+        func encode() throws -> Data {
+            let encoder = CBOREncoder()
+            do {
+                return try encoder.encode(self)
+            } catch {
+                throw PairingError.INVALID_INPUT
+            }
+        }
+
+    }
+
     public enum PairingMode {
         case LocalOpen
         case LocalInitial
@@ -76,8 +116,27 @@ class PairingUtil {
         // todo parse string and invoke appropriate pairing function
     }
 
+    static public func getDeviceDetails(connection: Connection) throws -> DeviceDetails {
+        do {
+            let coap = try connection.createCoapRequest(method: "GET", path: "/iam/pairing")
+            let response = try coap.execute()
+            switch (response.status) {
+            case 205: break
+            case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
+            default: throw PairingError.FAILED
+            }
+            let hex = response.payload.map { String(format: "%02hhx", $0) }.joined()
+            print("*** hex response: \(hex)")
+            return try DeviceDetails.decode(cbor: response.payload)
+        } catch {
+            try rethrowPairingError(error)
+            // swift 5.6 compiler error about missing return. grmbl.
+            return DeviceDetails(Modes: [], NabtoVersion: "", AppVersion: "", AppName: "", ProductId: "", DeviceId: "")
+        }
+    }
+
     static public func getAvailablePairingModes(connection: Connection) throws -> [PairingMode] {
-        // todo CoAP GET /iam/pairing
+        // todo
         return []
     }
 
