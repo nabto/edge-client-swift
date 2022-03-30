@@ -2,12 +2,18 @@
    "InitialPairingUsername" : "admin",
    "LocalInitialPairing" : true,
    "LocalOpenPairing" : false,
-   "OpenPairingPassword" : "escec3UweCvJ",
+   "OpenPairingPassword" : "uJFdyXyuigCW",
    "OpenPairingRole" : "Standard",
-   "OpenPairingSct" : "7iHcnujqzPXz",
+   "OpenPairingSct" : "vJo9NWP7JWfh",
    "PasswordInvitePairing" : false,
    "PasswordOpenPairing" : false,
    "Users" : [
+      {
+         "Password" : "UwfgwrrLN7L3",
+         "Role" : "Administrator",
+         "ServerConnectToken" : "AAUT9aVu3gC7",
+         "Username" : "admin"
+      }
    ],
    "Version" : 1
 }
