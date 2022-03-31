@@ -152,7 +152,7 @@ class PairingUtil {
         do {
             let coap = try connection.createCoapRequest(method: "POST", path: "/iam/pairing/local-open")
             try coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: cbor)
-            let response = try! coap.execute()
+            let response = try coap.execute()
             switch (response.status) {
             case 201: break
             case 400: throw PairingError.INVALID_INPUT
@@ -173,7 +173,7 @@ class PairingUtil {
 //            409: Initial user already paired.
         do {
             let coap = try connection.createCoapRequest(method: "POST", path: "/iam/pairing/local-initial")
-            let response = try! coap.execute()
+            let response = try coap.execute()
             switch (response.status) {
             case 201: break
             case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
@@ -221,7 +221,7 @@ class PairingUtil {
             if let data = data {
                 try coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: data)
             }
-            let response = try! coap.execute()
+            let response = try coap.execute()
             switch (response.status) {
             case 201: break
             case 400: throw PairingError.INVALID_INPUT
@@ -297,10 +297,30 @@ class PairingUtil {
     static public func deleteUser(connection: Connection, username: String) throws {
         do {
             let coap = try connection.createCoapRequest(method: "DELETE", path: "/iam/users/\(username)")
-            let response = try! coap.execute()
+            let response = try coap.execute()
             switch (response.status) {
             case 202: break
             case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
+            default: throw PairingError.FAILED
+            }
+        } catch {
+            try rethrowPairingError(error)
+        }
+    }
+
+    // todo reuse put logic
+    static public func renameUser(connection: Connection, username: String, newUsername: String) throws {
+        let encoder = CBOREncoder()
+        let cborRequest: Data = try encoder.encode(newUsername)
+        do {
+            let coap = try connection.createCoapRequest(method: "PUT", path: "/iam/users/\(username)/username")
+            try coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: cborRequest)
+            let response = try coap.execute()
+            switch (response.status) {
+            case 204: break
+            case 400: throw PairingError.INVALID_INPUT
+            case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
+            case 404: throw PairingError.USER_DOES_NOT_EXIST
             default: throw PairingError.FAILED
             }
         } catch {
@@ -348,6 +368,7 @@ class PairingUtil {
         }
     }
 
+    // todo reuse put logic
     static private func updateUserSetPassword(connection: Connection,
                                    username: String,
                                    password: String) throws{
@@ -369,6 +390,7 @@ class PairingUtil {
         }
     }
 
+    // todo reuse put logic
     static private func updateUserSetRole(connection: Connection,
                                           username: String,
                                           role: String) throws{

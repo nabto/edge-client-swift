@@ -67,6 +67,14 @@ class PairingUtilTests_HostedTestDevices : NabtoEdgeClientTestBase {
 
 class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
 
+    let localInitialAdminKey = """
+                               -----BEGIN EC PRIVATE KEY-----
+                               MHcCAQEEIAl3ZURem5NMCTZA0OeTPcT7y6T2FHjHhmQz54UiH7mQoAoGCCqGSM49
+                               AwEHoUQDQgAEbiabrII+WZ8ABD4VQpmLe3cSIWdQfrRbxXotx5yxwInfgLuDU+rq
+                               OIFReqTf5h+Nwp/jj00fnsII88n1YCveoQ==
+                               -----END EC PRIVATE KEY-----
+                               """
+
     func testPasswordOpen_Success() {
         let device = self.testDevices.localPasswordProtectedDevice
         try! super.connect(device)
@@ -263,25 +271,47 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
         XCTAssertEqual(user.Sct, decoded.Sct)
     }
 
-}
+    func resetLocalInitialPairingState(_ connection: Connection) throws {
+        let initialUser = "admin"
+        let tmpUser = uniqueUser()
+        let currentUser: PairingUtil.User
+        do {
+            currentUser = try PairingUtil.getCurrentUser(connection: connection)
+        } catch {
+            return
+        }
+        XCTAssertEqual(currentUser.Username, initialUser)
+        try PairingUtil.renameUser(connection: connection, username: initialUser, newUsername: tmpUser)
+        try PairingUtil.createNewUserForInvitePairing(connection: connection, username: initialUser, password: "", role: "Administrator")
+        try PairingUtil.deleteUser(connection: connection, username: tmpUser)
+    }
 
-class PairingUtilTests_LocalTestDevices_NeedCleanState : NabtoEdgeClientTestBase {
-
-    func testLocalInitial_Success() {
+    func connectLocalInitial(_ client: Client) throws -> Connection {
         let device = self.testDevices.localPairLocalInitial
-        try! self.connect(device)
+        self.enableLogging(client)
+        let connection = try! client.createConnection()
+        try connection.setPrivateKey(key: self.localInitialAdminKey)
+        try connection.updateOptions(json: device.asJson())
+        try connection.connect()
+        try self.resetLocalInitialPairingState(connection)
+        return connection
+    }
+
+    func testLocalInitial_Success() throws {
+        let client = Client()
+        let connection = try connectLocalInitial(client)
         XCTAssertFalse(try! PairingUtil.isCurrentUserPaired(connection: connection))
-        try! PairingUtil.pairLocalInitial(connection: self.connection)
+        try! PairingUtil.pairLocalInitial(connection: connection)
         XCTAssertTrue(try! PairingUtil.isCurrentUserPaired(connection: connection))
     }
 
-    func testLocalInitial_Fail_AlreadyPaired() {
-        let device = self.testDevices.localPairLocalInitial
-        try! self.connect(device)
+    func testLocalInitial_Fail_AlreadyPaired() throws {
+        let client = Client()
+        let connection = try connectLocalInitial(client)
         XCTAssertFalse(try! PairingUtil.isCurrentUserPaired(connection: connection))
-        try! PairingUtil.pairLocalInitial(connection: self.connection)
+        try! PairingUtil.pairLocalInitial(connection: connection)
         XCTAssertTrue(try! PairingUtil.isCurrentUserPaired(connection: connection))
-        XCTAssertThrowsError(try PairingUtil.pairLocalInitial(connection: self.connection) ) { error in
+        XCTAssertThrowsError(try PairingUtil.pairLocalInitial(connection: connection) ) { error in
             XCTAssertEqual(error as? PairingError, .INITIAL_USER_ALREADY_PAIRED)
         }
     }
