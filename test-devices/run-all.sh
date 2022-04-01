@@ -9,7 +9,7 @@ function run {
     ./tcp_tunnel_device_macos -H ./config/$config --random-ports $opts 2>&1 > /tmp/tunnel-$config
 }
 
-find ./config -type d -name state -exec git checkout {} \; || true
+#find ./config -type d -name state -exec git checkout {} \; || true
 
 run localPairLocalOpen &
 run localPairLocalInitial &

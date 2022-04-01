@@ -235,6 +235,19 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
         XCTAssertEqual(me.Role, "Guest")
     }
 
+    func testSetDisplayName() throws {
+        let device = self.testDevices.localPairLocalOpen
+        try self.connect(device)
+        XCTAssertFalse(try PairingUtil.isCurrentUserPaired(connection: connection))
+        let username = uniqueUser()
+        let displayName = uniqueUser()
+        try PairingUtil.pairLocalOpen(connection: self.connection, desiredUsername: username)
+        try PairingUtil.updateUserSetDisplayName(connection: self.connection, username: username, displayName: displayName)
+        let user = try PairingUtil.getCurrentUser(connection: connection)
+        XCTAssertEqual(user.DisplayName, displayName)
+        XCTAssertTrue(try PairingUtil.isCurrentUserPaired(connection: connection))
+    }
+
     func testDeleteUser() throws {
         let device = self.testDevices.localPasswordInvite
         let admin = uniqueUser()

@@ -58,7 +58,7 @@
                "Actions" : [
                   "IAM:GetUser",
                   "IAM:DeleteUser",
-                  "IAM:SetUserFriendlyName"
+                  "IAM:SetUserDisplayName"
                ],
                "Conditions" : [
                   {

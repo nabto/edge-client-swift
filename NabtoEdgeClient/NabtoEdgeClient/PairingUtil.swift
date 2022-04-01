@@ -32,7 +32,7 @@ class PairingUtil {
         let Sct: String?
         let Role: String?
 
-        init(username: String, displayName: String?=nil, fingerprint: String?=nil, sct: String?=nil, role: String?=nil) {
+        init(username: String, displayName: String? = nil, fingerprint: String? = nil, sct: String? = nil, role: String? = nil) {
             self.Username = username
             self.DisplayName = displayName
             self.Fingerprint = fingerprint
@@ -60,7 +60,10 @@ class PairingUtil {
 
         public func cborAsHex() -> String? {
             let encoder = CBOREncoder()
-            return try? encoder.encode(self).map { String(format: "%02hhx", $0) }.joined()
+            return try? encoder.encode(self).map {
+                        String(format: "%02hhx", $0)
+                    }
+                    .joined()
         }
 
     }
@@ -68,7 +71,7 @@ class PairingUtil {
     // upper camelcase field names breaks standard Swift style - they match
     // the key names in the CBOR string map for the "CoAP GET /iam/pairing" service
     // https://docs.nabto.com/developer/api-reference/coap/iam/pairing.html
-    public struct DeviceDetails : Codable {
+    public struct DeviceDetails: Codable {
         let Modes: [String]
         let NabtoVersion: String
         let AppVersion: String?
@@ -126,8 +129,6 @@ class PairingUtil {
             case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
             default: throw PairingError.FAILED
             }
-            let hex = response.payload.map { String(format: "%02hhx", $0) }.joined()
-            print("*** hex response: \(hex)")
             return try DeviceDetails.decode(cbor: response.payload)
         } catch {
             try rethrowPairingError(error)
@@ -149,14 +150,7 @@ class PairingUtil {
         }
     }
 
-    // https://docs.nabto.com/developer/api-reference/coap/iam/pairing-local-open.html
     static public func pairLocalOpen(connection: Connection, desiredUsername: String) throws {
-//        201: Pairing completed successfully.
-//        201: Already paired.
-//        400: Bad request (likely invalid username).
-//        403: Blocked by IAM configuration.
-//        404: Pairing mode disabled.
-//        409: Username exists.
         let cbor = try User(username: desiredUsername).encode()
         do {
             let coap = try connection.createCoapRequest(method: "POST", path: "/iam/pairing/local-open")
@@ -176,10 +170,6 @@ class PairingUtil {
     }
 
     static public func pairLocalInitial(connection: Connection) throws {
-//            201: Pairing completed successfully.
-//            403: Blocked by IAM configuration.
-//            404: Pairing mode disabled.
-//            409: Initial user already paired.
         do {
             let coap = try connection.createCoapRequest(method: "POST", path: "/iam/pairing/local-initial")
             let response = try coap.execute()
@@ -203,8 +193,8 @@ class PairingUtil {
                 path: "/iam/pairing/password-open",
                 username: "",
                 password: password,
-                data: Data(cbor)
-                )
+                data: cbor
+        )
     }
 
     /**
@@ -223,7 +213,7 @@ class PairingUtil {
                                                    path: String,
                                                    username: String,
                                                    password: String,
-                                                   data: Data?=nil) throws {
+                                                   data: Data? = nil) throws {
         do {
             try connection.passwordAuthenticate(username: username, password: password)
             let coap = try connection.createCoapRequest(method: "POST", path: path)
@@ -302,7 +292,6 @@ class PairingUtil {
         }
     }
 
-
     static public func deleteUser(connection: Connection, username: String) throws {
         do {
             let coap = try connection.createCoapRequest(method: "DELETE", path: "/iam/users/\(username)")
@@ -320,8 +309,7 @@ class PairingUtil {
     static public func createNewUserForInvitePairing(connection: Connection,
                                                      username: String,
                                                      password: String,
-                                                     role: String?=nil,
-                                                     displayName: String?=nil) throws {
+                                                     role: String) throws {
         let user: User
         let cborRequest = try User(username: username).encode()
         do {
@@ -349,13 +337,12 @@ class PairingUtil {
                 connection: connection,
                 username: username,
                 password: password)
-        if let role = role {
-            try updateUserSetRole(
-                    connection: connection,
-                    username: username,
-                    role: role)
-        }
+        try updateUserSetRole(
+                connection: connection,
+                username: username,
+                role: role)
     }
+
 
     static public func updateUserSetPassword(connection: Connection,
                                       username: String,
@@ -379,6 +366,18 @@ class PairingUtil {
                 value: role,
                 // user was just created - so ambiguous 404 is most likely due to missing role (... unless race condition)
                 fourOhFourMapping: PairingError.ROLE_DOES_NOT_EXIST
+        )
+    }
+
+    static public func updateUserSetDisplayName(connection: Connection,
+                                         username: String,
+                                         displayName: String) throws{
+        try updateUser(
+                connection: connection,
+                username: username,
+                parameter: "display-name",
+                value: displayName,
+                fourOhFourMapping: PairingError.USER_DOES_NOT_EXIST
         )
     }
 
