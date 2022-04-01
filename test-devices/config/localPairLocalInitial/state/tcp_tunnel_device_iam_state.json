@@ -9,8 +9,6 @@
    "PasswordOpenPairing" : false,
    "Users" : [
       {
-         "Fingerprint" : "",
-         "Password" : "",
          "Role" : "Administrator",
          "ServerConnectToken" : "AAKCQqtyw18A",
          "Username" : "admin"
