@@ -262,15 +262,6 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
 
     }
 
-    func testGetDeviceDetails() throws {
-        let device = self.testDevices.localPairLocalInitial
-        try super.connect(device)
-        let details = try PairingUtil.getDeviceDetails(connection: connection)
-        XCTAssertEqual(details.ProductId, device.productId)
-        XCTAssertEqual(details.DeviceId, device.deviceId)
-        XCTAssertEqual(details.Modes, ["LocalInitial"])
-    }
-
     func testCodableUser() throws {
         let user = PairingUtil.User(username: "username-foobarbaz", sct: "sct-qux")
         let cbor = try user.encode()
@@ -322,6 +313,16 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
         XCTAssertThrowsError(try PairingUtil.pairLocalInitial(connection: connection) ) { error in
             XCTAssertEqual(error as? PairingError, .INITIAL_USER_ALREADY_PAIRED)
         }
+    }
+
+    func testGetDeviceDetails() throws {
+        let client = Client()
+        let connection = try connectLocalInitial(client)
+        let details = try PairingUtil.getDeviceDetails(connection: connection)
+        let device = self.testDevices.localPairLocalInitial
+        XCTAssertEqual(details.ProductId, device.productId)
+        XCTAssertEqual(details.DeviceId, device.deviceId)
+        XCTAssertEqual(details.Modes, ["LocalInitial"])
     }
 
     func testGetPairingModes_1() throws {
