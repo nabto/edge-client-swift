@@ -112,8 +112,9 @@ class PairingUtil {
         case PasswordInvite
     }
 
-    static public func pair(connection: Connection, usingPairingString: String) {
-        // todo parse string and invoke appropriate pairing function
+    static public func pair(client: Client, usingPairingString: String) throws -> Connection {
+        // todo parse string, connect to device, invoke appropriate pairing function, close connection
+        throw PairingError.FAILED
     }
 
     static public func getDeviceDetails(connection: Connection) throws -> DeviceDetails {
@@ -316,26 +317,6 @@ class PairingUtil {
         }
     }
 
-    // todo reuse put logic
-    static public func renameUser(connection: Connection, username: String, newUsername: String) throws {
-        let encoder = CBOREncoder()
-        let cborRequest: Data = try encoder.encode(newUsername)
-        do {
-            let coap = try connection.createCoapRequest(method: "PUT", path: "/iam/users/\(username)/username")
-            try coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: cborRequest)
-            let response = try coap.execute()
-            switch (response.status) {
-            case 204: break
-            case 400: throw PairingError.INVALID_INPUT
-            case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
-            case 404: throw PairingError.USER_DOES_NOT_EXIST
-            default: throw PairingError.FAILED
-            }
-        } catch {
-            try rethrowPairingError(error)
-        }
-    }
-
     static public func createNewUserForInvitePairing(connection: Connection,
                                                      username: String,
                                                      password: String,
@@ -376,46 +357,60 @@ class PairingUtil {
         }
     }
 
-    // todo reuse put logic
-    static private func updateUserSetPassword(connection: Connection,
-                                   username: String,
-                                   password: String) throws{
-        let encoder = CBOREncoder()
-        let cborRequest: Data = try encoder.encode(password)
-        do {
-            let coap = try connection.createCoapRequest(method: "PUT", path: "/iam/users/\(username)/password")
-            try coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: cborRequest)
-            let response = try coap.execute()
-            switch (response.status) {
-            case 204: break
-            case 400: throw PairingError.INVALID_INPUT
-            case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
-            case 404: throw PairingError.USER_DOES_NOT_EXIST
-            default: throw PairingError.FAILED
-            }
-        } catch {
-            try rethrowPairingError(error)
-        }
+    static public func updateUserSetPassword(connection: Connection,
+                                      username: String,
+                                      password: String) throws {
+        try updateUser(
+                connection: connection,
+                username: username,
+                parameter: "password",
+                value: password,
+                fourOhFourMapping: PairingError.USER_DOES_NOT_EXIST
+        )
     }
 
-    // todo reuse put logic
-    static private func updateUserSetRole(connection: Connection,
-                                          username: String,
-                                          role: String) throws{
+    static public func updateUserSetRole(connection: Connection,
+                                         username: String,
+                                         role: String) throws{
+        try updateUser(
+                connection: connection,
+                username: username,
+                parameter: "role",
+                value: role,
+                // user was just created - so ambiguous 404 is most likely due to missing role (... unless race condition)
+                fourOhFourMapping: PairingError.ROLE_DOES_NOT_EXIST
+        )
+    }
+
+    static public func renameUser(connection: Connection,
+                                  username: String,
+                                  newUsername: String) throws {
+        try updateUser(
+                connection: connection,
+                username: username,
+                parameter: "username",
+                value: newUsername,
+                // user was just created - so ambiguous 404 is most likely due to missing role (... unless race condition)
+                fourOhFourMapping: PairingError.ROLE_DOES_NOT_EXIST
+        )
+    }
+
+    static private func updateUser(connection: Connection,
+                                   username: String,
+                                   parameter: String,
+                                   value: String,
+                                   fourOhFourMapping: PairingError) throws {
         let encoder = CBOREncoder()
-        let cborRequest: Data = try encoder.encode(role)
+        let cborRequest: Data = try encoder.encode(value)
         do {
-            let coap = try connection.createCoapRequest(method: "PUT", path: "/iam/users/\(username)/role")
+            let coap = try connection.createCoapRequest(method: "PUT", path: "/iam/users/\(username)/\(parameter)")
             try coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: cborRequest)
             let response = try coap.execute()
             switch (response.status) {
             case 204: break
             case 400: throw PairingError.INVALID_INPUT
             case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
-
-            // user was just created - so ambiguous 404 is most likely due to missing role (... unless race condition)
-            case 404: throw PairingError.ROLE_DOES_NOT_EXIST
-
+            case 404: throw fourOhFourMapping
             default: throw PairingError.FAILED
             }
         } catch {
