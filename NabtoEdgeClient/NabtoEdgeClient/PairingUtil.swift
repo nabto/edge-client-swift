@@ -136,8 +136,16 @@ class PairingUtil {
     }
 
     static public func getAvailablePairingModes(connection: Connection) throws -> [PairingMode] {
-        // todo
-        return []
+        let details = try getDeviceDetails(connection: connection)
+        return try details.Modes.map { s -> PairingMode in
+            switch s {
+            case "LocalInitial": return .LocalInitial
+            case "LocalOpen": return .LocalOpen
+            case "PasswordInvite": return .PasswordInvite
+            case "PasswordOpen": return .PasswordOpen
+            default: throw PairingError.INVALID_RESPONSE(error: "pairing mode '\(s)'")
+            }
+        }
     }
 
     // https://docs.nabto.com/developer/api-reference/coap/iam/pairing-local-open.html
@@ -227,7 +235,7 @@ class PairingUtil {
             case 400: throw PairingError.INVALID_INPUT
             case 401: throw PairingError.FAILED                // never here
             case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
-            case 404: throw PairingError.PAIRING_MODE_DISABLED // never here
+            case 404: throw PairingError.PAIRING_MODE_DISABLED // never here - authentication error above if not enabled
             case 409: throw PairingError.USERNAME_EXISTS
             default: throw PairingError.FAILED
             }

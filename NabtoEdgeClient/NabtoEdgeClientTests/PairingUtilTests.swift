@@ -82,10 +82,18 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
     }
 
     func testPasswordOpen_BlockedByDeviceIamConfig() throws {
+        // This device has open password pairing disabled in IAM config (not state) - hence expect
+        // BLOCKED_BY_DEVICE_CONFIGURATION and not AUTHENTICATION_ERROR.
+        //
+        // A note on AUTHENTICATION_ERROR vs PAIRING_MODE_DISABLED: The former would be seen if open
+        // password pairing was enabled in config but disabled in state (and not PAIRING_MODE_DISABLED as
+        // intuitively expected): An auth listener is not started if a password pairing mode is not
+        // enabled. And if no auth listener is enabled, the password auth step fails that happens prior to
+        // the pairing attempt, hence AUTHENTICATION_ERROR in that case.
         let device = self.testDevices.localPasswordPairingDisabledConfig
         try super.connect(device)
         XCTAssertThrowsError(try PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: uniqueUser(), password: device.password)) { error in
-            XCTAssertEqual(error as! PairingError, PairingError.PAIRING_MODE_DISABLED)
+            XCTAssertEqual(error as! PairingError, PairingError.BLOCKED_BY_DEVICE_CONFIGURATION)
         }
     }
 
