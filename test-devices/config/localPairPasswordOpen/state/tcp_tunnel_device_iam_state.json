@@ -1,0 +1,13 @@
+{
+   "InitialPairingUsername" : "admin",
+   "LocalInitialPairing" : false,
+   "LocalOpenPairing" : false,
+   "OpenPairingPassword" : "pUhkiHnLhaoo",
+   "OpenPairingRole" : "Guest",
+   "OpenPairingSct" : "zwmdYKKFikJ4",
+   "PasswordInvitePairing" : false,
+   "PasswordOpenPairing" : true,
+   "Users" : [
+   ],
+   "Version" : 1
+}
