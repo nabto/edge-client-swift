@@ -91,17 +91,6 @@ struct TestDevices {
     // $ cd _build
     // $ cmake -j ..
 
-    // local password protected device
-    let localPasswordProtectedDevice = TestDevice(
-            productId: "pr-fatqcwj9",
-            deviceId: "de-aiywxrjr",
-            url: "https://pr-fatqcwj9.clients.nabto.net",
-            key: "sk-9c826d2ebb4343a789b280fe22b98305",
-            sct: "RTLRgFXLwCsk",
-            local: true,
-            password: "pUhkiHnLhaoo"
-    )
-
     // password open pairing not enabled in config
     let localPasswordPairingDisabledConfig = TestDevice(
             productId: "pr-fatqcwj9",
@@ -111,6 +100,17 @@ struct TestDevices {
             sct: "",
             local: true,
             password: "pff3wUnbs7V7"
+    )
+
+    // local password protected device
+    let localPairPasswordOpen = TestDevice(
+            productId: "pr-fatqcwj9",
+            deviceId: "de-aiywxrjr",
+            url: "https://pr-fatqcwj9.clients.nabto.net",
+            key: "sk-9c826d2ebb4343a789b280fe22b98305",
+            sct: "RTLRgFXLwCsk",
+            local: true,
+            password: "pUhkiHnLhaoo"
     )
 
     // local open enabled device

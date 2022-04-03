@@ -16,6 +16,7 @@ public enum PairingError: Error, Equatable {
     case PAIRING_MODE_DISABLED
     case BLOCKED_BY_DEVICE_CONFIGURATION
     case INVALID_RESPONSE(error: String)
+    case INVALID_PAIRING_STRING(error: String)
     case API_ERROR(cause: NabtoEdgeClientError)
     case FAILED
 }
@@ -115,9 +116,49 @@ class PairingUtil {
         case PasswordInvite
     }
 
-    static public func pair(client: Client, usingPairingString: String) throws -> Connection {
-        // todo parse string, connect to device, invoke appropriate pairing function, close connection
-        throw PairingError.FAILED
+    static public func pair(client: Client,
+                            opts: ConnectionOptions,
+                            pairingString: String?=nil,
+                            desiredUsername: String?=nil) throws -> Connection {
+        var password: String!
+        if let pairingString = pairingString {
+            let elements = pairingString.components(separatedBy: ",")
+            for element in elements {
+                let tuple = element.components(separatedBy: "=")
+                let key = tuple[0]
+                let value = tuple[1]
+                switch (key) {
+                case "p": opts.ProductId = value; break
+                case "d": opts.DeviceId = value; break
+                case "pwd": password = value; break
+                case "sct": opts.ServerConnectToken = value; break
+                default: throw PairingError.INVALID_PAIRING_STRING(error: "unexpected element \(key)")
+                }
+            }
+            if (opts.ProductId == nil || opts.DeviceId == nil || password == nil || opts.ServerConnectToken == nil) {
+                throw PairingError.INVALID_PAIRING_STRING(error: "missing element in pairing string")
+            }
+        }
+
+        let connection = try client.createConnection()
+        try connection.updateOptions(options: opts)
+        try connection.connect()
+
+        do {
+            try pairLocalInitial(connection: connection)
+        } catch {
+            if let desiredUsername = desiredUsername {
+                do {
+                    try pairLocalOpen(connection: connection, desiredUsername: desiredUsername)
+                } catch {
+                    if let password = password {
+                        try pairPasswordOpen(connection: connection, desiredUsername: desiredUsername, password: password)
+                    }
+                }
+            }
+        }
+
+        return connection
     }
 
     static public func getDeviceDetails(connection: Connection) throws -> DeviceDetails {
@@ -247,7 +288,7 @@ class PairingUtil {
 
     static public func isCurrentUserPaired(connection: Connection) throws -> Bool {
         do {
-            try self.getCurrentUser(connection: connection)
+            _ = try self.getCurrentUser(connection: connection)
         } catch {
             if let pairingError = error as? PairingError {
                 if (pairingError == .USER_IS_NOT_PAIRED) {

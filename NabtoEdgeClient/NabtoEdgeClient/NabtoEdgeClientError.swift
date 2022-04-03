@@ -41,6 +41,7 @@ public indirect enum NabtoEdgeClientError: Error, Equatable {
     case UNKNOWN_SERVER_KEY
 
     case FAILED
+    case FAILED_WITH_DETAIL(detail: String)
 
     case UNEXPECTED_API_STATUS
 }

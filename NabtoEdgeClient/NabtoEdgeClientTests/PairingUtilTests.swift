@@ -47,7 +47,7 @@ class PairingUtilTests_HostedTestDevices : NabtoEdgeClientTestBase {
     }
 
     func testPasswordOpen_UsernameExists() throws {
-        let device = self.testDevices.passwordProtectedDevice
+        let device = self.testDevices.localPairPasswordOpen
         try super.connect(device)
         let username = uniqueUser()
         try PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: username, password: device.password)
@@ -76,7 +76,7 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
                                """
 
     func testPasswordOpen_Success() throws {
-        let device = self.testDevices.localPasswordProtectedDevice
+        let device = self.testDevices.localPairPasswordOpen
         try super.connect(device)
         try PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: uniqueUser(), password: device.password)
     }
@@ -326,6 +326,50 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
         XCTAssertThrowsError(try PairingUtil.pairLocalInitial(connection: connection) ) { error in
             XCTAssertEqual(error as? PairingError, .INITIAL_USER_ALREADY_PAIRED)
         }
+    }
+
+    func testPair_AutoPair_LocalInitial_Success() throws {
+        let device = self.testDevices.localPairLocalInitial
+        try self.enableLogging(self.client)
+        let opts = ConnectionOptions()
+        opts.PrivateKey = self.localInitialAdminKey
+        opts.ServerUrl = device.url
+        opts.ServerKey = device.key
+        opts.ProductId = device.productId
+        opts.DeviceId = device.deviceId
+        try connection.updateOptions(options: opts)
+        let connection = try PairingUtil.pair(client: self.client, opts: opts)
+        XCTAssertTrue(try PairingUtil.isCurrentUserPaired(connection: connection))
+        try self.resetLocalInitialPairingState(connection)
+    }
+
+    func testPair_AutoPair_LocalOpen_Success() throws {
+        let device = self.testDevices.localPairLocalOpen
+        try self.enableLogging(self.client)
+        let opts = ConnectionOptions()
+        opts.PrivateKey = try client.createPrivateKey()
+        opts.ServerUrl = device.url
+        opts.ServerKey = device.key
+        opts.ProductId = device.productId
+        opts.DeviceId = device.deviceId
+        try connection.updateOptions(options: opts)
+        let connection = try PairingUtil.pair(client: self.client, opts: opts, desiredUsername: self.uniqueUser())
+        XCTAssertTrue(try PairingUtil.isCurrentUserPaired(connection: connection))
+    }
+
+    func testPair_AutoPair_PairingString_Success() throws {
+        let device = self.testDevices.localPairPasswordOpen
+        let pairingString = "p=\(device.productId),d=\(device.deviceId),pwd=\(device.password!),sct=\(device.sct!)"
+        try self.enableLogging(self.client)
+        let opts = ConnectionOptions()
+        opts.PrivateKey = try client.createPrivateKey()
+        opts.ServerUrl = device.url
+        opts.ServerKey = device.key
+        opts.ProductId = device.productId
+        opts.DeviceId = device.deviceId
+        try connection.updateOptions(options: opts)
+        let connection = try PairingUtil.pair(client: self.client, opts: opts, pairingString: pairingString, desiredUsername: self.uniqueUser())
+        XCTAssertTrue(try PairingUtil.isCurrentUserPaired(connection: connection))
     }
 
     func testGetDeviceDetails() throws {
