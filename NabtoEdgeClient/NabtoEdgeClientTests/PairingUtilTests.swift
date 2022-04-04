@@ -276,9 +276,9 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
     }
 
     func testCodableUser() throws {
-        let user = PairingUtil.User(username: "username-foobarbaz", sct: "sct-qux")
+        let user = PairingUser(username: "username-foobarbaz", sct: "sct-qux")
         let cbor = try user.encode()
-        let decoded = try PairingUtil.User.decode(cbor: cbor)
+        let decoded = try PairingUser.decode(cbor: cbor)
         XCTAssertEqual(user.Username, decoded.Username)
         XCTAssertEqual(user.Sct, decoded.Sct)
     }
@@ -286,7 +286,7 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
     func resetLocalInitialPairingState(_ connection: Connection) throws {
         let initialUser = "admin"
         let tmpUser = uniqueUser()
-        let currentUser: PairingUtil.User
+        let currentUser: PairingUser
         do {
             currentUser = try PairingUtil.getCurrentUser(connection: connection)
         } catch {
@@ -338,7 +338,7 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
         opts.ProductId = device.productId
         opts.DeviceId = device.deviceId
         try connection.updateOptions(options: opts)
-        let connection = try PairingUtil.pair(client: self.client, opts: opts)
+        let connection = try PairingUtil.pairAutomatic(client: self.client, opts: opts)
         XCTAssertTrue(try PairingUtil.isCurrentUserPaired(connection: connection))
         try self.resetLocalInitialPairingState(connection)
     }
@@ -353,7 +353,7 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
         opts.ProductId = device.productId
         opts.DeviceId = device.deviceId
         try connection.updateOptions(options: opts)
-        let connection = try PairingUtil.pair(client: self.client, opts: opts, desiredUsername: self.uniqueUser())
+        let connection = try PairingUtil.pairAutomatic(client: self.client, opts: opts, desiredUsername: self.uniqueUser())
         XCTAssertTrue(try PairingUtil.isCurrentUserPaired(connection: connection))
     }
 
@@ -368,7 +368,7 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
         opts.ProductId = device.productId
         opts.DeviceId = device.deviceId
         try connection.updateOptions(options: opts)
-        let connection = try PairingUtil.pair(client: self.client, opts: opts, pairingString: pairingString, desiredUsername: self.uniqueUser())
+        let connection = try PairingUtil.pairAutomatic(client: self.client, opts: opts, pairingString: pairingString, desiredUsername: self.uniqueUser())
         XCTAssertTrue(try PairingUtil.isCurrentUserPaired(connection: connection))
     }
 

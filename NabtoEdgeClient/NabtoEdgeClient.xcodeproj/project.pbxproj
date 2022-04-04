@@ -33,9 +33,15 @@
 		D479085027C581E400790A51 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D479084D27C581E400790A51 /* Helper.swift */; };
 		D479085127C581E400790A51 /* CallbackWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D479084E27C581E400790A51 /* CallbackWrapper.swift */; };
 		E2FB5D4F1AA78AC7D4FAEA68 /* Pods_NabtoEdgeClientTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28C850E1A5507E6CEBD10099 /* Pods_NabtoEdgeClientTests.framework */; };
+		E92196AB502AB49408E4FC42 /* PairLocalOpen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9256A8C5236863622AF32E4 /* PairLocalOpen.swift */; };
+		E921A15EE02C1433B964AB09 /* PairAutomatic.swift in Sources */ = {isa = PBXBuildFile; fileRef = E927EF296FB1B93512004057 /* PairAutomatic.swift */; };
 		E92302F614DFF1CE2D44AF7A /* PairingUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92E1F3B78BE7B59AA656356 /* PairingUtil.swift */; };
+		E92534ED04879ADC7039B5E3 /* PairPasswordInvite.swift in Sources */ = {isa = PBXBuildFile; fileRef = E926E4A0D0B66C887B045430 /* PairPasswordInvite.swift */; };
 		E92837BE0959E8D8679649C7 /* TestDeviceDefinitions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9221D728E77EBE65E3D5868 /* TestDeviceDefinitions.swift */; };
 		E92B89A1B66E2D1F8F8D818F /* PairingUtilTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92CE3DEF30197BFA961376C /* PairingUtilTests.swift */; };
+		E92C4277079C65CA5BAF73B4 /* PairLocalInitial.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92A6CEAB3F96E4A6309B1D1 /* PairLocalInitial.swift */; };
+		E92E9953BAE8BEE7763B7F0A /* PairingHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92BF0B8F8EA3F13BDAD751E /* PairingHelper.swift */; };
+		E92FB70D518F54288FA4441E /* PairPasswordOpen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92E50075FD3EE7B5EC11EEB /* PairPasswordOpen.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -112,8 +118,14 @@
 		D479084E27C581E400790A51 /* CallbackWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallbackWrapper.swift; sourceTree = "<group>"; };
 		D4BA975B27D60A2100012902 /* TestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestPlan.xctestplan; sourceTree = "<group>"; };
 		E9221D728E77EBE65E3D5868 /* TestDeviceDefinitions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestDeviceDefinitions.swift; sourceTree = "<group>"; };
+		E9256A8C5236863622AF32E4 /* PairLocalOpen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairLocalOpen.swift; sourceTree = "<group>"; };
+		E926E4A0D0B66C887B045430 /* PairPasswordInvite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairPasswordInvite.swift; sourceTree = "<group>"; };
+		E927EF296FB1B93512004057 /* PairAutomatic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairAutomatic.swift; sourceTree = "<group>"; };
+		E92A6CEAB3F96E4A6309B1D1 /* PairLocalInitial.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairLocalInitial.swift; sourceTree = "<group>"; };
+		E92BF0B8F8EA3F13BDAD751E /* PairingHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairingHelper.swift; sourceTree = "<group>"; };
 		E92CE3DEF30197BFA961376C /* PairingUtilTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairingUtilTests.swift; sourceTree = "<group>"; };
 		E92E1F3B78BE7B59AA656356 /* PairingUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairingUtil.swift; sourceTree = "<group>"; };
+		E92E50075FD3EE7B5EC11EEB /* PairPasswordOpen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairPasswordOpen.swift; sourceTree = "<group>"; };
 		F6A91DD14AB1C2318A089A9A /* Pods-NabtoEdgeClientTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClientTests.debug.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClientTests/Pods-NabtoEdgeClientTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -243,6 +255,12 @@
 				D479084E27C581E400790A51 /* CallbackWrapper.swift */,
 				D479084C27C581E400790A51 /* ClientImpl.swift */,
 				D479084D27C581E400790A51 /* Helper.swift */,
+				E92A6CEAB3F96E4A6309B1D1 /* PairLocalInitial.swift */,
+				E92BF0B8F8EA3F13BDAD751E /* PairingHelper.swift */,
+				E927EF296FB1B93512004057 /* PairAutomatic.swift */,
+				E9256A8C5236863622AF32E4 /* PairLocalOpen.swift */,
+				E92E50075FD3EE7B5EC11EEB /* PairPasswordOpen.swift */,
+				E926E4A0D0B66C887B045430 /* PairPasswordInvite.swift */,
 			);
 			path = impl;
 			sourceTree = "<group>";
@@ -513,6 +531,12 @@
 				D479084927C5803300790A51 /* CoapResponse.swift in Sources */,
 				D479085027C581E400790A51 /* Helper.swift in Sources */,
 				E92302F614DFF1CE2D44AF7A /* PairingUtil.swift in Sources */,
+				E92C4277079C65CA5BAF73B4 /* PairLocalInitial.swift in Sources */,
+				E92E9953BAE8BEE7763B7F0A /* PairingHelper.swift in Sources */,
+				E921A15EE02C1433B964AB09 /* PairAutomatic.swift in Sources */,
+				E92196AB502AB49408E4FC42 /* PairLocalOpen.swift in Sources */,
+				E92FB70D518F54288FA4441E /* PairPasswordOpen.swift in Sources */,
+				E92534ED04879ADC7039B5E3 /* PairPasswordInvite.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
