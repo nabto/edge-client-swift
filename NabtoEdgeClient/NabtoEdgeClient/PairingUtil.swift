@@ -167,7 +167,7 @@ class PairingUtil {
     }
 
     static public func pairLocalInitialAsync(connection: Connection, closure: @escaping AsyncPairingResultReceiver) {
-        PairLocalInitial(connection).executeAsync(connection, closure)
+        PairLocalInitial(connection).executeAsync(closure)
     }
 
     static public func pairPasswordOpen(connection: Connection, desiredUsername: String, password: String) throws {

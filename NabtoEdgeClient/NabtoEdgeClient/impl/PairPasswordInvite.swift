@@ -19,6 +19,7 @@ internal class PairPasswordInvite {
     }
 
     internal func execute() throws {
+        // TODO apply template method pattern
         try PairingHelper.invokePasswordBasedPairing(
                 connection: connection,
                 path: self.path,

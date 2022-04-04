@@ -19,6 +19,7 @@ internal class PairPasswordOpen {
     }
 
     internal func execute() throws {
+        // TODO apply template method pattern
         let cbor = try PairingUser(username: self.desiredUsername).encode()
         try PairingHelper.invokePasswordBasedPairing(
                 connection: self.connection,
