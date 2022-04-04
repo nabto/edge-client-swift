@@ -392,9 +392,7 @@ class PairingUtil {
                 connection: connection,
                 username: username,
                 parameter: "password",
-                value: password,
-                fourOhFourMapping: PairingError.USER_DOES_NOT_EXIST
-        )
+                value: password)
     }
 
     static public func updateUserSetRole(connection: Connection,
@@ -406,8 +404,7 @@ class PairingUtil {
                 parameter: "role",
                 value: role,
                 // user was just created - so ambiguous 404 is most likely due to missing role (... unless race condition)
-                fourOhFourMapping: PairingError.ROLE_DOES_NOT_EXIST
-        )
+                fourOhFourMapping: PairingError.ROLE_DOES_NOT_EXIST)
     }
 
     static public func updateUserSetDisplayName(connection: Connection,
@@ -417,9 +414,7 @@ class PairingUtil {
                 connection: connection,
                 username: username,
                 parameter: "display-name",
-                value: displayName,
-                fourOhFourMapping: PairingError.USER_DOES_NOT_EXIST
-        )
+                value: displayName)
     }
 
     static public func renameUser(connection: Connection,
@@ -429,17 +424,14 @@ class PairingUtil {
                 connection: connection,
                 username: username,
                 parameter: "username",
-                value: newUsername,
-                // user was just created - so ambiguous 404 is most likely due to missing role (... unless race condition)
-                fourOhFourMapping: PairingError.ROLE_DOES_NOT_EXIST
-        )
+                value: newUsername)
     }
 
     static private func updateUser(connection: Connection,
                                    username: String,
                                    parameter: String,
                                    value: String,
-                                   fourOhFourMapping: PairingError) throws {
+                                   fourOhFourMapping: PairingError=PairingError.USER_DOES_NOT_EXIST) throws {
         let encoder = CBOREncoder()
         let cborRequest: Data = try encoder.encode(value)
         do {

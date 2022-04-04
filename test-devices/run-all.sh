@@ -13,8 +13,8 @@ function run {
 
 run localPairLocalOpen &
 run localPairLocalInitial &
+run localPairPasswordOpen &
 run localPasswordPairingDisabledConfig &
-run localPasswordProtectedDevice &
 run localPasswordInvite &
 
 ./simple_mdns_device_macos pr-mdns de-mdns swift-test-subtype swift-txt-key swift-txt-val
