@@ -171,10 +171,19 @@ class PairingUtil {
     }
 
     static public func pairPasswordOpen(connection: Connection, desiredUsername: String, password: String) throws {
+        try PairPasswordOpen(connection: connection, desiredUsername: desiredUsername, password: password)
+                .execute()
+    }
+
+    static public func pairPasswordOpenAsync(
+            connection: Connection,
+            desiredUsername: String,
+            password: String,
+            closure: @escaping AsyncPairingResultReceiver) throws {
         try PairPasswordOpen(
                 connection: connection,
                 desiredUsername: desiredUsername,
-                password: password).execute()
+                password: password).executeAsync(closure)
     }
 
     /**

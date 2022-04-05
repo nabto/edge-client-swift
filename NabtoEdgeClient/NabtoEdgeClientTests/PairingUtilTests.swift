@@ -42,7 +42,7 @@ class PairingUtilTests_HostedTestDevices : NabtoEdgeClientTestBase {
     func testPasswordOpen_InvalidUsername() throws {
         try super.connect(self.testDevices.passwordProtectedDevice)
         XCTAssertThrowsError(try PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: "foo bar baz", password: "open-password")) { error in
-            XCTAssertEqual(error as! PairingError, PairingError.INVALID_INPUT)
+            XCTAssertEqual(error as? PairingError, PairingError.INVALID_INPUT)
         }
     }
 
@@ -52,14 +52,14 @@ class PairingUtilTests_HostedTestDevices : NabtoEdgeClientTestBase {
         let username = uniqueUser()
         try PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: username, password: device.password)
         XCTAssertThrowsError(try PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: username, password: device.password)) { error in
-            XCTAssertEqual(error as! PairingError, PairingError.USERNAME_EXISTS)
+            XCTAssertEqual(error as? PairingError, PairingError.USERNAME_EXISTS)
         }
     }
 
     func testPasswordOpen_InvalidPassword() throws {
         try super.connect(self.testDevices.passwordProtectedDevice)
         XCTAssertThrowsError(try PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: uniqueUser(), password: "wrong-password")) { error in
-            XCTAssertEqual(error as! PairingError, PairingError.AUTHENTICATION_ERROR)
+            XCTAssertEqual(error as? PairingError, PairingError.AUTHENTICATION_ERROR)
         }
     }
 }
@@ -93,7 +93,7 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
         let device = self.testDevices.localPasswordPairingDisabledConfig
         try super.connect(device)
         XCTAssertThrowsError(try PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: uniqueUser(), password: device.password)) { error in
-            XCTAssertEqual(error as! PairingError, PairingError.BLOCKED_BY_DEVICE_CONFIGURATION)
+            XCTAssertEqual(error as? PairingError, PairingError.BLOCKED_BY_DEVICE_CONFIGURATION)
         }
     }
 
@@ -108,7 +108,7 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
     func testLocalOpen_InvalidUsername() throws {
         try self.connect(self.testDevices.localPairLocalOpen)
         XCTAssertThrowsError(try PairingUtil.pairLocalOpen(connection: self.connection, desiredUsername: "foo bar baz")) { error in
-            XCTAssertEqual(error as! PairingError, PairingError.INVALID_INPUT)
+            XCTAssertEqual(error as? PairingError, PairingError.INVALID_INPUT)
         }
     }
 
@@ -118,7 +118,7 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
         let username = uniqueUser()
         try PairingUtil.pairLocalOpen(connection: self.connection, desiredUsername: username)
         XCTAssertThrowsError(try PairingUtil.pairLocalOpen(connection: self.connection, desiredUsername: username)) { error in
-            XCTAssertEqual(error as! PairingError, PairingError.USERNAME_EXISTS)
+            XCTAssertEqual(error as? PairingError, PairingError.USERNAME_EXISTS)
         }
     }
 
@@ -126,7 +126,7 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
         let device = self.testDevices.localPasswordPairingDisabledConfig
         try super.connect(device)
         XCTAssertThrowsError(try PairingUtil.pairLocalOpen(connection: self.connection, desiredUsername: uniqueUser())) { error in
-            XCTAssertEqual(error as! PairingError, PairingError.PAIRING_MODE_DISABLED)
+            XCTAssertEqual(error as? PairingError, PairingError.PAIRING_MODE_DISABLED)
         }
     }
 
@@ -172,7 +172,7 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
         self.connection = try client.createConnection()
         try self.connect(device)
         XCTAssertThrowsError(try PairingUtil.pairPasswordInvite(connection: self.connection, username: "wrongusername", password: guestPassword))  { error in
-            XCTAssertEqual(error as! PairingError, PairingError.AUTHENTICATION_ERROR)
+            XCTAssertEqual(error as? PairingError, PairingError.AUTHENTICATION_ERROR)
         }
     }
 
@@ -190,7 +190,7 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
                         password: guestPassword,
                         role: "unexistingrole"))
         { error in
-            XCTAssertEqual(error as! PairingError, PairingError.ROLE_DOES_NOT_EXIST)
+            XCTAssertEqual(error as? PairingError, PairingError.ROLE_DOES_NOT_EXIST)
         }
     }
 
@@ -199,7 +199,7 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
         try super.connect(device)
         XCTAssertFalse(try PairingUtil.isCurrentUserPaired(connection: self.connection))
         XCTAssertThrowsError(try PairingUtil.getCurrentUser(connection: self.connection)) { error in
-            XCTAssertEqual(error as! PairingError, PairingError.USER_IS_NOT_PAIRED)
+            XCTAssertEqual(error as? PairingError, PairingError.USER_IS_NOT_PAIRED)
         }
     }
 
@@ -226,7 +226,7 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
 
         // guest is not allowed to get admin user
         XCTAssertThrowsError(try PairingUtil.getUser(connection: self.connection, username: admin)) { error in
-            XCTAssertEqual(error as! PairingError, PairingError.BLOCKED_BY_DEVICE_CONFIGURATION)
+            XCTAssertEqual(error as? PairingError, PairingError.BLOCKED_BY_DEVICE_CONFIGURATION)
         }
 
         // guest can get self

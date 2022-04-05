@@ -5,16 +5,23 @@
 import Foundation
 
 internal protocol PairAbstractProtocol {
+
+    typealias SyncHook = () throws -> ()
+    typealias AsyncHook = (@escaping AsyncStatusReceiver) -> Void
+
     func mapStatus(status: UInt16?) -> PairingError
     var method: String { get }
     var path: String { get }
     var connection: Connection { get }
     var cbor: Data? { get }
+    var hookBeforeCoap: SyncHook? { get }
+    var asyncHookBeforeCoap: AsyncHook? { get }
 }
 
 extension PairAbstractProtocol {
 
     func execute() throws {
+        try self.hookBeforeCoap?()
         do {
             let coap = try createCoapRequest(connection: connection)
             if let cbor = cbor {
@@ -26,11 +33,25 @@ extension PairAbstractProtocol {
                 throw error
             }
         } catch {
-            try PairingHelper.rethrowPairingError(error)
+            try PairingHelper.throwPairingError(error)
         }
     }
 
     internal func executeAsync(_ closure: @escaping AsyncPairingResultReceiver) {
+        if (self.asyncHookBeforeCoap != nil) {
+            self.asyncHookBeforeCoap! { error in
+                if (error == NabtoEdgeClientError.OK) {
+                    self.executeAsyncImpl(closure)
+                } else {
+                    PairingHelper.invokePairingErrorHandler(error, closure)
+                }
+            }
+        } else {
+            self.executeAsyncImpl(closure)
+        }
+    }
+
+    internal func executeAsyncImpl(_ closure: @escaping AsyncPairingResultReceiver) {
         do {
             let coap = try createCoapRequest(connection: connection)
             if let cbor = cbor {

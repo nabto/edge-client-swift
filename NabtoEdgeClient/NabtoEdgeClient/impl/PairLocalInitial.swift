@@ -9,6 +9,8 @@ internal class PairLocalInitial : PairAbstractProtocol {
     private(set) var path: String = "/iam/pairing/local-initial"
     private(set) var connection: Connection
     private(set) var cbor: Data? = nil
+    private(set) var hookBeforeCoap: SyncHook? = nil
+    private(set) var asyncHookBeforeCoap: AsyncHook? = nil
 
     func mapStatus(status: UInt16?) -> PairingError {
         guard let status = status else {

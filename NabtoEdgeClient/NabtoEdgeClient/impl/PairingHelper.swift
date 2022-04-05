@@ -5,7 +5,7 @@
 import Foundation
 
 internal class PairingHelper {
-    static internal func rethrowPairingError(_ error: Error) throws {
+    static internal func throwPairingError(_ error: Error) throws {
         if let pairingError = error as? PairingError {
             throw pairingError
         } else if let apiError = error as? NabtoEdgeClientError {
