@@ -5,11 +5,16 @@
 import Foundation
 
 internal class PairingHelper {
+
     static internal func throwPairingError(_ error: Error) throws {
         if let pairingError = error as? PairingError {
             throw pairingError
         } else if let apiError = error as? NabtoEdgeClientError {
-            throw PairingError.API_ERROR(cause: apiError)
+            if (apiError == .UNAUTHORIZED) {
+                throw PairingError.AUTHENTICATION_ERROR
+            } else {
+                throw PairingError.API_ERROR(cause: apiError)
+            }
         }
         throw PairingError.FAILED
     }
@@ -18,9 +23,14 @@ internal class PairingHelper {
         if let pairingError = error as? PairingError {
             closure(pairingError)
         } else if let apiError = error as? NabtoEdgeClientError {
-            closure(PairingError.API_ERROR(cause: apiError))
+            if (apiError == .UNAUTHORIZED) {
+                closure(PairingError.AUTHENTICATION_ERROR)
+            } else {
+                closure(PairingError.API_ERROR(cause: apiError))
+            }
+        } else {
+            closure(PairingError.FAILED)
         }
-        closure(PairingError.FAILED)
     }
 
     // XXX move out?

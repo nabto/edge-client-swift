@@ -21,8 +21,8 @@ internal protocol PairAbstractProtocol {
 extension PairAbstractProtocol {
 
     func execute() throws {
-        try self.hookBeforeCoap?()
         do {
+            try self.hookBeforeCoap?()
             let coap = try createCoapRequest(connection: connection)
             if let cbor = cbor {
                 try coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: cbor)

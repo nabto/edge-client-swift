@@ -81,6 +81,13 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
         try PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: uniqueUser(), password: device.password)
     }
 
+    func testPasswordOpen_InvalidPassword() throws {
+        try super.connect(self.testDevices.localPairPasswordOpen)
+        XCTAssertThrowsError(try PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: uniqueUser(), password: "wrong-password")) { error in
+            XCTAssertEqual(error as? PairingError, PairingError.AUTHENTICATION_ERROR)
+        }
+    }
+
     func testPasswordOpen_BlockedByDeviceIamConfig() throws {
         // This device has open password pairing disabled in IAM config (not state) - hence expect
         // BLOCKED_BY_DEVICE_CONFIGURATION and not AUTHENTICATION_ERROR.
@@ -96,6 +103,90 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
             XCTAssertEqual(error as? PairingError, PairingError.BLOCKED_BY_DEVICE_CONFIGURATION)
         }
     }
+
+    func testPasswordOpen_Async_Success() throws {
+        let device = self.testDevices.localPairPasswordOpen
+        try super.connect(device)
+        let exp = XCTestExpectation(description: "pairing done")
+        var err: PairingError? = nil
+        try PairingUtil.pairPasswordOpenAsync(
+                connection: self.connection,
+                desiredUsername: uniqueUser(),
+                password: device.password) { error in
+            err = error
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 2.0)
+        XCTAssertNotNil(err)
+        XCTAssertEqual(err , PairingError.OK)
+    }
+
+    func testPasswordOpen_Async_InvalidInput() throws {
+        let device = self.testDevices.localPairPasswordOpen
+        try super.connect(device)
+        let exp = XCTestExpectation(description: "pairing done")
+        var err: PairingError? = nil
+        try PairingUtil.pairPasswordOpenAsync(
+                connection: self.connection,
+                desiredUsername: "",
+                password: device.password) { error in
+            err = error
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 2.0)
+        XCTAssertNotNil(err)
+        XCTAssertEqual(err , PairingError.INVALID_INPUT)
+    }
+
+    func testPasswordOpen_Async_AuthFail_XXX_FAILS_WITH_STOPPED() throws {
+        let device = self.testDevices.localPairPasswordOpen
+        try super.connect(device)
+        let exp = XCTestExpectation(description: "pairing done")
+        var err: PairingError? = nil
+        try PairingUtil.pairPasswordOpenAsync(
+                connection: self.connection,
+                desiredUsername: uniqueUser(),
+                password: "wrong-password") { error in
+            err = error
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 2.0)
+        XCTAssertNotNil(err)
+        XCTAssertEqual(err , PairingError.AUTHENTICATION_ERROR)
+    }
+
+    func testPasswordOpen_Async_AuthFail() throws {
+        let device = self.testDevices.localPairPasswordOpen
+
+        let client = Client()
+        try client.setLogLevel(level: "trace")
+        client.enableNsLogLogging()
+
+        let key = try client.createPrivateKey()
+        let connection = try client.createConnection()
+        try connection.setPrivateKey(key: key)
+        try connection.updateOptions(json: device.asJson())
+        try connection.connect()
+
+        let exp = XCTestExpectation(description: "pairing done")
+        var err: PairingError? = nil
+//        try PairingUtil.pairPasswordOpen(
+//                connection: connection,
+//                desiredUsername: uniqueUser(),
+//                password: "wrong-passwword")
+//        exp.fulfill()
+        try PairingUtil.pairPasswordOpenAsync(
+                connection: connection,
+                desiredUsername: uniqueUser(),
+                password: "wrong-password") { error in
+            err = error
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 2.0)
+        XCTAssertNotNil(err)
+        XCTAssertEqual(err , PairingError.AUTHENTICATION_ERROR)
+    }
+
 
     func testLocalOpen_Success() throws {
         let device = self.testDevices.localPairLocalOpen
@@ -128,6 +219,38 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
         XCTAssertThrowsError(try PairingUtil.pairLocalOpen(connection: self.connection, desiredUsername: uniqueUser())) { error in
             XCTAssertEqual(error as? PairingError, PairingError.PAIRING_MODE_DISABLED)
         }
+    }
+
+    func testLocalOpen_Async_Success() throws {
+        let device = self.testDevices.localPairLocalOpen
+        try super.connect(device)
+        let exp = XCTestExpectation(description: "pairing done")
+        var err: PairingError? = nil
+        try PairingUtil.pairLocalOpenAsync(
+                connection: self.connection,
+                desiredUsername: uniqueUser()) { error in
+            err = error
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 2.0)
+        XCTAssertNotNil(err)
+        XCTAssertEqual(err , PairingError.OK)
+    }
+
+    func testLocalOpen_Async_Fail() throws {
+        let device = self.testDevices.localPairLocalOpen
+        try super.connect(device)
+        let exp = XCTestExpectation(description: "pairing done")
+        var err: PairingError? = nil
+        try PairingUtil.pairLocalOpenAsync(
+                connection: self.connection,
+                desiredUsername: "") { error in
+            err = error
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 2.0)
+        XCTAssertNotNil(err)
+        XCTAssertEqual(err , PairingError.INVALID_INPUT)
     }
 
     func testPasswordInvite_Success() throws {

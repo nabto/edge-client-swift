@@ -162,6 +162,13 @@ class PairingUtil {
         try PairLocalOpen(connection, desiredUsername).execute()
     }
 
+    static public func pairLocalOpenAsync(
+            connection: Connection,
+            desiredUsername: String,
+            closure: @escaping AsyncPairingResultReceiver) throws {
+        try PairLocalOpen(connection, desiredUsername).executeAsync(closure)
+    }
+
     static public func pairLocalInitial(connection: Connection) throws {
         try PairLocalInitial(connection).execute()
     }
@@ -195,6 +202,16 @@ class PairingUtil {
                 connection: connection,
                 username: username,
                 password: password).execute()
+    }
+
+    static public func pairPasswordInviteAsync(connection: Connection,
+                                               username: String,
+                                               password: String,
+                                               closure: @escaping AsyncPairingResultReceiver) throws {
+        try PairPasswordInvite(
+                connection: connection,
+                username: username,
+                password: password).executeAsync(closure)
     }
 
     static public func isCurrentUserPaired(connection: Connection) throws -> Bool {
