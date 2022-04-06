@@ -39,6 +39,8 @@ public indirect enum NabtoEdgeClientError: Error, Equatable {
     case UNKNOWN_DEVICE_ID
     case UNKNOWN_PRODUCT_ID
     case UNKNOWN_SERVER_KEY
+    case API_UNKNOWN_ERROR
+    case TOO_MANY_WRONG_PASSWORD_ATTEMPTS
 
     case FAILED
     case FAILED_WITH_DETAIL(detail: String)

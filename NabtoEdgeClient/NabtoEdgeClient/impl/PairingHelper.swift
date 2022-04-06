@@ -6,15 +6,19 @@ import Foundation
 
 internal class PairingHelper {
 
+    static internal func mapApiError(_ error: NabtoEdgeClientError) -> PairingError {
+        switch (error) {
+        case NabtoEdgeClientError.UNAUTHORIZED: return PairingError.AUTHENTICATION_ERROR
+        case NabtoEdgeClientError.TOO_MANY_WRONG_PASSWORD_ATTEMPTS: return PairingError.TOO_MANY_WRONG_PASSWORD_ATTEMPTS
+        default: return PairingError.API_ERROR(cause: error)
+        }
+    }
+
     static internal func throwPairingError(_ error: Error) throws {
         if let pairingError = error as? PairingError {
             throw pairingError
         } else if let apiError = error as? NabtoEdgeClientError {
-            if (apiError == .UNAUTHORIZED) {
-                throw PairingError.AUTHENTICATION_ERROR
-            } else {
-                throw PairingError.API_ERROR(cause: apiError)
-            }
+            throw mapApiError(apiError)
         }
         throw PairingError.FAILED
     }
@@ -23,51 +27,9 @@ internal class PairingHelper {
         if let pairingError = error as? PairingError {
             closure(pairingError)
         } else if let apiError = error as? NabtoEdgeClientError {
-            if (apiError == .UNAUTHORIZED) {
-                closure(PairingError.AUTHENTICATION_ERROR)
-            } else {
-                closure(PairingError.API_ERROR(cause: apiError))
-            }
+            closure(mapApiError(apiError))
         } else {
             closure(PairingError.FAILED)
         }
     }
-
-    // XXX move out?
-    static internal func invokePasswordBasedPairing(connection: Connection,
-                                                   path: String,
-                                                   username: String,
-                                                   password: String,
-                                                   data: Data? = nil) throws {
-        do {
-            try connection.passwordAuthenticate(username: username, password: password)
-            let coap = try connection.createCoapRequest(method: "POST", path: path)
-            if let data = data {
-                try coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: data)
-            }
-            let response = try coap.execute()
-            switch (response.status) {
-            case 201: break
-            case 400: throw PairingError.INVALID_INPUT
-            case 401: throw PairingError.FAILED                // never here
-            case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
-            case 404: throw PairingError.PAIRING_MODE_DISABLED // never here - authentication error above if not enabled
-            case 409: throw PairingError.USERNAME_EXISTS
-            default: throw PairingError.FAILED
-            }
-        } catch {
-            if let pairingError = error as? PairingError {
-                throw pairingError
-            } else if let apiError = error as? NabtoEdgeClientError {
-                if (apiError == .UNAUTHORIZED) {
-                    throw PairingError.AUTHENTICATION_ERROR
-                } else {
-                    throw PairingError.API_ERROR(cause: apiError)
-                }
-            } else {
-                throw PairingError.FAILED
-            }
-        }
-    }
-
 }

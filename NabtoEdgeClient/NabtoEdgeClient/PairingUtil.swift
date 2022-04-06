@@ -14,6 +14,7 @@ public enum PairingError: Error, Equatable {
     case INITIAL_USER_ALREADY_PAIRED
     case ROLE_DOES_NOT_EXIST
     case AUTHENTICATION_ERROR
+    case TOO_MANY_WRONG_PASSWORD_ATTEMPTS
     case PAIRING_MODE_DISABLED
     case BLOCKED_BY_DEVICE_CONFIGURATION
     case INVALID_RESPONSE(error: String)
