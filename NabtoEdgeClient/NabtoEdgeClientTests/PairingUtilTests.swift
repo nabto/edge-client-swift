@@ -428,7 +428,7 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
         opts.ProductId = device.productId
         opts.DeviceId = device.deviceId
         try connection.updateOptions(options: opts)
-        let connection = try PairingUtil.pairAutomatic(client: self.client, opts: opts)
+        let connection = try PairingUtil.pairAutomatic(client: self.client, opts: opts, desiredUsername: self.uniqueUser())
         XCTAssertTrue(try PairingUtil.isCurrentUserPaired(connection: connection))
         try self.resetLocalInitialPairingState(connection)
     }
@@ -442,7 +442,6 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
         opts.ServerKey = device.key
         opts.ProductId = device.productId
         opts.DeviceId = device.deviceId
-        try connection.updateOptions(options: opts)
         let connection = try PairingUtil.pairAutomatic(client: self.client, opts: opts, desiredUsername: self.uniqueUser())
         XCTAssertTrue(try PairingUtil.isCurrentUserPaired(connection: connection))
     }
@@ -455,12 +454,56 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
         opts.PrivateKey = try client.createPrivateKey()
         opts.ServerUrl = device.url
         opts.ServerKey = device.key
-        opts.ProductId = device.productId
-        opts.DeviceId = device.deviceId
-        try connection.updateOptions(options: opts)
         let connection = try PairingUtil.pairAutomatic(client: self.client, opts: opts, pairingString: pairingString, desiredUsername: self.uniqueUser())
         XCTAssertTrue(try PairingUtil.isCurrentUserPaired(connection: connection))
     }
+
+    func testPair_AutoPair_PairingString_MissingPassword() throws {
+        let device = self.testDevices.localPairPasswordOpen
+        let pairingString = "p=\(device.productId),d=\(device.deviceId),sct=\(device.sct!),sct=foo"
+        let opts = ConnectionOptions()
+        opts.PrivateKey = try client.createPrivateKey()
+        opts.ServerUrl = device.url
+        opts.ServerKey = device.key
+        opts.ProductId = device.productId
+        opts.DeviceId = device.deviceId
+        XCTAssertThrowsError(try PairingUtil.pairAutomatic(client: self.client, opts: opts,
+                pairingString: pairingString, desiredUsername: self.uniqueUser())) { error in
+            XCTAssertEqual(error as? PairingError, PairingError.INVALID_PAIRING_STRING(error: "missing element in pairing string"))
+        }
+    }
+
+    func testPair_AutoPair_PairingString_BadString_1() throws {
+        let device = self.testDevices.localPairPasswordOpen
+        let pairingString = ""
+        let opts = ConnectionOptions()
+        XCTAssertThrowsError(try PairingUtil.pairAutomatic(client: self.client, opts: opts,
+                pairingString: pairingString, desiredUsername: self.uniqueUser())) { error in
+            XCTAssertEqual(error as? PairingError, PairingError.INVALID_PAIRING_STRING(error: "unexpected number of elements"))
+        }
+    }
+
+    func testPair_AutoPair_PairingString_BadString_2() throws {
+        let device = self.testDevices.localPairPasswordOpen
+        let pairingString = "p=p,d=d,pwd=pwd,sct=sct,foo=bar"
+        let opts = ConnectionOptions()
+        XCTAssertThrowsError(try PairingUtil.pairAutomatic(client: self.client, opts: opts,
+                pairingString: pairingString, desiredUsername: self.uniqueUser())) { error in
+            XCTAssertEqual(error as? PairingError, PairingError.INVALID_PAIRING_STRING(error: "unexpected number of elements"))
+        }
+    }
+
+    func testPair_AutoPair_PairingString_BadString_3() throws {
+        let device = self.testDevices.localPairPasswordOpen
+        let pairingString = "p=p,d=d,pwd=pwd,xxx=sct"
+        let opts = ConnectionOptions()
+        XCTAssertThrowsError(try PairingUtil.pairAutomatic(client: self.client, opts: opts,
+                pairingString: pairingString, desiredUsername: self.uniqueUser())) { error in
+            XCTAssertEqual(error as? PairingError, PairingError.INVALID_PAIRING_STRING(error: "unexpected element xxx"))
+        }
+    }
+
+    // todo - test autopair async
 
     func testGetDeviceDetails() throws {
         let client = Client()

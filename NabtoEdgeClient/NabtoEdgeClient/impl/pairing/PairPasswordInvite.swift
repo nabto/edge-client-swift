@@ -18,8 +18,8 @@ internal class PairPasswordInvite : PairAbstractProtocol {
         self.hookBeforeCoap = {
             try connection.passwordAuthenticate(username: username, password: password)
         }
-        self.asyncHookBeforeCoap = { closure in
-            connection.passwordAuthenticateAsync(username: username, password: password, closure: closure)
+        self.asyncHookBeforeCoap = { next in
+            connection.passwordAuthenticateAsync(username: username, password: password, closure: next)
         }
     }
 

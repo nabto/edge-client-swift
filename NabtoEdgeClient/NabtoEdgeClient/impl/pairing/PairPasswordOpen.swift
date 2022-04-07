@@ -19,8 +19,8 @@ internal class PairPasswordOpen : PairAbstractProtocol {
         self.hookBeforeCoap = {
             try connection.passwordAuthenticate(username: "", password: password)
         }
-        self.asyncHookBeforeCoap = { closure in
-            connection.passwordAuthenticateAsync(username: "", password: password, closure: closure)
+        self.asyncHookBeforeCoap = { next in
+            connection.passwordAuthenticateAsync(username: "", password: password, closure: next)
         }
     }
 

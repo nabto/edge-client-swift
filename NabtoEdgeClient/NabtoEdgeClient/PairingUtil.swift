@@ -31,6 +31,7 @@ public enum PairingMode {
 }
 
 public typealias AsyncPairingResultReceiver = (PairingError) -> Void
+public typealias AsyncPairingResultReceiverWithConnection = (PairingError, Connection?) -> Void
 
 // upper camelcase field names breaks standard Swift style - they match
 // the key names in the CBOR string map for the "CoAP GET /iam/me" service
