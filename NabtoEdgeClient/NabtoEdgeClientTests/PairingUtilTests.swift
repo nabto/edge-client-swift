@@ -47,7 +47,7 @@ class PairingUtilTests_HostedTestDevices : NabtoEdgeClientTestBase {
     }
 
     func testPasswordOpen_UsernameExists() throws {
-        let device = self.testDevices.localPairPasswordOpen
+        let device = self.testDevices.passwordProtectedDevice
         try super.connect(device)
         let username = uniqueUser()
         try PairingUtil.pairPasswordOpen(connection: self.connection, desiredUsername: username, password: device.password)
