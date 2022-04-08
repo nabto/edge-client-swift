@@ -458,6 +458,29 @@ class PairingUtilTests_LocalTestDevices : NabtoEdgeClientTestBase {
         XCTAssertTrue(try PairingUtil.isCurrentUserPaired(connection: connection))
     }
 
+    func testPair_AutoPair_PairingString_Success_Async() throws {
+        let device = self.testDevices.localPairPasswordOpen
+        let pairingString = "p=\(device.productId),d=\(device.deviceId),pwd=\(device.password!),sct=\(device.sct!)"
+        try self.enableLogging(self.client)
+        let opts = ConnectionOptions()
+        opts.PrivateKey = try client.createPrivateKey()
+        opts.ServerUrl = device.url
+        opts.ServerKey = device.key
+        var conn: Connection!
+        var err: Error?
+        let exp = XCTestExpectation(description: "pairing done")
+        PairingUtil.pairAutomaticAsync(client: self.client, opts: opts, pairingString: pairingString, desiredUsername: self.uniqueUser()) { error, connection in
+            err = error
+            conn = connection
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 2.0)
+        XCTAssertNotNil(err)
+        XCTAssertEqual(err as? PairingError, PairingError.OK)
+        XCTAssertNotNil(conn)
+        XCTAssertTrue(try PairingUtil.isCurrentUserPaired(connection: conn))
+    }
+
     func testPair_AutoPair_PairingString_MissingPassword() throws {
         let device = self.testDevices.localPairPasswordOpen
         let pairingString = "p=\(device.productId),d=\(device.deviceId),sct=\(device.sct!),sct=foo"

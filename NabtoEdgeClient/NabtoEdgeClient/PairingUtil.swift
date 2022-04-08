@@ -130,34 +130,16 @@ class PairingUtil {
                 desiredUsername: desiredUsername).execute()
     }
 
-    static public func getDeviceDetails(connection: Connection) throws -> DeviceDetails {
-        do {
-            let coap = try connection.createCoapRequest(method: "GET", path: "/iam/pairing")
-            let response = try coap.execute()
-            switch (response.status) {
-            case 205: break
-            case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
-            default: throw PairingError.FAILED
-            }
-            return try DeviceDetails.decode(cbor: response.payload)
-        } catch {
-            try rethrowPairingError(error)
-            // swift 5.6 compiler error about missing return. grmbl.
-            return DeviceDetails(Modes: [], NabtoVersion: "", AppVersion: "", AppName: "", ProductId: "", DeviceId: "")
-        }
-    }
-
-    static public func getAvailablePairingModes(connection: Connection) throws -> [PairingMode] {
-        let details = try getDeviceDetails(connection: connection)
-        return try details.Modes.map { s -> PairingMode in
-            switch s {
-            case "LocalInitial": return .LocalInitial
-            case "LocalOpen": return .LocalOpen
-            case "PasswordInvite": return .PasswordInvite
-            case "PasswordOpen": return .PasswordOpen
-            default: throw PairingError.INVALID_RESPONSE(error: "pairing mode '\(s)'")
-            }
-        }
+    static public func pairAutomaticAsync(client: Client,
+                                          opts: ConnectionOptions,
+                                          pairingString: String?=nil,
+                                          desiredUsername: String?=nil,
+                                          closure: @escaping AsyncPairingResultReceiverWithConnection) {
+        PairAutomatic(
+                client: client,
+                opts: opts,
+                pairingString: pairingString,
+                desiredUsername: desiredUsername).executeAsync(closure)
     }
 
     static public func pairLocalOpen(connection: Connection, desiredUsername: String) throws {
@@ -214,6 +196,36 @@ class PairingUtil {
                 connection: connection,
                 username: username,
                 password: password).executeAsync(closure)
+    }
+
+    static public func getAvailablePairingModes(connection: Connection) throws -> [PairingMode] {
+        let details = try getDeviceDetails(connection: connection)
+        return try details.Modes.map { s -> PairingMode in
+            switch s {
+            case "LocalInitial": return .LocalInitial
+            case "LocalOpen": return .LocalOpen
+            case "PasswordInvite": return .PasswordInvite
+            case "PasswordOpen": return .PasswordOpen
+            default: throw PairingError.INVALID_RESPONSE(error: "pairing mode '\(s)'")
+            }
+        }
+    }
+
+    static public func getDeviceDetails(connection: Connection) throws -> DeviceDetails {
+        do {
+            let coap = try connection.createCoapRequest(method: "GET", path: "/iam/pairing")
+            let response = try coap.execute()
+            switch (response.status) {
+            case 205: break
+            case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
+            default: throw PairingError.FAILED
+            }
+            return try DeviceDetails.decode(cbor: response.payload)
+        } catch {
+            try rethrowPairingError(error)
+            // swift 5.6 compiler error about missing return. grmbl.
+            return DeviceDetails(Modes: [], NabtoVersion: "", AppVersion: "", AppName: "", ProductId: "", DeviceId: "")
+        }
     }
 
     static public func isCurrentUserPaired(connection: Connection) throws -> Bool {
