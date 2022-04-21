@@ -5,7 +5,7 @@
 import Foundation
 import CBORCoding
 
-public enum PairingError: Error, Equatable {
+public enum IamError: Error, Equatable {
     case OK
     case INVALID_INPUT
     case USERNAME_EXISTS
@@ -30,13 +30,13 @@ public enum PairingMode {
     case PasswordInvite
 }
 
-public typealias AsyncPairingResultReceiver = (PairingError) -> Void
-public typealias AsyncPairingResultReceiverWithConnection = (PairingError, Connection?) -> Void
+public typealias AsyncPairingResultReceiver = (IamError) -> Void
+public typealias AsyncPairingResultReceiverWithConnection = (IamError, Connection?) -> Void
 
 // upper camelcase field names breaks standard Swift style - they match
 // the key names in the CBOR string map for the "CoAP GET /iam/me" service
 // https://docs.nabto.com/developer/api-reference/coap/iam/me.html
-public struct PairingUser: Codable {
+public struct IamUser: Codable {
     let Username: String
     let DisplayName: String?
     let Fingerprint: String?
@@ -51,12 +51,12 @@ public struct PairingUser: Codable {
         self.Role = role
     }
 
-    static func decode(cbor: Data) throws -> PairingUser {
+    static func decode(cbor: Data) throws -> IamUser {
         let decoder = CBORDecoder()
         do {
-            return try decoder.decode(PairingUser.self, from: cbor)
+            return try decoder.decode(IamUser.self, from: cbor)
         } catch {
-            throw PairingError.INVALID_RESPONSE(error: "\(error)")
+            throw IamError.INVALID_RESPONSE(error: "\(error)")
         }
     }
 
@@ -65,7 +65,7 @@ public struct PairingUser: Codable {
         do {
             return try encoder.encode(self)
         } catch {
-            throw PairingError.INVALID_INPUT
+            throw IamError.INVALID_INPUT
         }
     }
 
@@ -103,7 +103,7 @@ public struct DeviceDetails: Codable {
         do {
             return try decoder.decode(DeviceDetails.self, from: cbor)
         } catch {
-            throw PairingError.INVALID_RESPONSE(error: "\(error)")
+            throw IamError.INVALID_RESPONSE(error: "\(error)")
         }
     }
 
@@ -112,35 +112,12 @@ public struct DeviceDetails: Codable {
         do {
             return try encoder.encode(self)
         } catch {
-            throw PairingError.INVALID_INPUT
+            throw IamError.INVALID_INPUT
         }
     }
 }
 
-class PairingUtil {
-
-    static public func pairAutomatic(client: Client,
-                                     opts: ConnectionOptions,
-                                     pairingString: String?=nil,
-                                     desiredUsername: String?=nil) throws -> Connection {
-        try PairAutomatic(
-                client: client,
-                opts: opts,
-                pairingString: pairingString,
-                desiredUsername: desiredUsername).execute()
-    }
-
-    static public func pairAutomaticAsync(client: Client,
-                                          opts: ConnectionOptions,
-                                          pairingString: String?=nil,
-                                          desiredUsername: String?=nil,
-                                          closure: @escaping AsyncPairingResultReceiverWithConnection) {
-        PairAutomatic(
-                client: client,
-                opts: opts,
-                pairingString: pairingString,
-                desiredUsername: desiredUsername).executeAsync(closure)
-    }
+class IamUtil {
 
     static public func pairLocalOpen(connection: Connection, desiredUsername: String) throws {
         try PairLocalOpen(connection, desiredUsername).execute()
@@ -206,7 +183,7 @@ class PairingUtil {
             case "LocalOpen": return .LocalOpen
             case "PasswordInvite": return .PasswordInvite
             case "PasswordOpen": return .PasswordOpen
-            default: throw PairingError.INVALID_RESPONSE(error: "pairing mode '\(s)'")
+            default: throw IamError.INVALID_RESPONSE(error: "pairing mode '\(s)'")
             }
         }
     }
@@ -217,8 +194,8 @@ class PairingUtil {
             let response = try coap.execute()
             switch (response.status) {
             case 205: break
-            case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
-            default: throw PairingError.FAILED
+            case 403: throw IamError.BLOCKED_BY_DEVICE_CONFIGURATION
+            default: throw IamError.FAILED
             }
             return try DeviceDetails.decode(cbor: response.payload)
         } catch {
@@ -232,7 +209,7 @@ class PairingUtil {
         do {
             _ = try self.getCurrentUser(connection: connection)
         } catch {
-            if let pairingError = error as? PairingError {
+            if let pairingError = error as? IamError {
                 if (pairingError == .USER_IS_NOT_PAIRED) {
                     return false
                 }
@@ -242,36 +219,36 @@ class PairingUtil {
         return true
     }
 
-    static public func getUser(connection: Connection, username: String) throws -> PairingUser {
+    static public func getUser(connection: Connection, username: String) throws -> IamUser {
         do {
             let coap = try connection.createCoapRequest(method: "GET", path: "/iam/users/\(username)")
             let response = try coap.execute()
             switch (response.status) {
             case 205: break
-            case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
-            case 404: throw PairingError.USER_DOES_NOT_EXIST
-            default: throw PairingError.FAILED
+            case 403: throw IamError.BLOCKED_BY_DEVICE_CONFIGURATION
+            case 404: throw IamError.USER_DOES_NOT_EXIST
+            default: throw IamError.FAILED
             }
-            return try PairingUser.decode(cbor: response.payload)
+            return try IamUser.decode(cbor: response.payload)
         } catch {
             try rethrowPairingError(error)
-            return PairingUser(username: "swift 5.6 compiler error about missing return if not including this line")
+            return IamUser(username: "swift 5.6 compiler error about missing return if not including this line")
         }
     }
 
-    static public func getCurrentUser(connection: Connection) throws -> PairingUser {
+    static public func getCurrentUser(connection: Connection) throws -> IamUser {
         do {
             let coap = try connection.createCoapRequest(method: "GET", path: "/iam/me")
             let response = try coap.execute()
             switch (response.status) {
             case 205: break
-            case 404: throw PairingError.USER_IS_NOT_PAIRED
-            default: throw PairingError.FAILED
+            case 404: throw IamError.USER_IS_NOT_PAIRED
+            default: throw IamError.FAILED
             }
-            return try PairingUser.decode(cbor: response.payload)
+            return try IamUser.decode(cbor: response.payload)
         } catch {
             try rethrowPairingError(error)
-            return PairingUser(username: "swift 5.6 compiler error about missing return if not including this line")
+            return IamUser(username: "swift 5.6 compiler error about missing return if not including this line")
         }
     }
 
@@ -281,8 +258,8 @@ class PairingUtil {
             let response = try coap.execute()
             switch (response.status) {
             case 202: break
-            case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
-            default: throw PairingError.FAILED
+            case 403: throw IamError.BLOCKED_BY_DEVICE_CONFIGURATION
+            default: throw IamError.FAILED
             }
         } catch {
             try rethrowPairingError(error)
@@ -293,8 +270,8 @@ class PairingUtil {
                                                      username: String,
                                                      password: String,
                                                      role: String) throws {
-        let user: PairingUser
-        let cborRequest = try PairingUser(username: username).encode()
+        let user: IamUser
+        let cborRequest = try IamUser(username: username).encode()
         do {
             // https://docs.nabto.com/developer/api-reference/coap/iam/post-users.html
             let coap = try connection.createCoapRequest(method: "POST", path: "/iam/users")
@@ -302,14 +279,14 @@ class PairingUtil {
             let response = try coap.execute()
             switch (response.status) {
             case 201: break
-            case 400: throw PairingError.INVALID_INPUT
-            case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
-            case 409: throw PairingError.USERNAME_EXISTS
-            default: throw PairingError.FAILED
+            case 400: throw IamError.INVALID_INPUT
+            case 403: throw IamError.BLOCKED_BY_DEVICE_CONFIGURATION
+            case 409: throw IamError.USERNAME_EXISTS
+            default: throw IamError.FAILED
             }
-            user = try PairingUser.decode(cbor: response.payload)
+            user = try IamUser.decode(cbor: response.payload)
             if (user.Sct == nil) {
-                throw PairingError.INVALID_RESPONSE(error: "missing sct")
+                throw IamError.INVALID_RESPONSE(error: "missing sct")
             }
         } catch {
             try rethrowPairingError(error)
@@ -346,7 +323,7 @@ class PairingUtil {
                 parameter: "role",
                 value: role,
                 // user was just created - so ambiguous 404 is most likely due to missing role (... unless race condition)
-                fourOhFourMapping: PairingError.ROLE_DOES_NOT_EXIST)
+                fourOhFourMapping: IamError.ROLE_DOES_NOT_EXIST)
     }
 
     static public func updateUserSetDisplayName(connection: Connection,
@@ -373,7 +350,7 @@ class PairingUtil {
                                    username: String,
                                    parameter: String,
                                    value: String,
-                                   fourOhFourMapping: PairingError=PairingError.USER_DOES_NOT_EXIST) throws {
+                                   fourOhFourMapping: IamError=IamError.USER_DOES_NOT_EXIST) throws {
         let encoder = CBOREncoder()
         let cborRequest: Data = try encoder.encode(value)
         do {
@@ -382,10 +359,10 @@ class PairingUtil {
             let response = try coap.execute()
             switch (response.status) {
             case 204: break
-            case 400: throw PairingError.INVALID_INPUT
-            case 403: throw PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
+            case 400: throw IamError.INVALID_INPUT
+            case 403: throw IamError.BLOCKED_BY_DEVICE_CONFIGURATION
             case 404: throw fourOhFourMapping
-            default: throw PairingError.FAILED
+            default: throw IamError.FAILED
             }
         } catch {
             try rethrowPairingError(error)
@@ -393,21 +370,49 @@ class PairingUtil {
     }
 
     static private func rethrowPairingError(_ error: Error) throws {
-        if let pairingError = error as? PairingError {
+        if let pairingError = error as? IamError {
             throw pairingError
         } else if let apiError = error as? NabtoEdgeClientError {
-            throw PairingError.API_ERROR(cause: apiError)
+            throw IamError.API_ERROR(cause: apiError)
         }
-        throw PairingError.FAILED
+        throw IamError.FAILED
     }
 
     static private func invokePairingErrorHandler(_ error: Error, _ closure: @escaping AsyncPairingResultReceiver) {
-        if let pairingError = error as? PairingError {
+        if let pairingError = error as? IamError {
             closure(pairingError)
         } else if let apiError = error as? NabtoEdgeClientError {
-            closure(PairingError.API_ERROR(cause: apiError))
+            closure(IamError.API_ERROR(cause: apiError))
         }
-        closure(PairingError.FAILED)
+        closure(IamError.FAILED)
     }
 
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// experimental functions - subject to change!
+
+extension IamUtil {
+    static public func pairAutomatic(client: Client,
+                                     opts: ConnectionOptions,
+                                     pairingString: String?=nil,
+                                     desiredUsername: String?=nil) throws -> Connection {
+        try PairAutomatic(
+                client: client,
+                opts: opts,
+                pairingString: pairingString,
+                desiredUsername: desiredUsername).execute()
+    }
+
+    static public func pairAutomaticAsync(client: Client,
+                                          opts: ConnectionOptions,
+                                          pairingString: String?=nil,
+                                          desiredUsername: String?=nil,
+                                          closure: @escaping AsyncPairingResultReceiverWithConnection) {
+        PairAutomatic(
+                client: client,
+                opts: opts,
+                pairingString: pairingString,
+                desiredUsername: desiredUsername).executeAsync(closure)
+    }
 }

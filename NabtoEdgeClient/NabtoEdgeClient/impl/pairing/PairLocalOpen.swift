@@ -12,22 +12,22 @@ internal class PairLocalOpen : PairAbstractProtocol {
     private(set) var hookBeforeCoap: SyncHook? = nil
     private(set) var asyncHookBeforeCoap: AsyncHook? = nil
 
-    func mapStatus(status: UInt16?) -> PairingError {
+    func mapStatus(status: UInt16?) -> IamError {
         guard let status = status else {
-            return PairingError.FAILED
+            return IamError.FAILED
         }
         switch (status) {
-        case 201: return PairingError.OK
-        case 400: return PairingError.INVALID_INPUT
-        case 403: return PairingError.PAIRING_MODE_DISABLED
-        case 404: return PairingError.PAIRING_MODE_DISABLED
-        case 409: return PairingError.USERNAME_EXISTS
-        default:  return PairingError.FAILED
+        case 201: return IamError.OK
+        case 400: return IamError.INVALID_INPUT
+        case 403: return IamError.PAIRING_MODE_DISABLED
+        case 404: return IamError.PAIRING_MODE_DISABLED
+        case 409: return IamError.USERNAME_EXISTS
+        default:  return IamError.FAILED
         }
     }
 
     init(_ connection: Connection, _ desiredUsername: String) throws {
-        self.cbor = try PairingUser(username: desiredUsername).encode()
+        self.cbor = try IamUser(username: desiredUsername).encode()
         self.connection = connection
     }
 }

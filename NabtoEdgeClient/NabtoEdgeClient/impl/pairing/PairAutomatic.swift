@@ -25,7 +25,7 @@ internal class PairAutomatic {
         var password: String! = nil
         let elements = pairingString.components(separatedBy: ",")
         if (elements.count != 4) {
-            throw PairingError.INVALID_PAIRING_STRING(error: "unexpected number of elements")
+            throw IamError.INVALID_PAIRING_STRING(error: "unexpected number of elements")
         }
         for element in elements {
             let tuple = element.components(separatedBy: "=")
@@ -36,11 +36,11 @@ internal class PairAutomatic {
             case "d": options.DeviceId = value; break
             case "pwd": password = value; break
             case "sct": options.ServerConnectToken = value; break
-            default: throw PairingError.INVALID_PAIRING_STRING(error: "unexpected element \(key)")
+            default: throw IamError.INVALID_PAIRING_STRING(error: "unexpected element \(key)")
             }
         }
         if (self.options.ProductId == nil || self.options.DeviceId == nil || password == nil || self.options.ServerConnectToken == nil) {
-            throw PairingError.INVALID_PAIRING_STRING(error: "missing element in pairing string")
+            throw IamError.INVALID_PAIRING_STRING(error: "missing element in pairing string")
         }
         return password
     }
@@ -85,7 +85,7 @@ internal class PairAutomatic {
                 })
                 return
             }
-            closure(PairingError.OK, connection)
+            closure(IamError.OK, connection)
         }
     }
 

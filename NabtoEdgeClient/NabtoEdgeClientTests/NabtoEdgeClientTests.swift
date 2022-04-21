@@ -990,7 +990,7 @@ class NabtoEdgeClientTests: NabtoEdgeClientTestBase {
         try self.connection.passwordAuthenticate(username: "", password: "open-password")
 
         let coap = try self.connection.createCoapRequest(method: "POST", path: "/iam/pairing/password-open")
-        let user = PairingUser(username: UUID().uuidString.lowercased())
+        let user = IamUser(username: UUID().uuidString.lowercased())
         let cbor = try user.encode()
         try coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: cbor)
         let response = try coap.execute()

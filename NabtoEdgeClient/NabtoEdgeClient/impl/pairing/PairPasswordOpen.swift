@@ -15,7 +15,7 @@ internal class PairPasswordOpen : PairAbstractProtocol {
 
     init(connection: Connection, desiredUsername: String, password: String) throws {
         self.connection = connection
-        self.cbor = try PairingUser(username: desiredUsername).encode()
+        self.cbor = try IamUser(username: desiredUsername).encode()
         self.hookBeforeCoap = {
             try connection.passwordAuthenticate(username: "", password: password)
         }
@@ -24,18 +24,18 @@ internal class PairPasswordOpen : PairAbstractProtocol {
         }
     }
 
-    func mapStatus(status: UInt16?) -> PairingError {
+    func mapStatus(status: UInt16?) -> IamError {
         guard let status = status else {
-            return PairingError.FAILED
+            return IamError.FAILED
         }
         switch (status) {
-        case 201: return PairingError.OK
-        case 400: return PairingError.INVALID_INPUT
-        case 401: return PairingError.FAILED // never here
-        case 403: return PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
-        case 404: return PairingError.PAIRING_MODE_DISABLED // never here - authentication error before if not enabled
-        case 409: return PairingError.USERNAME_EXISTS
-        default:  return PairingError.FAILED
+        case 201: return IamError.OK
+        case 400: return IamError.INVALID_INPUT
+        case 401: return IamError.FAILED // never here
+        case 403: return IamError.BLOCKED_BY_DEVICE_CONFIGURATION
+        case 404: return IamError.PAIRING_MODE_DISABLED // never here - authentication error before if not enabled
+        case 409: return IamError.USERNAME_EXISTS
+        default:  return IamError.FAILED
         }
     }
 }

@@ -9,7 +9,7 @@ internal protocol PairAbstractProtocol {
     typealias SyncHook = () throws -> ()
     typealias AsyncHook = (@escaping AsyncStatusReceiver) -> Void
 
-    func mapStatus(status: UInt16?) -> PairingError
+    func mapStatus(status: UInt16?) -> IamError
     var method: String { get }
     var path: String { get }
     var connection: Connection { get }
@@ -29,7 +29,7 @@ extension PairAbstractProtocol {
             }
             let response = try coap.execute()
             let error = mapStatus(status: response.status)
-            if (error != PairingError.OK) {
+            if (error != IamError.OK) {
                 throw error
             }
         } catch {

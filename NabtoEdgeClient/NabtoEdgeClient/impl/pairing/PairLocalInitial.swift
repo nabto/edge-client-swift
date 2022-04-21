@@ -12,16 +12,16 @@ internal class PairLocalInitial : PairAbstractProtocol {
     private(set) var hookBeforeCoap: SyncHook? = nil
     private(set) var asyncHookBeforeCoap: AsyncHook? = nil
 
-    func mapStatus(status: UInt16?) -> PairingError {
+    func mapStatus(status: UInt16?) -> IamError {
         guard let status = status else {
-            return PairingError.FAILED
+            return IamError.FAILED
         }
         switch (status) {
-        case 201: return PairingError.OK
-        case 403: return PairingError.BLOCKED_BY_DEVICE_CONFIGURATION
-        case 404: return PairingError.PAIRING_MODE_DISABLED
-        case 409: return PairingError.INITIAL_USER_ALREADY_PAIRED
-        default:  return PairingError.FAILED
+        case 201: return IamError.OK
+        case 403: return IamError.BLOCKED_BY_DEVICE_CONFIGURATION
+        case 404: return IamError.PAIRING_MODE_DISABLED
+        case 409: return IamError.INITIAL_USER_ALREADY_PAIRED
+        default:  return IamError.FAILED
         }
     }
 
