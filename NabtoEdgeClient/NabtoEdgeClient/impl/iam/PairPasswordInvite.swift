@@ -4,23 +4,22 @@
 
 import Foundation
 
-internal class PairPasswordOpen : PairAbstractProtocol {
+internal class PairPasswordInvite : AbstractIamInvocationProtocol {
 
     private(set) var method: String = "POST"
-    private(set) var path: String = "/iam/pairing/password-open"
+    private(set) var path: String = "/iam/pairing/password-invite"
     private(set) var connection: Connection
     private(set) var cbor: Data? = nil
     private(set) var hookBeforeCoap: SyncHook? = nil
     private(set) var asyncHookBeforeCoap: AsyncHook? = nil
 
-    init(connection: Connection, desiredUsername: String, password: String) throws {
+    init(connection: Connection, username: String, password: String) throws {
         self.connection = connection
-        self.cbor = try IamUser(username: desiredUsername).encode()
         self.hookBeforeCoap = {
-            try connection.passwordAuthenticate(username: "", password: password)
+            try connection.passwordAuthenticate(username: username, password: password)
         }
         self.asyncHookBeforeCoap = { next in
-            connection.passwordAuthenticateAsync(username: "", password: password, closure: next)
+            connection.passwordAuthenticateAsync(username: username, password: password, closure: next)
         }
     }
 

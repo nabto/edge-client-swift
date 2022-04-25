@@ -14,7 +14,7 @@ internal class PairingHelper {
         }
     }
 
-    static internal func throwPairingError(_ error: Error) throws {
+    static internal func throwIamError(_ error: Error) throws {
         if let pairingError = error as? IamError {
             throw pairingError
         } else if let apiError = error as? NabtoEdgeClientError {
@@ -23,7 +23,7 @@ internal class PairingHelper {
         throw IamError.FAILED
     }
 
-    static internal func invokePairingErrorHandler(_ error: Error, _ closure: @escaping AsyncPairingResultReceiver) {
+    static internal func invokeIamErrorHandler(_ error: Error, _ closure: @escaping AsyncPairingResultReceiver) {
         if let pairingError = error as? IamError {
             closure(pairingError)
         } else if let apiError = error as? NabtoEdgeClientError {

@@ -4,7 +4,7 @@
 
 import Foundation
 
-internal protocol PairAbstractProtocol {
+internal protocol AbstractIamInvocationProtocol {
 
     typealias SyncHook = () throws -> ()
     typealias AsyncHook = (@escaping AsyncStatusReceiver) -> Void
@@ -18,7 +18,7 @@ internal protocol PairAbstractProtocol {
     var asyncHookBeforeCoap: AsyncHook? { get }
 }
 
-extension PairAbstractProtocol {
+extension AbstractIamInvocationProtocol {
 
     func execute() throws {
         do {
@@ -33,7 +33,7 @@ extension PairAbstractProtocol {
                 throw error
             }
         } catch {
-            try PairingHelper.throwPairingError(error)
+            try PairingHelper.throwIamError(error)
         }
     }
 
@@ -43,7 +43,7 @@ extension PairAbstractProtocol {
                 if (error == NabtoEdgeClientError.OK) {
                     self.executeAsyncImpl(closure)
                 } else {
-                    PairingHelper.invokePairingErrorHandler(error, closure)
+                    PairingHelper.invokeIamErrorHandler(error, closure)
                 }
             }
         } else {
@@ -59,13 +59,13 @@ extension PairAbstractProtocol {
             }
             coap.executeAsync { error, response in
                 if (error != NabtoEdgeClientError.OK) {
-                    PairingHelper.invokePairingErrorHandler(error, closure)
+                    PairingHelper.invokeIamErrorHandler(error, closure)
                 } else {
                     closure(self.mapStatus(status: response?.status))
                 }
             }
         } catch {
-            PairingHelper.invokePairingErrorHandler(error, closure)
+            PairingHelper.invokeIamErrorHandler(error, closure)
         }
     }
 

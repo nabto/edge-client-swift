@@ -4,9 +4,9 @@
 
 import Foundation
 
-internal class PairLocalOpen : PairAbstractProtocol {
+internal class PairLocalInitial : AbstractIamInvocationProtocol {
     private(set) var method: String = "POST"
-    private(set) var path: String = "/iam/pairing/local-open"
+    private(set) var path: String = "/iam/pairing/local-initial"
     private(set) var connection: Connection
     private(set) var cbor: Data? = nil
     private(set) var hookBeforeCoap: SyncHook? = nil
@@ -18,16 +18,14 @@ internal class PairLocalOpen : PairAbstractProtocol {
         }
         switch (status) {
         case 201: return IamError.OK
-        case 400: return IamError.INVALID_INPUT
-        case 403: return IamError.PAIRING_MODE_DISABLED
+        case 403: return IamError.BLOCKED_BY_DEVICE_CONFIGURATION
         case 404: return IamError.PAIRING_MODE_DISABLED
-        case 409: return IamError.USERNAME_EXISTS
+        case 409: return IamError.INITIAL_USER_ALREADY_PAIRED
         default:  return IamError.FAILED
         }
     }
 
-    init(_ connection: Connection, _ desiredUsername: String) throws {
-        self.cbor = try IamUser(username: desiredUsername).encode()
+    init(_ connection: Connection) {
         self.connection = connection
     }
 }

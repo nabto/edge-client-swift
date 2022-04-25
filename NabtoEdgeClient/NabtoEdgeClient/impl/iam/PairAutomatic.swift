@@ -80,7 +80,7 @@ internal class PairAutomatic {
             do {
                 connection = try self.execute()
             } catch {
-                PairingHelper.invokePairingErrorHandler(error, { pairingError in
+                PairingHelper.invokeIamErrorHandler(error, { pairingError in
                     closure(pairingError, nil)
                 })
                 return
