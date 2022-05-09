@@ -26,6 +26,7 @@ public typealias CoapResponseReceiver = (NabtoEdgeClientError, CoapResponse?) ->
  * This class represents a CoAP request on an open connection, ready to be executed.
  *
  * Instances are created using createCoapRequest() function on the Connection class.
+ * The CoapRequest object must be kept alive while in use.
  *
  * See https://docs.nabto.com/developer/guides/get-started/coap/intro.html for info about Nabto Edge
  * CoAP.

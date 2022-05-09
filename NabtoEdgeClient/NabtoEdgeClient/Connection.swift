@@ -42,7 +42,8 @@ internal protocol NativeConnectionWrapper {
 }
 
 /**
- * This class represents a connection to a specific Nabto Edge device.
+ * This class represents a connection to a specific Nabto Edge device. The Connection object must
+ * be kept alive for the duration of all streams, tunnels, and CoAP sessions created from it.
  *
  * Instances are created using `NabtoEdgeClient.createConnection()`.
  */
@@ -273,6 +274,8 @@ public class Connection: NSObject, NativeConnectionWrapper {
 
     /**
      * Create a new stream on this connection. Stream must subsequently be opened.
+     * The returned Stream object must be kept alive while in use.
+     *
      * @throws ALLOCATION_ERROR if the stream could not be created.
      */
     public func createStream() throws -> Stream {
@@ -281,6 +284,8 @@ public class Connection: NSObject, NativeConnectionWrapper {
 
     /**
      * Create a new CoAP request on this connection. Request must subsequently be executed.
+     * The returned CoapRequest object must be kep alive while in use.
+     *
      * @param method   The CoAP method (either `GET`. `POST`, `PUT` or `DELETE`)
      * @param path   The CoAP path (e.g., `/heatpump/temperature`)
      * @throws ALLOCATION_ERROR if the request could not be created.
@@ -291,6 +296,8 @@ public class Connection: NSObject, NativeConnectionWrapper {
 
     /**
      * Create a new tunnel on this connection. Tunnel must subsequently be opened.
+     * The returned TcpTunnel object must be kept alive while in use.
+     *
      * @throws ALLOCATION_ERROR if the tunnel could not be created.
      */
     public func createTcpTunnel() throws -> TcpTunnel {

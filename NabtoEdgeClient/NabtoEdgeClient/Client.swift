@@ -39,6 +39,7 @@ internal protocol NativeClientWrapper {
  *
  * It enables you to create a connection object, used to connect to a Nabto Edge Embedded device. And it provides misc
  * support functions: Create a private key (mandatory to later connect to a device), control logging, get SDK version.
+ * The Client object must be kept alive for the duration of all connections created from it.
  */
 public class Client: NSObject {
 
@@ -67,7 +68,7 @@ public class Client: NSObject {
     /**
      * Create a connection object.
      *
-     * The created connection can then be configured and opened.
+     * The created connection can then be configured and opened. Returned object must be kept alive while in use.
      *
      * @throws NabtoEdgeClientError.ALLOCATION_ERROR if the underlying SDK fails creating a connection object
      */
@@ -88,7 +89,7 @@ public class Client: NSObject {
     }
 
     /**
-     * Create an mDNS scanner to discover local devices.
+     * Create an mDNS scanner to discover local devices. Returned object must be kept alive while in use.
      *
      * @param subType the mDNS subtype to scan for: If nil or the empty string, the mDNS subtype
      * `_nabto._udp.local` is located; if subtype is specified, `[subtype]._sub._nabto._udp.local` is located.

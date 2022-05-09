@@ -14,6 +14,7 @@ public typealias AsyncDataReceiver = (NabtoEdgeClientError, Data?) -> Void
  * be met, the stream will be closed in such a way that it is detectable.
  *
  * Stream instances are created using `Connection.createStream()`.
+ * The Stream object must be kept alive while in use.
  *
  * See https://docs.nabto.com/developer/guides/get-started/streams/intro.html for info about Nabto Edge
  * Streams.
