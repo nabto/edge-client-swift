@@ -6,8 +6,9 @@ import Foundation
 
 internal protocol AbstractIamInvocationProtocol {
 
+    typealias SyncHookWithResult = (CoapResponse) throws -> ()
     typealias SyncHook = () throws -> ()
-    typealias AsyncHook = (@escaping AsyncStatusReceiver) -> Void
+    typealias AsyncHook = (@escaping AsyncStatusReceiver) -> ()
 
     func mapStatus(status: UInt16?) -> IamError
     var method: String { get }
@@ -16,6 +17,8 @@ internal protocol AbstractIamInvocationProtocol {
     var cbor: Data? { get }
     var hookBeforeCoap: SyncHook? { get }
     var asyncHookBeforeCoap: AsyncHook? { get }
+    var hookAfterCoap: SyncHookWithResult? { get }
+    var asyncHookAfterCoap: AsyncHook? { get }
 }
 
 extension AbstractIamInvocationProtocol {
@@ -29,7 +32,9 @@ extension AbstractIamInvocationProtocol {
             }
             let response = try coap.execute()
             let error = mapStatus(status: response.status)
-            if (error != IamError.OK) {
+            if (error == IamError.OK) {
+                try self.hookAfterCoap?(response)
+            } else {
                 throw error
             }
         } catch {

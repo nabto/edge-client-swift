@@ -390,6 +390,10 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
 
     func connectLocalInitial(_ client: Client) throws -> Connection {
         let device = self.testDevices.localPairLocalInitial
+        return try connectToDevice(client, device)
+    }
+
+    func connectToDevice(_ client: Client, _ device: TestDevice) throws -> Connection {
         try self.enableLogging(client)
         let connection = try client.createConnection()
         try connection.setPrivateKey(key: self.localInitialAdminKey)
@@ -398,6 +402,7 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
         try self.resetLocalInitialPairingState(connection)
         return connection
     }
+
 
     func testLocalInitial_Success() throws {
         let client = Client()
@@ -526,13 +531,11 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
         }
     }
 
-    // todo - test autopair async
-
     func testGetDeviceDetails() throws {
         let client = Client()
-        let connection = try connectLocalInitial(client)
-        let details = try IamUtil.getDeviceDetails(connection: connection)
         let device = self.testDevices.localPairLocalInitial
+        let connection = try connectToDevice(client, device)
+        let details = try IamUtil.getDeviceDetails(connection: connection)
         XCTAssertEqual(details.ProductId, device.productId)
         XCTAssertEqual(details.DeviceId, device.deviceId)
         XCTAssertEqual(details.Modes, ["LocalInitial"])
@@ -540,7 +543,7 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
 
     func testGetPairingModes_1() throws {
         let device = self.testDevices.localPasswordInvite
-        try self.connect(device)
+        let connection = try connectToDevice(client, device)
         let modes = try IamUtil.getAvailablePairingModes(connection: connection)
         XCTAssertTrue(modes.contains(.PasswordInvite))
         XCTAssertTrue(modes.contains(.PasswordOpen))
@@ -548,14 +551,15 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
 
     func testGetPairingModes_2() throws {
         let client = Client()
-        let connection = try connectLocalInitial(client)
+        let device = self.testDevices.localPairLocalInitial
+        let connection = try connectToDevice(client, device)
         let modes = try IamUtil.getAvailablePairingModes(connection: connection)
         XCTAssertTrue(modes.contains(.LocalInitial))
     }
 
     func testGetPairingModes_3() throws {
         let device = self.testDevices.localPairLocalOpen
-        try self.connect(device)
+        let connection = try connectToDevice(client, device)
         let modes = try IamUtil.getAvailablePairingModes(connection: connection)
         XCTAssertTrue(modes.contains(.LocalOpen))
     }

@@ -154,10 +154,6 @@ class IamUtil {
                 password: password).executeAsync(closure)
     }
 
-    /**
-     * Perform Password Invite pairing.
-     * @throws AUTHENTICATION_ERROR if not possible to authenticate using the specified username and password
-     */
     static public func pairPasswordInvite(connection: Connection, username: String, password: String) throws {
         try PairPasswordInvite(
                 connection: connection,
@@ -189,20 +185,9 @@ class IamUtil {
     }
 
     static public func getDeviceDetails(connection: Connection) throws -> DeviceDetails {
-        do {
-            let coap = try connection.createCoapRequest(method: "GET", path: "/iam/pairing")
-            let response = try coap.execute()
-            switch (response.status) {
-            case 205: break
-            case 403: throw IamError.BLOCKED_BY_DEVICE_CONFIGURATION
-            default: throw IamError.FAILED
-            }
-            return try DeviceDetails.decode(cbor: response.payload)
-        } catch {
-            try rethrowPairingError(error)
-            // swift 5.6 compiler error about missing return. grmbl.
-            return DeviceDetails(Modes: [], NabtoVersion: "", AppVersion: "", AppName: "", ProductId: "", DeviceId: "")
-        }
+        let cmd = try GetDeviceDetails(connection)
+        try cmd.execute()
+        return try cmd.getResult()
     }
 
     static public func isCurrentUserPaired(connection: Connection) throws -> Bool {
