@@ -18,7 +18,6 @@ internal protocol AbstractIamInvocationProtocol {
     var hookBeforeCoap: SyncHook? { get }
     var asyncHookBeforeCoap: AsyncHook? { get }
     var hookAfterCoap: SyncHookWithResult? { get }
-    var asyncHookAfterCoap: AsyncHook? { get }
 }
 
 extension AbstractIamInvocationProtocol {
@@ -38,17 +37,17 @@ extension AbstractIamInvocationProtocol {
                 throw error
             }
         } catch {
-            try PairingHelper.throwIamError(error)
+            try IamHelper.throwIamError(error)
         }
     }
 
-    internal func executeAsync(_ closure: @escaping AsyncPairingResultReceiver) {
+    internal func executeAsync(_ closure: @escaping AsyncIamResultReceiver) {
         if (self.asyncHookBeforeCoap != nil) {
             self.asyncHookBeforeCoap! { error in
                 if (error == NabtoEdgeClientError.OK) {
                     self.executeAsyncImpl(closure)
                 } else {
-                    PairingHelper.invokeIamErrorHandler(error, closure)
+                    IamHelper.invokeIamErrorHandler(error, closure)
                 }
             }
         } else {
@@ -56,21 +55,21 @@ extension AbstractIamInvocationProtocol {
         }
     }
 
-    internal func executeAsyncImpl(_ closure: @escaping AsyncPairingResultReceiver) {
+    internal func executeAsyncImpl(_ closure: @escaping AsyncIamResultReceiver) {
         do {
             let coap = try createCoapRequest(connection: connection)
-            if let cbor = cbor {
+            if let cbor = self.cbor {
                 try coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: cbor)
             }
             coap.executeAsync { error, response in
                 if (error != NabtoEdgeClientError.OK) {
-                    PairingHelper.invokeIamErrorHandler(error, closure)
+                    IamHelper.invokeIamErrorHandler(error, closure)
                 } else {
                     closure(self.mapStatus(status: response?.status))
                 }
             }
         } catch {
-            PairingHelper.invokeIamErrorHandler(error, closure)
+            IamHelper.invokeIamErrorHandler(error, closure)
         }
     }
 

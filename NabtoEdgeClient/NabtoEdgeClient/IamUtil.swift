@@ -19,6 +19,7 @@ public enum IamError: Error, Equatable {
     case BLOCKED_BY_DEVICE_CONFIGURATION
     case INVALID_RESPONSE(error: String)
     case INVALID_PAIRING_STRING(error: String)
+    case IAM_NOT_SUPPORTED
     case API_ERROR(cause: NabtoEdgeClientError)
     case FAILED
 }
@@ -30,8 +31,9 @@ public enum PairingMode {
     case PasswordInvite
 }
 
-public typealias AsyncPairingResultReceiver = (IamError) -> Void
-public typealias AsyncPairingResultReceiverWithConnection = (IamError, Connection?) -> Void
+public typealias AsyncIamResultReceiver = (IamError) -> Void
+public typealias AsyncIamResultReceiverWithData<T> = (IamError, T?) -> Void
+public typealias AsyncIamPayloadReceiver<T> = (IamError, Data?) -> Void
 
 // upper camelcase field names breaks standard Swift style - they match
 // the key names in the CBOR string map for the "CoAP GET /iam/me" service
@@ -126,7 +128,7 @@ class IamUtil {
     static public func pairLocalOpenAsync(
             connection: Connection,
             desiredUsername: String,
-            closure: @escaping AsyncPairingResultReceiver) throws {
+            closure: @escaping AsyncIamResultReceiver) throws {
         try PairLocalOpen(connection, desiredUsername).executeAsync(closure)
     }
 
@@ -134,7 +136,7 @@ class IamUtil {
         try PairLocalInitial(connection).execute()
     }
 
-    static public func pairLocalInitialAsync(connection: Connection, closure: @escaping AsyncPairingResultReceiver) {
+    static public func pairLocalInitialAsync(connection: Connection, closure: @escaping AsyncIamResultReceiver) {
         PairLocalInitial(connection).executeAsync(closure)
     }
 
@@ -147,7 +149,7 @@ class IamUtil {
             connection: Connection,
             desiredUsername: String,
             password: String,
-            closure: @escaping AsyncPairingResultReceiver) throws {
+            closure: @escaping AsyncIamResultReceiver) throws {
         try PairPasswordOpen(
                 connection: connection,
                 desiredUsername: desiredUsername,
@@ -164,7 +166,7 @@ class IamUtil {
     static public func pairPasswordInviteAsync(connection: Connection,
                                                username: String,
                                                password: String,
-                                               closure: @escaping AsyncPairingResultReceiver) throws {
+                                               closure: @escaping AsyncIamResultReceiver) throws {
         try PairPasswordInvite(
                 connection: connection,
                 username: username,
@@ -184,10 +186,38 @@ class IamUtil {
         }
     }
 
+    static public func getAvailablePairingModesAsync(connection: Connection,
+                                                     closure: @escaping AsyncIamResultReceiverWithData<[PairingMode]>) {
+        DispatchQueue.global().async {
+            do {
+                let res = try self.getAvailablePairingModes(connection: connection)
+                closure(IamError.OK, res)
+            } catch {
+                IamHelper.invokeIamErrorHandler(error, { error in
+                    closure(error, nil)
+                })
+            }
+        }
+    }
+
     static public func getDeviceDetails(connection: Connection) throws -> DeviceDetails {
         let cmd = try GetDeviceDetails(connection)
         try cmd.execute()
         return try cmd.getResult()
+    }
+
+    static public func getDeviceDetailsAsync(connection: Connection,
+                                             closure: @escaping AsyncIamResultReceiverWithData<DeviceDetails>) {
+        DispatchQueue.global().async {
+            do {
+                let res = try self.getDeviceDetails(connection: connection)
+                closure(IamError.OK, res)
+            } catch {
+                IamHelper.invokeIamErrorHandler(error, { error in
+                    closure(error, nil)
+                })
+            }
+        }
     }
 
     static public func isCurrentUserPaired(connection: Connection) throws -> Bool {
@@ -202,6 +232,20 @@ class IamUtil {
             try rethrowPairingError(error)
         }
         return true
+    }
+
+    static public func isCurrentUserPairedAsync(connection: Connection,
+                                                closure: @escaping AsyncIamResultReceiverWithData<Bool>) {
+        DispatchQueue.global().async {
+            do {
+                let res = try self.isCurrentUserPaired(connection: connection)
+                closure(IamError.OK, res)
+            } catch {
+                IamHelper.invokeIamErrorHandler(error, { error in
+                    closure(error, nil)
+                })
+            }
+        }
     }
 
     static public func getUser(connection: Connection, username: String) throws -> IamUser {
@@ -221,6 +265,21 @@ class IamUtil {
         }
     }
 
+    static public func getUserAsync(connection: Connection,
+                                    username: String,
+                                    closure: @escaping AsyncIamResultReceiverWithData<IamUser>) {
+        DispatchQueue.global().async {
+            do {
+                let res = try self.getUser(connection: connection, username: username)
+                closure(IamError.OK, res)
+            } catch {
+                IamHelper.invokeIamErrorHandler(error, { error in
+                    closure(error, nil)
+                })
+            }
+        }
+    }
+
     static public func getCurrentUser(connection: Connection) throws -> IamUser {
         do {
             let coap = try connection.createCoapRequest(method: "GET", path: "/iam/me")
@@ -234,6 +293,20 @@ class IamUtil {
         } catch {
             try rethrowPairingError(error)
             return IamUser(username: "swift 5.6 compiler error about missing return if not including this line")
+        }
+    }
+
+    static public func getCurrentUserAsync(connection: Connection,
+                                           closure: @escaping AsyncIamResultReceiverWithData<IamUser>) {
+        DispatchQueue.global().async {
+            do {
+                let res = try self.getCurrentUser(connection: connection)
+                closure(IamError.OK, res)
+            } catch {
+                IamHelper.invokeIamErrorHandler(error, { error in
+                    closure(error, nil)
+                })
+            }
         }
     }
 
@@ -251,10 +324,10 @@ class IamUtil {
         }
     }
 
-    static public func createNewUserForInvitePairing(connection: Connection,
-                                                     username: String,
-                                                     password: String,
-                                                     role: String) throws {
+    static public func createNewUser(connection: Connection,
+                                     username: String,
+                                     password: String,
+                                     role: String) throws {
         let user: IamUser
         let cborRequest = try IamUser(username: username).encode()
         do {
@@ -363,41 +436,5 @@ class IamUtil {
         throw IamError.FAILED
     }
 
-    static private func invokePairingErrorHandler(_ error: Error, _ closure: @escaping AsyncPairingResultReceiver) {
-        if let pairingError = error as? IamError {
-            closure(pairingError)
-        } else if let apiError = error as? NabtoEdgeClientError {
-            closure(IamError.API_ERROR(cause: apiError))
-        }
-        closure(IamError.FAILED)
-    }
-
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// experimental functions - subject to change!
-
-extension IamUtil {
-    static public func pairAutomatic(client: Client,
-                                     opts: ConnectionOptions,
-                                     pairingString: String?=nil,
-                                     desiredUsername: String?=nil) throws -> Connection {
-        try PairAutomatic(
-                client: client,
-                opts: opts,
-                pairingString: pairingString,
-                desiredUsername: desiredUsername).execute()
-    }
-
-    static public func pairAutomaticAsync(client: Client,
-                                          opts: ConnectionOptions,
-                                          pairingString: String?=nil,
-                                          desiredUsername: String?=nil,
-                                          closure: @escaping AsyncPairingResultReceiverWithConnection) {
-        PairAutomatic(
-                client: client,
-                opts: opts,
-                pairingString: pairingString,
-                desiredUsername: desiredUsername).executeAsync(closure)
-    }
-}

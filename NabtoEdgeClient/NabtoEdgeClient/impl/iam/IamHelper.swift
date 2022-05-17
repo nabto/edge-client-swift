@@ -4,7 +4,7 @@
 
 import Foundation
 
-internal class PairingHelper {
+internal class IamHelper {
 
     static internal func mapApiError(_ error: NabtoEdgeClientError) -> IamError {
         switch (error) {
@@ -23,7 +23,7 @@ internal class PairingHelper {
         throw IamError.FAILED
     }
 
-    static internal func invokeIamErrorHandler(_ error: Error, _ closure: @escaping AsyncPairingResultReceiver) {
+    static internal func invokeIamErrorHandler(_ error: Error, _ closure: @escaping AsyncIamResultReceiver) {
         if let pairingError = error as? IamError {
             closure(pairingError)
         } else if let apiError = error as? NabtoEdgeClientError {

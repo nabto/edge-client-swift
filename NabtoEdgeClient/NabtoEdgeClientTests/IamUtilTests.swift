@@ -228,7 +228,7 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
 
         let guest = uniqueUser()
         let guestPassword = "guestpassword"
-        try IamUtil.createNewUserForInvitePairing(
+        try IamUtil.createNewUser(
                         connection: self.connection,
                         username: guest,
                         password: guestPassword,
@@ -251,7 +251,7 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
 
         let guest = uniqueUser()
         let guestPassword = "guestpassword"
-        try IamUtil.createNewUserForInvitePairing(
+        try IamUtil.createNewUser(
                         connection: self.connection,
                         username: guest,
                         password: guestPassword,
@@ -274,7 +274,7 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
 
         let guest = uniqueUser()
         let guestPassword = "guestpassword"
-        XCTAssertThrowsError(try IamUtil.createNewUserForInvitePairing(
+        XCTAssertThrowsError(try IamUtil.createNewUser(
                         connection: self.connection,
                         username: guest,
                         password: guestPassword,
@@ -293,6 +293,42 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
         }
     }
 
+    func testCheckUnpairedUser_Async() throws {
+        let device = self.testDevices.localPasswordInvite
+        try super.connect(device)
+        let exp = XCTestExpectation(description: "invocation done")
+        var err: IamError? = nil
+        var res: Bool!
+        IamUtil.isCurrentUserPairedAsync(connection: self.connection) { error, isPaired in
+            err = error
+            res = isPaired
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 2.0)
+        XCTAssertEqual(err, .OK)
+        XCTAssertNotNil(res)
+        XCTAssertFalse(res)
+    }
+
+    func testCheckPairedUser_Async() throws { // sync version tested in other tests
+        let device = self.testDevices.localPairLocalOpen
+        try self.connect(device)
+        XCTAssertFalse(try IamUtil.isCurrentUserPaired(connection: connection))
+        try IamUtil.pairLocalOpen(connection: self.connection, desiredUsername: uniqueUser())
+        let exp = XCTestExpectation(description: "invocation done")
+        var err: IamError? = nil
+        var res: Bool!
+        IamUtil.isCurrentUserPairedAsync(connection: connection) { error, isPaired in
+            err = error
+            res = isPaired
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 2.0)
+        XCTAssertEqual(err, .OK)
+        XCTAssertNotNil(res)
+        XCTAssertTrue(res)
+    }
+
     func testCreateUser_and_GetUser() throws {
         let device = self.testDevices.localPasswordInvite
         let admin = uniqueUser()
@@ -302,7 +338,7 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
 
         let guest = uniqueUser()
         let guestPassword = "guestpassword"
-        try IamUtil.createNewUserForInvitePairing(
+        try IamUtil.createNewUser(
                         connection: self.connection,
                         username: guest,
                         password: guestPassword,
@@ -321,6 +357,41 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
 
         // guest can get self
         let me = try IamUtil.getUser(connection: self.connection, username: guest)
+        XCTAssertEqual(me.Username, guest)
+        XCTAssertEqual(me.Role, "Guest")
+    }
+
+    func testCreateUser_and_GetUser_Async() throws {
+        let device = self.testDevices.localPasswordInvite
+        let admin = uniqueUser()
+        try super.connect(device)
+        try IamUtil.pairPasswordOpen(connection: self.connection, desiredUsername: admin, password: device.password)
+        XCTAssertTrue(try IamUtil.isCurrentUserPaired(connection: self.connection))
+
+        let guest = uniqueUser()
+        let guestPassword = "guestpassword"
+        try IamUtil.createNewUser(
+                connection: self.connection,
+                username: guest,
+                password: guestPassword,
+                role: "Guest")
+
+        // currently connected as admin - connect as new user
+        try self.connection.close()
+        self.connection = try client.createConnection()
+        try self.connect(device)
+        try IamUtil.pairPasswordInvite(connection: self.connection, username: guest, password: guestPassword)
+
+        let exp = XCTestExpectation(description: "invocation done")
+        var err: IamError? = nil
+        var me: IamUser!
+        IamUtil.getCurrentUserAsync(connection: self.connection) { error, user in
+            err = error
+            me = user
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 2.0)
+        XCTAssertEqual(err, .OK)
         XCTAssertEqual(me.Username, guest)
         XCTAssertEqual(me.Role, "Guest")
     }
@@ -347,7 +418,7 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
 
         let guest = uniqueUser()
         let guestPassword = "guestpassword"
-        try IamUtil.createNewUserForInvitePairing(
+        try IamUtil.createNewUser(
                 connection: self.connection,
                 username: guest,
                 password: guestPassword,
@@ -384,7 +455,7 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
         }
         XCTAssertEqual(currentUser.Username, initialUser)
         try IamUtil.renameUser(connection: connection, username: initialUser, newUsername: tmpUser)
-        try IamUtil.createNewUserForInvitePairing(connection: connection, username: initialUser, password: "", role: "Administrator")
+        try IamUtil.createNewUser(connection: connection, username: initialUser, password: "", role: "Administrator")
         try IamUtil.deleteUser(connection: connection, username: tmpUser)
     }
 
@@ -423,114 +494,6 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
         }
     }
 
-    func testPair_AutoPair_LocalInitial_Success() throws {
-        let device = self.testDevices.localPairLocalInitial
-        try self.enableLogging(self.client)
-        let opts = ConnectionOptions()
-        opts.PrivateKey = self.localInitialAdminKey
-        opts.ServerUrl = device.url
-        opts.ServerKey = device.key
-        opts.ProductId = device.productId
-        opts.DeviceId = device.deviceId
-        try connection.updateOptions(options: opts)
-        let connection = try IamUtil.pairAutomatic(client: self.client, opts: opts, desiredUsername: self.uniqueUser())
-        XCTAssertTrue(try IamUtil.isCurrentUserPaired(connection: connection))
-        try self.resetLocalInitialPairingState(connection)
-    }
-
-    func testPair_AutoPair_LocalOpen_Success() throws {
-        let device = self.testDevices.localPairLocalOpen
-        try self.enableLogging(self.client)
-        let opts = ConnectionOptions()
-        opts.PrivateKey = try client.createPrivateKey()
-        opts.ServerUrl = device.url
-        opts.ServerKey = device.key
-        opts.ProductId = device.productId
-        opts.DeviceId = device.deviceId
-        let connection = try IamUtil.pairAutomatic(client: self.client, opts: opts, desiredUsername: self.uniqueUser())
-        XCTAssertTrue(try IamUtil.isCurrentUserPaired(connection: connection))
-    }
-
-    func testPair_AutoPair_PairingString_Success() throws {
-        let device = self.testDevices.localPairPasswordOpen
-        let pairingString = "p=\(device.productId),d=\(device.deviceId),pwd=\(device.password!),sct=\(device.sct!)"
-        try self.enableLogging(self.client)
-        let opts = ConnectionOptions()
-        opts.PrivateKey = try client.createPrivateKey()
-        opts.ServerUrl = device.url
-        opts.ServerKey = device.key
-        let connection = try IamUtil.pairAutomatic(client: self.client, opts: opts, pairingString: pairingString, desiredUsername: self.uniqueUser())
-        XCTAssertTrue(try IamUtil.isCurrentUserPaired(connection: connection))
-    }
-
-    func testPair_AutoPair_PairingString_Success_Async() throws {
-        let device = self.testDevices.localPairPasswordOpen
-        let pairingString = "p=\(device.productId),d=\(device.deviceId),pwd=\(device.password!),sct=\(device.sct!)"
-        try self.enableLogging(self.client)
-        let opts = ConnectionOptions()
-        opts.PrivateKey = try client.createPrivateKey()
-        opts.ServerUrl = device.url
-        opts.ServerKey = device.key
-        var conn: Connection!
-        var err: Error?
-        let exp = XCTestExpectation(description: "pairing done")
-        IamUtil.pairAutomaticAsync(client: self.client, opts: opts, pairingString: pairingString, desiredUsername: self.uniqueUser()) { error, connection in
-            err = error
-            conn = connection
-            exp.fulfill()
-        }
-        wait(for: [exp], timeout: 2.0)
-        XCTAssertNotNil(err)
-        XCTAssertEqual(err as? IamError, IamError.OK)
-        XCTAssertNotNil(conn)
-        XCTAssertTrue(try IamUtil.isCurrentUserPaired(connection: conn))
-    }
-
-    func testPair_AutoPair_PairingString_MissingPassword() throws {
-        let device = self.testDevices.localPairPasswordOpen
-        let pairingString = "p=\(device.productId),d=\(device.deviceId),sct=\(device.sct!),sct=foo"
-        let opts = ConnectionOptions()
-        opts.PrivateKey = try client.createPrivateKey()
-        opts.ServerUrl = device.url
-        opts.ServerKey = device.key
-        opts.ProductId = device.productId
-        opts.DeviceId = device.deviceId
-        XCTAssertThrowsError(try IamUtil.pairAutomatic(client: self.client, opts: opts,
-                pairingString: pairingString, desiredUsername: self.uniqueUser())) { error in
-            XCTAssertEqual(error as? IamError, IamError.INVALID_PAIRING_STRING(error: "missing element in pairing string"))
-        }
-    }
-
-    func testPair_AutoPair_PairingString_BadString_1() throws {
-        let device = self.testDevices.localPairPasswordOpen
-        let pairingString = ""
-        let opts = ConnectionOptions()
-        XCTAssertThrowsError(try IamUtil.pairAutomatic(client: self.client, opts: opts,
-                pairingString: pairingString, desiredUsername: self.uniqueUser())) { error in
-            XCTAssertEqual(error as? IamError, IamError.INVALID_PAIRING_STRING(error: "unexpected number of elements"))
-        }
-    }
-
-    func testPair_AutoPair_PairingString_BadString_2() throws {
-        let device = self.testDevices.localPairPasswordOpen
-        let pairingString = "p=p,d=d,pwd=pwd,sct=sct,foo=bar"
-        let opts = ConnectionOptions()
-        XCTAssertThrowsError(try IamUtil.pairAutomatic(client: self.client, opts: opts,
-                pairingString: pairingString, desiredUsername: self.uniqueUser())) { error in
-            XCTAssertEqual(error as? IamError, IamError.INVALID_PAIRING_STRING(error: "unexpected number of elements"))
-        }
-    }
-
-    func testPair_AutoPair_PairingString_BadString_3() throws {
-        let device = self.testDevices.localPairPasswordOpen
-        let pairingString = "p=p,d=d,pwd=pwd,xxx=sct"
-        let opts = ConnectionOptions()
-        XCTAssertThrowsError(try IamUtil.pairAutomatic(client: self.client, opts: opts,
-                pairingString: pairingString, desiredUsername: self.uniqueUser())) { error in
-            XCTAssertEqual(error as? IamError, IamError.INVALID_PAIRING_STRING(error: "unexpected element xxx"))
-        }
-    }
-
     func testGetDeviceDetails() throws {
         let client = Client()
         let device = self.testDevices.localPairLocalInitial
@@ -541,10 +504,66 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
         XCTAssertEqual(details.Modes, ["LocalInitial"])
     }
 
+    func testGetDeviceDetails_Async_Success() throws {
+        let client = Client()
+        let device = self.testDevices.localPairLocalInitial
+        let connection = try connectToDevice(client, device)
+        let exp = XCTestExpectation(description: "invocation done")
+        var err: IamError? = nil
+        var details: DeviceDetails!
+        try IamUtil.getDeviceDetailsAsync(connection: connection) { (error: IamError, result: DeviceDetails?) in
+            err = error
+            details = result
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 2.0)
+        XCTAssertEqual(err, .OK)
+        XCTAssertEqual(details.ProductId, device.productId)
+        XCTAssertEqual(details.DeviceId, device.deviceId)
+        XCTAssertEqual(details.Modes, ["LocalInitial"])
+    }
+
+    func testGetDeviceDetails_Async_Fail() throws {
+        let client = Client()
+        let device = self.testDevices.localMdnsDevice
+        let connection = try connectToDevice(client, device)
+        let exp = XCTestExpectation(description: "invocation done")
+        var err: IamError? = nil
+        var details: DeviceDetails!
+        try IamUtil.getDeviceDetailsAsync(connection: connection) { (error: IamError, result: DeviceDetails?) in
+            err = error
+            details = result
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 2.0)
+        XCTAssertEqual(err, .IAM_NOT_SUPPORTED)
+        XCTAssertNil(details)
+    }
+
     func testGetPairingModes_1() throws {
         let device = self.testDevices.localPasswordInvite
         let connection = try connectToDevice(client, device)
         let modes = try IamUtil.getAvailablePairingModes(connection: connection)
+        XCTAssertEqual(modes.count, 2)
+        XCTAssertTrue(modes.contains(.PasswordInvite))
+        XCTAssertTrue(modes.contains(.PasswordOpen))
+    }
+
+    func testGetPairingModes_1_Async() throws {
+        let client = Client()
+        let device = self.testDevices.localPasswordInvite
+        let connection = try connectToDevice(client, device)
+        let exp = XCTestExpectation(description: "invocation done")
+        var err: IamError? = nil
+        var modes: [PairingMode]!
+        try IamUtil.getAvailablePairingModesAsync(connection: connection) { (error: IamError, result: [PairingMode]?) in
+            err = error
+            modes = result
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 2.0)
+        XCTAssertEqual(err, .OK)
+        XCTAssertEqual(modes.count, 2)
         XCTAssertTrue(modes.contains(.PasswordInvite))
         XCTAssertTrue(modes.contains(.PasswordOpen))
     }
@@ -554,6 +573,7 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
         let device = self.testDevices.localPairLocalInitial
         let connection = try connectToDevice(client, device)
         let modes = try IamUtil.getAvailablePairingModes(connection: connection)
+        XCTAssertEqual(modes.count, 1)
         XCTAssertTrue(modes.contains(.LocalInitial))
     }
 
@@ -561,6 +581,7 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
         let device = self.testDevices.localPairLocalOpen
         let connection = try connectToDevice(client, device)
         let modes = try IamUtil.getAvailablePairingModes(connection: connection)
+        XCTAssertEqual(modes.count, 1)
         XCTAssertTrue(modes.contains(.LocalOpen))
     }
 

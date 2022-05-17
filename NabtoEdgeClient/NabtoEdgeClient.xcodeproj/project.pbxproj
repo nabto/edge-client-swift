@@ -36,7 +36,6 @@
 		E92302F614DFF1CE2D44AF7A /* IamUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92E1F3B78BE7B59AA656356 /* IamUtil.swift */; };
 		E923120C46CF30C6E5681300 /* AbstractIamInvocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92AE96525DAF4143AE97A68 /* AbstractIamInvocation.swift */; };
 		E925CA6B746BB821ABFC6E33 /* PairLocalInitial.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92CF513E9FC4558DD69F13D /* PairLocalInitial.swift */; };
-		E925DD6F9224960796ADCA21 /* PairAutomatic.swift in Sources */ = {isa = PBXBuildFile; fileRef = E920A43B395C45B40AE07277 /* PairAutomatic.swift */; };
 		E92652701579C3210C57BD1A /* PairPasswordInvite.swift in Sources */ = {isa = PBXBuildFile; fileRef = E922433FDF28CDFC63583059 /* PairPasswordInvite.swift */; };
 		E92837BE0959E8D8679649C7 /* TestDeviceDefinitions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9221D728E77EBE65E3D5868 /* TestDeviceDefinitions.swift */; };
 		E9289DDF58735633C1389870 /* PairLocalOpen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9222CFACFDBA713CE870C08 /* PairLocalOpen.swift */; };
@@ -119,7 +118,6 @@
 		D479084D27C581E400790A51 /* Helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		D479084E27C581E400790A51 /* CallbackWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallbackWrapper.swift; sourceTree = "<group>"; };
 		D4BA975B27D60A2100012902 /* TestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestPlan.xctestplan; sourceTree = "<group>"; };
-		E920A43B395C45B40AE07277 /* PairAutomatic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairAutomatic.swift; sourceTree = "<group>"; };
 		E921C62E2CEAA960557ADD43 /* GetDeviceDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetDeviceDetails.swift; sourceTree = "<group>"; };
 		E9221D728E77EBE65E3D5868 /* TestDeviceDefinitions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestDeviceDefinitions.swift; sourceTree = "<group>"; };
 		E9222CFACFDBA713CE870C08 /* PairLocalOpen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairLocalOpen.swift; sourceTree = "<group>"; };
@@ -268,7 +266,6 @@
 			isa = PBXGroup;
 			children = (
 				E92AE96525DAF4143AE97A68 /* AbstractIamInvocation.swift */,
-				E920A43B395C45B40AE07277 /* PairAutomatic.swift */,
 				E927FB7D04C0ABD6951697C1 /* IamHelper.swift */,
 				E92CF513E9FC4558DD69F13D /* PairLocalInitial.swift */,
 				E9222CFACFDBA713CE870C08 /* PairLocalOpen.swift */,
@@ -546,7 +543,6 @@
 				D479085027C581E400790A51 /* Helper.swift in Sources */,
 				E92302F614DFF1CE2D44AF7A /* IamUtil.swift in Sources */,
 				E923120C46CF30C6E5681300 /* AbstractIamInvocation.swift in Sources */,
-				E925DD6F9224960796ADCA21 /* PairAutomatic.swift in Sources */,
 				E92E743784165CA504619D02 /* IamHelper.swift in Sources */,
 				E925CA6B746BB821ABFC6E33 /* PairLocalInitial.swift in Sources */,
 				E9289DDF58735633C1389870 /* PairLocalOpen.swift in Sources */,

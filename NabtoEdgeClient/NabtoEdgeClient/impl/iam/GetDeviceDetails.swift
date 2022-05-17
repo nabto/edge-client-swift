@@ -24,6 +24,7 @@ internal class GetDeviceDetails : AbstractIamInvocationProtocol {
         switch (status) {
         case 205: return IamError.OK
         case 403: return IamError.BLOCKED_BY_DEVICE_CONFIGURATION
+        case 404: return IamError.IAM_NOT_SUPPORTED
         default:  return IamError.FAILED
         }
     }
