@@ -11,11 +11,6 @@ internal class GetDeviceDetails : AbstractIamInvocationProtocol {
     private(set) var cbor: Data? = nil
     private(set) var hookBeforeCoap: SyncHook? = nil
     private(set) var asyncHookBeforeCoap: AsyncHook? = nil
-    private(set) var asyncHookAfterCoap: AsyncHook? = nil
-
-    private(set) var hookAfterCoap: SyncHookWithResult?
-
-    var payload: Data?
 
     func mapStatus(status: UInt16?) -> IamError {
         guard let status = status else {
@@ -29,18 +24,15 @@ internal class GetDeviceDetails : AbstractIamInvocationProtocol {
         }
     }
 
-    func getResult() throws -> DeviceDetails {
-        if let payload = self.payload {
+    func mapResponse(_ response: CoapResponse) throws -> DeviceDetails {
+        if let payload = response.payload {
             return try DeviceDetails.decode(cbor: payload)
         } else {
-            throw IamError.INVALID_RESPONSE(error: "empty")
+            throw IamError.INVALID_RESPONSE(error: "\(path) returned empty response")
         }
     }
 
     init(_ connection: Connection) {
         self.connection = connection
-        self.hookAfterCoap = { response in
-            self.payload = response.payload
-        }
     }
 }

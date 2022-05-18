@@ -5,8 +5,9 @@
 import Foundation
 
 internal protocol AbstractIamInvocationProtocol {
+    associatedtype T
+    func mapResponse(_ response: CoapResponse) throws -> T
 
-    typealias SyncHookWithResult = (CoapResponse) throws -> ()
     typealias SyncHook = () throws -> ()
     typealias AsyncHook = (@escaping AsyncStatusReceiver) -> ()
 
@@ -17,12 +18,11 @@ internal protocol AbstractIamInvocationProtocol {
     var cbor: Data? { get }
     var hookBeforeCoap: SyncHook? { get }
     var asyncHookBeforeCoap: AsyncHook? { get }
-    var hookAfterCoap: SyncHookWithResult? { get }
 }
 
 extension AbstractIamInvocationProtocol {
 
-    func execute() throws {
+    func execute() throws -> T {
         do {
             try self.hookBeforeCoap?()
             let coap = try createCoapRequest(connection: connection)
@@ -32,13 +32,14 @@ extension AbstractIamInvocationProtocol {
             let response = try coap.execute()
             let error = mapStatus(status: response.status)
             if (error == IamError.OK) {
-                try self.hookAfterCoap?(response)
+                return try mapResponse(response)
             } else {
                 throw error
             }
         } catch {
             try IamHelper.throwIamError(error)
         }
+        throw IamError.FAILED // never here
     }
 
     internal func executeAsync(_ closure: @escaping AsyncIamResultReceiver) {
@@ -55,6 +56,23 @@ extension AbstractIamInvocationProtocol {
         }
     }
 
+    internal func executeAsyncWithData(_ closure: @escaping ((IamError, T?) -> ())) {
+        if (self.asyncHookBeforeCoap != nil) {
+            self.asyncHookBeforeCoap! { error in
+                if (error == NabtoEdgeClientError.OK) {
+                    self.executeAsyncWithDataImpl(closure)
+                } else {
+                    IamHelper.invokeIamErrorHandler(error, { error in
+                        closure(error, nil)
+                    })
+                }
+            }
+        } else {
+            self.executeAsyncWithDataImpl(closure)
+        }
+    }
+
+
     internal func executeAsyncImpl(_ closure: @escaping AsyncIamResultReceiver) {
         do {
             let coap = try createCoapRequest(connection: connection)
@@ -70,6 +88,45 @@ extension AbstractIamInvocationProtocol {
             }
         } catch {
             IamHelper.invokeIamErrorHandler(error, closure)
+        }
+    }
+
+    internal func executeAsyncWithDataImpl(_ closure: @escaping ((IamError, T?) -> ())) {
+        do {
+            let coap = try createCoapRequest(connection: connection)
+            if let cbor = self.cbor {
+                try coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: cbor)
+            }
+            coap.executeAsync { error, response in
+                if (error == NabtoEdgeClientError.OK) {
+                    if let response = response {
+                        do {
+                            let status = self.mapStatus(status: response.status)
+                            let result: T?
+                            if (status == IamError.OK) {
+                                result = try mapResponse(response)
+                            } else {
+                                result = nil
+                            }
+                            closure(status, result)
+                        } catch {
+                            IamHelper.invokeIamErrorHandler(error, { error in
+                                closure(error, nil)
+                            })
+                        }
+                    } else {
+                        closure(IamError.INVALID_RESPONSE(error: "status ok with no response from \(self.path)"), nil)
+                    }
+                } else {
+                    IamHelper.invokeIamErrorHandler(error, { error in
+                        closure(error, nil)
+                    })
+                }
+            }
+        } catch {
+            IamHelper.invokeIamErrorHandler(error, { error in
+                closure(error, nil)
+            })
         }
     }
 

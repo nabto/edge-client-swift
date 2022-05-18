@@ -11,8 +11,11 @@ internal class PairLocalInitial : AbstractIamInvocationProtocol {
     private(set) var cbor: Data? = nil
     private(set) var hookBeforeCoap: SyncHook? = nil
     private(set) var asyncHookBeforeCoap: AsyncHook? = nil
-    private(set) var hookAfterCoap: SyncHookWithResult? = nil
-    private(set) var asyncHookAfterCoap: AsyncHook? = nil
+    private(set) var hookAfterCoap: (() throws -> ())? = nil
+
+    func mapResponse(_ response: CoapResponse) throws -> () {
+        return
+    }
 
     func mapStatus(status: UInt16?) -> IamError {
         guard let status = status else {

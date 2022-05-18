@@ -201,23 +201,12 @@ class IamUtil {
     }
 
     static public func getDeviceDetails(connection: Connection) throws -> DeviceDetails {
-        let cmd = try GetDeviceDetails(connection)
-        try cmd.execute()
-        return try cmd.getResult()
+        return try GetDeviceDetails(connection).execute()
     }
 
     static public func getDeviceDetailsAsync(connection: Connection,
-                                             closure: @escaping AsyncIamResultReceiverWithData<DeviceDetails>) {
-        DispatchQueue.global().async {
-            do {
-                let res = try self.getDeviceDetails(connection: connection)
-                closure(IamError.OK, res)
-            } catch {
-                IamHelper.invokeIamErrorHandler(error, { error in
-                    closure(error, nil)
-                })
-            }
-        }
+                                             closure: @escaping (IamError, DeviceDetails?) -> ()) {
+        GetDeviceDetails(connection).executeAsyncWithData(closure)
     }
 
     static public func isCurrentUserPaired(connection: Connection) throws -> Bool {

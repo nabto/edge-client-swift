@@ -12,8 +12,6 @@ internal class PairPasswordInvite : AbstractIamInvocationProtocol {
     private(set) var cbor: Data? = nil
     private(set) var hookBeforeCoap: SyncHook? = nil
     private(set) var asyncHookBeforeCoap: AsyncHook? = nil
-    private(set) var hookAfterCoap: SyncHookWithResult? = nil
-    private(set) var asyncHookAfterCoap: AsyncHook? = nil
 
     init(connection: Connection, username: String, password: String) throws {
         self.connection = connection
@@ -23,6 +21,10 @@ internal class PairPasswordInvite : AbstractIamInvocationProtocol {
         self.asyncHookBeforeCoap = { next in
             connection.passwordAuthenticateAsync(username: username, password: password, closure: next)
         }
+    }
+
+    func mapResponse(_ response: CoapResponse) throws -> () {
+        return
     }
 
     func mapStatus(status: UInt16?) -> IamError {
