@@ -4,7 +4,7 @@
 
 import Foundation
 
-internal protocol AbstractIamInvocationProtocol {
+internal protocol AbstractIamInvocationTemplate {
     associatedtype T
     func mapResponse(_ response: CoapResponse) throws -> T
 
@@ -20,7 +20,7 @@ internal protocol AbstractIamInvocationProtocol {
     var asyncHookBeforeCoap: AsyncHook? { get }
 }
 
-extension AbstractIamInvocationProtocol {
+extension AbstractIamInvocationTemplate {
 
     func execute() throws -> T {
         do {

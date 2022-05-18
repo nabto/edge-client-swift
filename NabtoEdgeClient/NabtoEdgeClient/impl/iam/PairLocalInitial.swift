@@ -4,7 +4,7 @@
 
 import Foundation
 
-internal class PairLocalInitial : AbstractIamInvocationProtocol {
+internal class PairLocalInitial : AbstractIamInvocationTemplate {
     private(set) var method: String = "POST"
     private(set) var path: String = "/iam/pairing/local-initial"
     private(set) var connection: Connection

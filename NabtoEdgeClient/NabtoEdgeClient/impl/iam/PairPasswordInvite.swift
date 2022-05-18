@@ -4,7 +4,7 @@
 
 import Foundation
 
-internal class PairPasswordInvite : AbstractIamInvocationProtocol {
+internal class PairPasswordInvite : AbstractIamInvocationTemplate {
 
     private(set) var method: String = "POST"
     private(set) var path: String = "/iam/pairing/password-invite"

@@ -174,30 +174,12 @@ class IamUtil {
     }
 
     static public func getAvailablePairingModes(connection: Connection) throws -> [PairingMode] {
-        let details = try getDeviceDetails(connection: connection)
-        return try details.Modes.map { s -> PairingMode in
-            switch s {
-            case "LocalInitial": return .LocalInitial
-            case "LocalOpen": return .LocalOpen
-            case "PasswordInvite": return .PasswordInvite
-            case "PasswordOpen": return .PasswordOpen
-            default: throw IamError.INVALID_RESPONSE(error: "pairing mode '\(s)'")
-            }
-        }
+        return try GetAvailablePairingModes(connection).execute()
     }
 
     static public func getAvailablePairingModesAsync(connection: Connection,
                                                      closure: @escaping AsyncIamResultReceiverWithData<[PairingMode]>) {
-        DispatchQueue.global().async {
-            do {
-                let res = try self.getAvailablePairingModes(connection: connection)
-                closure(IamError.OK, res)
-            } catch {
-                IamHelper.invokeIamErrorHandler(error, { error in
-                    closure(error, nil)
-                })
-            }
-        }
+        return GetAvailablePairingModes(connection).executeAsyncWithData(closure)
     }
 
     static public func getDeviceDetails(connection: Connection) throws -> DeviceDetails {
@@ -238,80 +220,29 @@ class IamUtil {
     }
 
     static public func getUser(connection: Connection, username: String) throws -> IamUser {
-        do {
-            let coap = try connection.createCoapRequest(method: "GET", path: "/iam/users/\(username)")
-            let response = try coap.execute()
-            switch (response.status) {
-            case 205: break
-            case 403: throw IamError.BLOCKED_BY_DEVICE_CONFIGURATION
-            case 404: throw IamError.USER_DOES_NOT_EXIST
-            default: throw IamError.FAILED
-            }
-            return try IamUser.decode(cbor: response.payload)
-        } catch {
-            try rethrowPairingError(error)
-            return IamUser(username: "swift 5.6 compiler error about missing return if not including this line")
-        }
+        try GetUser(connection, username).execute()
     }
 
     static public func getUserAsync(connection: Connection,
                                     username: String,
                                     closure: @escaping AsyncIamResultReceiverWithData<IamUser>) {
-        DispatchQueue.global().async {
-            do {
-                let res = try self.getUser(connection: connection, username: username)
-                closure(IamError.OK, res)
-            } catch {
-                IamHelper.invokeIamErrorHandler(error, { error in
-                    closure(error, nil)
-                })
-            }
-        }
+        GetUser(connection, username).executeAsyncWithData(closure)
     }
 
     static public func getCurrentUser(connection: Connection) throws -> IamUser {
-        do {
-            let coap = try connection.createCoapRequest(method: "GET", path: "/iam/me")
-            let response = try coap.execute()
-            switch (response.status) {
-            case 205: break
-            case 404: throw IamError.USER_IS_NOT_PAIRED
-            default: throw IamError.FAILED
-            }
-            return try IamUser.decode(cbor: response.payload)
-        } catch {
-            try rethrowPairingError(error)
-            return IamUser(username: "swift 5.6 compiler error about missing return if not including this line")
-        }
+        try GetCurrentUser(connection).execute()
     }
 
     static public func getCurrentUserAsync(connection: Connection,
                                            closure: @escaping AsyncIamResultReceiverWithData<IamUser>) {
-        DispatchQueue.global().async {
-            do {
-                let res = try self.getCurrentUser(connection: connection)
-                closure(IamError.OK, res)
-            } catch {
-                IamHelper.invokeIamErrorHandler(error, { error in
-                    closure(error, nil)
-                })
-            }
-        }
+        GetCurrentUser(connection).executeAsyncWithData(closure)
     }
 
     static public func deleteUser(connection: Connection, username: String) throws {
-        do {
-            let coap = try connection.createCoapRequest(method: "DELETE", path: "/iam/users/\(username)")
-            let response = try coap.execute()
-            switch (response.status) {
-            case 202: break
-            case 403: throw IamError.BLOCKED_BY_DEVICE_CONFIGURATION
-            default: throw IamError.FAILED
-            }
-        } catch {
-            try rethrowPairingError(error)
-        }
+        try DeleteUser(connection, username).execute()
     }
+
+    // todo async delete
 
     static public func createNewUser(connection: Connection,
                                      username: String,
