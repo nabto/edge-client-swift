@@ -35,90 +35,6 @@ public typealias AsyncIamResultReceiver = (IamError) -> Void
 public typealias AsyncIamResultReceiverWithData<T> = (IamError, T?) -> Void
 public typealias AsyncIamPayloadReceiver<T> = (IamError, Data?) -> Void
 
-// upper camelcase field names breaks standard Swift style - they match
-// the key names in the CBOR string map for the "CoAP GET /iam/me" service
-// https://docs.nabto.com/developer/api-reference/coap/iam/me.html
-public struct IamUser: Codable {
-    let Username: String
-    let DisplayName: String?
-    let Fingerprint: String?
-    let Sct: String?
-    let Role: String?
-
-    init(username: String, displayName: String? = nil, fingerprint: String? = nil, sct: String? = nil, role: String? = nil) {
-        self.Username = username
-        self.DisplayName = displayName
-        self.Fingerprint = fingerprint
-        self.Sct = sct
-        self.Role = role
-    }
-
-    static func decode(cbor: Data) throws -> IamUser {
-        let decoder = CBORDecoder()
-        do {
-            return try decoder.decode(IamUser.self, from: cbor)
-        } catch {
-            throw IamError.INVALID_RESPONSE(error: "\(error)")
-        }
-    }
-
-    func encode() throws -> Data {
-        let encoder = CBOREncoder()
-        do {
-            return try encoder.encode(self)
-        } catch {
-            throw IamError.INVALID_INPUT
-        }
-    }
-
-    public func cborAsHex() -> String? {
-        let encoder = CBOREncoder()
-        return try? encoder.encode(self).map {
-                    String(format: "%02hhx", $0)
-                }
-                .joined()
-    }
-}
-
-// upper camelcase field names breaks standard Swift style - they match
-// the key names in the CBOR string map for the "CoAP GET /iam/pairing" service
-// https://docs.nabto.com/developer/api-reference/coap/iam/pairing.html
-public struct DeviceDetails: Codable {
-    let Modes: [String]
-    let NabtoVersion: String
-    let AppVersion: String?
-    let AppName: String?
-    let ProductId: String
-    let DeviceId: String
-
-    public init(Modes: [String], NabtoVersion: String, AppVersion: String, AppName: String, ProductId: String, DeviceId: String) {
-        self.Modes = Modes
-        self.NabtoVersion = NabtoVersion
-        self.AppVersion = AppVersion
-        self.AppName = AppName
-        self.ProductId = ProductId
-        self.DeviceId = DeviceId
-    }
-
-    static func decode(cbor: Data) throws -> DeviceDetails {
-        let decoder = CBORDecoder()
-        do {
-            return try decoder.decode(DeviceDetails.self, from: cbor)
-        } catch {
-            throw IamError.INVALID_RESPONSE(error: "\(error)")
-        }
-    }
-
-    func encode() throws -> Data {
-        let encoder = CBOREncoder()
-        do {
-            return try encoder.encode(self)
-        } catch {
-            throw IamError.INVALID_INPUT
-        }
-    }
-}
-
 class IamUtil {
 
     static public func pairLocalOpen(connection: Connection, desiredUsername: String) throws {
@@ -192,31 +108,12 @@ class IamUtil {
     }
 
     static public func isCurrentUserPaired(connection: Connection) throws -> Bool {
-        do {
-            _ = try self.getCurrentUser(connection: connection)
-        } catch {
-            if let pairingError = error as? IamError {
-                if (pairingError == .USER_IS_NOT_PAIRED) {
-                    return false
-                }
-            }
-            try rethrowPairingError(error)
-        }
-        return true
+        return try IsCurrentUserPaired(connection).execute()
     }
 
     static public func isCurrentUserPairedAsync(connection: Connection,
                                                 closure: @escaping AsyncIamResultReceiverWithData<Bool>) {
-        DispatchQueue.global().async {
-            do {
-                let res = try self.isCurrentUserPaired(connection: connection)
-                closure(IamError.OK, res)
-            } catch {
-                IamHelper.invokeIamErrorHandler(error, { error in
-                    closure(error, nil)
-                })
-            }
-        }
+        IsCurrentUserPaired(connection).executeAsyncWithData(closure)
     }
 
     static public func getUser(connection: Connection, username: String) throws -> IamUser {
@@ -242,7 +139,10 @@ class IamUtil {
         try DeleteUser(connection, username).execute()
     }
 
-    // todo async delete
+    static public func deleteUserAsync(connection: Connection, username: String,
+                                       closure: @escaping AsyncIamResultReceiver) throws {
+        try DeleteUser(connection, username).executeAsync(closure)
+    }
 
     static public func createNewUser(connection: Connection,
                                      username: String,
@@ -357,4 +257,89 @@ class IamUtil {
     }
 
 }
+
+// upper camelcase field names breaks standard Swift style - they match
+// the key names in the CBOR string map for the "CoAP GET /iam/me" service
+// https://docs.nabto.com/developer/api-reference/coap/iam/me.html
+public struct IamUser: Codable {
+    let Username: String
+    let DisplayName: String?
+    let Fingerprint: String?
+    let Sct: String?
+    let Role: String?
+
+    init(username: String, displayName: String? = nil, fingerprint: String? = nil, sct: String? = nil, role: String? = nil) {
+        self.Username = username
+        self.DisplayName = displayName
+        self.Fingerprint = fingerprint
+        self.Sct = sct
+        self.Role = role
+    }
+
+    static func decode(cbor: Data) throws -> IamUser {
+        let decoder = CBORDecoder()
+        do {
+            return try decoder.decode(IamUser.self, from: cbor)
+        } catch {
+            throw IamError.INVALID_RESPONSE(error: "\(error)")
+        }
+    }
+
+    func encode() throws -> Data {
+        let encoder = CBOREncoder()
+        do {
+            return try encoder.encode(self)
+        } catch {
+            throw IamError.INVALID_INPUT
+        }
+    }
+
+    public func cborAsHex() -> String? {
+        let encoder = CBOREncoder()
+        return try? encoder.encode(self).map {
+                    String(format: "%02hhx", $0)
+                }
+                .joined()
+    }
+}
+
+// upper camelcase field names breaks standard Swift style - they match
+// the key names in the CBOR string map for the "CoAP GET /iam/pairing" service
+// https://docs.nabto.com/developer/api-reference/coap/iam/pairing.html
+public struct DeviceDetails: Codable {
+    let Modes: [String]
+    let NabtoVersion: String
+    let AppVersion: String?
+    let AppName: String?
+    let ProductId: String
+    let DeviceId: String
+
+    public init(Modes: [String], NabtoVersion: String, AppVersion: String, AppName: String, ProductId: String, DeviceId: String) {
+        self.Modes = Modes
+        self.NabtoVersion = NabtoVersion
+        self.AppVersion = AppVersion
+        self.AppName = AppName
+        self.ProductId = ProductId
+        self.DeviceId = DeviceId
+    }
+
+    static func decode(cbor: Data) throws -> DeviceDetails {
+        let decoder = CBORDecoder()
+        do {
+            return try decoder.decode(DeviceDetails.self, from: cbor)
+        } catch {
+            throw IamError.INVALID_RESPONSE(error: "\(error)")
+        }
+    }
+
+    func encode() throws -> Data {
+        let encoder = CBOREncoder()
+        do {
+            return try encoder.encode(self)
+        } catch {
+            throw IamError.INVALID_INPUT
+        }
+    }
+}
+
 

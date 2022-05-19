@@ -428,8 +428,45 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
         XCTAssertEqual(guestUser.Username, guest)
         XCTAssertEqual(guestUser.Role, "Guest")
 
+        XCTAssertThrowsError(try IamUtil.deleteUser(connection: self.connection, username: "user-does-not-exist")) { error in
+            XCTAssertEqual(error as? IamError, .USER_DOES_NOT_EXIST)
+        }
+
         try IamUtil.deleteUser(connection: self.connection, username: guest)
 
+        XCTAssertThrowsError(try IamUtil.getUser(connection: self.connection, username: guest)) { error in
+            XCTAssertEqual(error as? IamError, .USER_DOES_NOT_EXIST)
+        }
+
+    }
+
+    func testDeleteUser_Async() throws {
+        let device = self.testDevices.localPasswordInvite
+        let admin = uniqueUser()
+        try super.connect(device)
+        try IamUtil.pairPasswordOpen(connection: self.connection, desiredUsername: admin, password: device.password)
+        XCTAssertTrue(try IamUtil.isCurrentUserPaired(connection: self.connection))
+
+        let guest = uniqueUser()
+        let guestPassword = "guestpassword"
+        try IamUtil.createNewUser(
+                connection: self.connection,
+                username: guest,
+                password: guestPassword,
+                role: "Guest")
+
+        let guestUser = try IamUtil.getUser(connection: self.connection, username: guest)
+        XCTAssertEqual(guestUser.Username, guest)
+        XCTAssertEqual(guestUser.Role, "Guest")
+
+        let exp = XCTestExpectation(description: "delete done")
+        var err: IamError? = nil
+        try IamUtil.deleteUserAsync(connection: self.connection, username: guest) { error in
+            err = error
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 1.0)
+        XCTAssertEqual(err, IamError.OK)
         XCTAssertThrowsError(try IamUtil.getUser(connection: self.connection, username: guest)) { error in
             XCTAssertEqual(error as? IamError, .USER_DOES_NOT_EXIST)
         }

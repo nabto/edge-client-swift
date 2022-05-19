@@ -45,6 +45,7 @@
 		E92A57C275EA2FD5BC371D9F /* GetCurrentUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9208EB79DB6FA86A325BE59 /* GetCurrentUser.swift */; };
 		E92B89A1B66E2D1F8F8D818F /* IamUtilTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92CE3DEF30197BFA961376C /* IamUtilTests.swift */; };
 		E92E743784165CA504619D02 /* IamHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E927FB7D04C0ABD6951697C1 /* IamHelper.swift */; };
+		E92F6E6146D807645CDD4B35 /* IsCurrentUserPaired.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9286DFA00DD128C54F1E8BA /* IsCurrentUserPaired.swift */; };
 		E92F92784753ABF65C759A79 /* PairPasswordOpen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92939973C97A9709F442C94 /* PairPasswordOpen.swift */; };
 		E92F9B04F3CB9AB49F114828 /* GetDeviceDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921C62E2CEAA960557ADD43 /* GetDeviceDetails.swift */; };
 /* End PBXBuildFile section */
@@ -129,6 +130,7 @@
 		E922433FDF28CDFC63583059 /* PairPasswordInvite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairPasswordInvite.swift; sourceTree = "<group>"; };
 		E9270F14E05A5511DF78141A /* GetUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetUser.swift; sourceTree = "<group>"; };
 		E927FB7D04C0ABD6951697C1 /* IamHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IamHelper.swift; sourceTree = "<group>"; };
+		E9286DFA00DD128C54F1E8BA /* IsCurrentUserPaired.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IsCurrentUserPaired.swift; sourceTree = "<group>"; };
 		E92939973C97A9709F442C94 /* PairPasswordOpen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairPasswordOpen.swift; sourceTree = "<group>"; };
 		E92AE96525DAF4143AE97A68 /* AbstractIamInvocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AbstractIamInvocation.swift; sourceTree = "<group>"; };
 		E92B906B4787E59860DA7927 /* GetAvailablePairingModes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetAvailablePairingModes.swift; sourceTree = "<group>"; };
@@ -284,6 +286,7 @@
 				E9270F14E05A5511DF78141A /* GetUser.swift */,
 				E9208EB79DB6FA86A325BE59 /* GetCurrentUser.swift */,
 				E92C74DF43642ECF620F0D94 /* DeleteUser.swift */,
+				E9286DFA00DD128C54F1E8BA /* IsCurrentUserPaired.swift */,
 			);
 			path = iam;
 			sourceTree = "<group>";
@@ -565,6 +568,7 @@
 				E926F5420D58576D4FD76E4C /* GetUser.swift in Sources */,
 				E92A57C275EA2FD5BC371D9F /* GetCurrentUser.swift in Sources */,
 				E920D40C05B13294EE40B302 /* DeleteUser.swift in Sources */,
+				E92F6E6146D807645CDD4B35 /* IsCurrentUserPaired.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
