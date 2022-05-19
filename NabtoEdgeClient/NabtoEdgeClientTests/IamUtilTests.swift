@@ -228,7 +228,7 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
 
         let guest = uniqueUser()
         let guestPassword = "guestpassword"
-        try IamUtil.createNewUser(
+        try IamUtil.createUser(
                         connection: self.connection,
                         username: guest,
                         password: guestPassword,
@@ -251,7 +251,7 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
 
         let guest = uniqueUser()
         let guestPassword = "guestpassword"
-        try IamUtil.createNewUser(
+        try IamUtil.createUser(
                         connection: self.connection,
                         username: guest,
                         password: guestPassword,
@@ -274,7 +274,7 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
 
         let guest = uniqueUser()
         let guestPassword = "guestpassword"
-        XCTAssertThrowsError(try IamUtil.createNewUser(
+        XCTAssertThrowsError(try IamUtil.createUser(
                         connection: self.connection,
                         username: guest,
                         password: guestPassword,
@@ -338,7 +338,7 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
 
         let guest = uniqueUser()
         let guestPassword = "guestpassword"
-        try IamUtil.createNewUser(
+        try IamUtil.createUser(
                         connection: self.connection,
                         username: guest,
                         password: guestPassword,
@@ -370,7 +370,7 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
 
         let guest = uniqueUser()
         let guestPassword = "guestpassword"
-        try IamUtil.createNewUser(
+        try IamUtil.createUser(
                 connection: self.connection,
                 username: guest,
                 password: guestPassword,
@@ -418,7 +418,7 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
 
         let guest = uniqueUser()
         let guestPassword = "guestpassword"
-        try IamUtil.createNewUser(
+        try IamUtil.createUser(
                 connection: self.connection,
                 username: guest,
                 password: guestPassword,
@@ -449,7 +449,7 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
 
         let guest = uniqueUser()
         let guestPassword = "guestpassword"
-        try IamUtil.createNewUser(
+        try IamUtil.createUser(
                 connection: self.connection,
                 username: guest,
                 password: guestPassword,
@@ -492,7 +492,7 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
         }
         XCTAssertEqual(currentUser.Username, initialUser)
         try IamUtil.renameUser(connection: connection, username: initialUser, newUsername: tmpUser)
-        try IamUtil.createNewUser(connection: connection, username: initialUser, password: "", role: "Administrator")
+        try IamUtil.createUser(connection: connection, username: initialUser, password: "", role: "Administrator")
         try IamUtil.deleteUser(connection: connection, username: tmpUser)
     }
 

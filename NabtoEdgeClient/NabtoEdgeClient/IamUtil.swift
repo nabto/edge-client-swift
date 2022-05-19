@@ -144,43 +144,25 @@ class IamUtil {
         try DeleteUser(connection, username).executeAsync(closure)
     }
 
-    static public func createNewUser(connection: Connection,
-                                     username: String,
-                                     password: String,
-                                     role: String) throws {
-        let user: IamUser
-        let cborRequest = try IamUser(username: username).encode()
-        do {
-            // https://docs.nabto.com/developer/api-reference/coap/iam/post-users.html
-            let coap = try connection.createCoapRequest(method: "POST", path: "/iam/users")
-            try coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: cborRequest)
-            let response = try coap.execute()
-            switch (response.status) {
-            case 201: break
-            case 400: throw IamError.INVALID_INPUT
-            case 403: throw IamError.BLOCKED_BY_DEVICE_CONFIGURATION
-            case 409: throw IamError.USERNAME_EXISTS
-            default: throw IamError.FAILED
-            }
-            user = try IamUser.decode(cbor: response.payload)
-            if (user.Sct == nil) {
-                throw IamError.INVALID_RESPONSE(error: "missing sct")
-            }
-        } catch {
-            try rethrowPairingError(error)
-        }
-
-        // if the following fails, a zombie user now exists on device - TODO, document how to check and cleanup!
-        try updateUserSetPassword(
+    static public func createUser(connection: Connection,
+                                   username: String,
+                                   password: String,
+                                   role: String) throws {
+        try CreateUser(connection, username).execute()
+        // if the following fails, a zombie user now exists on device
+        // TODO, document when it can occur (network error or race condition (user renamed before password/role set, quite unlikely))
+        try UpdateUser(
                 connection: connection,
                 username: username,
-                password: password)
-        try updateUserSetRole(
+                parameterName: "password",
+                parameterValue: password).execute()
+        try UpdateUser(
                 connection: connection,
                 username: username,
-                role: role)
+                parameterName: "role",
+                parameterValue: role,
+                fourOhFourMapping: IamError.ROLE_DOES_NOT_EXIST).execute()
     }
-
 
     static public func updateUserSetPassword(connection: Connection,
                                       username: String,

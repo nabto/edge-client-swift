@@ -36,6 +36,8 @@
 		E920D40C05B13294EE40B302 /* DeleteUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92C74DF43642ECF620F0D94 /* DeleteUser.swift */; };
 		E92302F614DFF1CE2D44AF7A /* IamUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92E1F3B78BE7B59AA656356 /* IamUtil.swift */; };
 		E923120C46CF30C6E5681300 /* AbstractIamInvocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92AE96525DAF4143AE97A68 /* AbstractIamInvocation.swift */; };
+		E9245BF32A15FBF23112817E /* UpdateUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92815681CC90C4994059AE6 /* UpdateUser.swift */; };
+		E924950057813BDEED31E0BE /* CreateUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92151858B2D17A5B9806BD1 /* CreateUser.swift */; };
 		E924E25FC8B3E45F8B6FE14D /* GetAvailablePairingModes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92B906B4787E59860DA7927 /* GetAvailablePairingModes.swift */; };
 		E925CA6B746BB821ABFC6E33 /* PairLocalInitial.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92CF513E9FC4558DD69F13D /* PairLocalInitial.swift */; };
 		E92652701579C3210C57BD1A /* PairPasswordInvite.swift in Sources */ = {isa = PBXBuildFile; fileRef = E922433FDF28CDFC63583059 /* PairPasswordInvite.swift */; };
@@ -124,12 +126,14 @@
 		D479084E27C581E400790A51 /* CallbackWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallbackWrapper.swift; sourceTree = "<group>"; };
 		D4BA975B27D60A2100012902 /* TestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestPlan.xctestplan; sourceTree = "<group>"; };
 		E9208EB79DB6FA86A325BE59 /* GetCurrentUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetCurrentUser.swift; sourceTree = "<group>"; };
+		E92151858B2D17A5B9806BD1 /* CreateUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateUser.swift; sourceTree = "<group>"; };
 		E921C62E2CEAA960557ADD43 /* GetDeviceDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetDeviceDetails.swift; sourceTree = "<group>"; };
 		E9221D728E77EBE65E3D5868 /* TestDeviceDefinitions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestDeviceDefinitions.swift; sourceTree = "<group>"; };
 		E9222CFACFDBA713CE870C08 /* PairLocalOpen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairLocalOpen.swift; sourceTree = "<group>"; };
 		E922433FDF28CDFC63583059 /* PairPasswordInvite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairPasswordInvite.swift; sourceTree = "<group>"; };
 		E9270F14E05A5511DF78141A /* GetUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetUser.swift; sourceTree = "<group>"; };
 		E927FB7D04C0ABD6951697C1 /* IamHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IamHelper.swift; sourceTree = "<group>"; };
+		E92815681CC90C4994059AE6 /* UpdateUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdateUser.swift; sourceTree = "<group>"; };
 		E9286DFA00DD128C54F1E8BA /* IsCurrentUserPaired.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IsCurrentUserPaired.swift; sourceTree = "<group>"; };
 		E92939973C97A9709F442C94 /* PairPasswordOpen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairPasswordOpen.swift; sourceTree = "<group>"; };
 		E92AE96525DAF4143AE97A68 /* AbstractIamInvocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AbstractIamInvocation.swift; sourceTree = "<group>"; };
@@ -287,6 +291,8 @@
 				E9208EB79DB6FA86A325BE59 /* GetCurrentUser.swift */,
 				E92C74DF43642ECF620F0D94 /* DeleteUser.swift */,
 				E9286DFA00DD128C54F1E8BA /* IsCurrentUserPaired.swift */,
+				E92151858B2D17A5B9806BD1 /* CreateUser.swift */,
+				E92815681CC90C4994059AE6 /* UpdateUser.swift */,
 			);
 			path = iam;
 			sourceTree = "<group>";
@@ -569,6 +575,8 @@
 				E92A57C275EA2FD5BC371D9F /* GetCurrentUser.swift in Sources */,
 				E920D40C05B13294EE40B302 /* DeleteUser.swift in Sources */,
 				E92F6E6146D807645CDD4B35 /* IsCurrentUserPaired.swift in Sources */,
+				E924950057813BDEED31E0BE /* CreateUser.swift in Sources */,
+				E9245BF32A15FBF23112817E /* UpdateUser.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
