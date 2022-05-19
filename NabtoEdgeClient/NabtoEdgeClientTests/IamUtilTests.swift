@@ -412,7 +412,7 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
         let username = uniqueUser()
         let displayName = uniqueUser()
         try IamUtil.pairLocalOpen(connection: self.connection, desiredUsername: username)
-        try IamUtil.updateUserSetDisplayName(connection: self.connection, username: username, displayName: displayName)
+        try IamUtil.updateUserDisplayName(connection: self.connection, username: username, displayName: displayName)
         let user = try IamUtil.getCurrentUser(connection: connection)
         XCTAssertEqual(user.DisplayName, displayName)
         XCTAssertTrue(try IamUtil.isCurrentUserPaired(connection: connection))
@@ -630,5 +630,195 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
         XCTAssertEqual(modes.count, 1)
         XCTAssertTrue(modes.contains(.LocalOpen))
     }
+
+    func createAdminAndGuest(device: TestDevice, guestPassword: String) throws -> String {
+        let admin = uniqueUser()
+        try super.connect(device)
+        try IamUtil.pairPasswordOpen(connection: self.connection, desiredUsername: admin, password: device.password)
+
+        let user = uniqueUser()
+        try IamUtil.createUser(
+                connection: self.connection,
+                username: user,
+                password: guestPassword,
+                role: "Guest")
+
+        return user
+    }
+
+    func doTestUpdateUserPassword(updateFunc: (Connection, String, String) throws -> ()) throws {
+        let device = self.testDevices.localPasswordInvite
+        let guestPassword = "guestpassword"
+        let user = try self.createAdminAndGuest(device: device, guestPassword: guestPassword)
+
+        let newGuestPassword = "newguestpassword"
+
+        // gracefully handle bad username
+        XCTAssertThrowsError(try updateFunc(self.connection, "baduser", "blah")) { error in
+            XCTAssertEqual(error as? IamError, IamError.USER_DOES_NOT_EXIST)
+        }
+
+        // sunshine scenario
+        try updateFunc(self.connection, user, newGuestPassword)
+
+        // currently connected as admin - connect as new user
+        try self.connection.close()
+        self.connection = try client.createConnection()
+        try self.connect(device)
+        XCTAssertFalse(try IamUtil.isCurrentUserPaired(connection: connection))
+
+        // confirm initial password no longer works
+        XCTAssertThrowsError(try IamUtil.pairPasswordInvite(connection: self.connection, username: user, password: guestPassword)) { error in
+            XCTAssertEqual(error as? IamError, IamError.AUTHENTICATION_ERROR)
+        }
+        try IamUtil.pairPasswordInvite(connection: self.connection, username: user, password: newGuestPassword)
+        XCTAssertTrue(try IamUtil.isCurrentUserPaired(connection: connection))
+    }
+
+    func testUpdateUserPassword_Sync() throws {
+        try doTestUpdateUserPassword { connection, username, password in
+            try IamUtil.updateUserPassword(connection: connection, username: username, password: password)
+        }
+    }
+
+    func testUpdateUserPassword_Async() throws {
+        try doTestUpdateUserPassword { connection, username, password in
+            let exp = XCTestExpectation(description: "set password done")
+            var err: IamError? = nil
+            try IamUtil.updateUserPasswordAsync(connection: connection, username: username, password: password) { error in
+                exp.fulfill()
+                err = error
+            }
+            wait(for: [exp], timeout: 2.0)
+            if (err != IamError.OK) {
+                throw err!
+            }
+        }
+    }
+
+    func doTestUpdateUserRole(updateFunc: (Connection, String, String) throws -> ()) throws {
+        let device = self.testDevices.localPasswordInvite
+        let guestPassword = "guestpassword"
+        let user = try self.createAdminAndGuest(device: device, guestPassword: guestPassword)
+
+        let newRole = "Standard"
+
+        // gracefully handle bad role name
+        XCTAssertThrowsError(try updateFunc(self.connection, user, "badrole")) { error in
+            XCTAssertEqual(error as? IamError, IamError.ROLE_DOES_NOT_EXIST)
+        }
+
+        // sunshine scenario
+        try updateFunc(self.connection, user, newRole)
+
+        let userObj = try IamUtil.getUser(connection: self.connection, username: user)
+        XCTAssertEqual(userObj.Role, newRole)
+    }
+
+    func testUpdateUserRole_Sync() throws {
+        try doTestUpdateUserRole { connection, username, role in
+            try IamUtil.updateUserRole(connection: connection, username: username, role: role)
+        }
+    }
+
+    func testUpdateUserRole_Async() throws {
+        try doTestUpdateUserRole { connection, username, role in
+            let exp = XCTestExpectation(description: "update role done")
+            var err: IamError? = nil
+            try IamUtil.updateUserRoleAsync(connection: connection, username: username, role: role) { error in
+                exp.fulfill()
+                err = error
+            }
+            wait(for: [exp], timeout: 2.0)
+            if (err != IamError.OK) {
+                throw err!
+            }
+        }
+    }
+
+    func doTestUpdateUserDisplayName(updateFunc: (Connection, String, String) throws -> ()) throws {
+        let device = self.testDevices.localPasswordInvite
+        let guestPassword = "guestpassword"
+        let user = try self.createAdminAndGuest(device: device, guestPassword: guestPassword)
+
+        let newDisplayName = "Foo Barsen"
+
+        // gracefully handle bad user name
+        XCTAssertThrowsError(try updateFunc(self.connection, "unexistinguser", newDisplayName)) { error in
+            XCTAssertEqual(error as? IamError, IamError.USER_DOES_NOT_EXIST)
+        }
+
+        // sunshine scenario
+        try updateFunc(self.connection, user, newDisplayName)
+
+        let userObj = try IamUtil.getUser(connection: self.connection, username: user)
+        XCTAssertEqual(userObj.DisplayName, newDisplayName)
+    }
+
+    func testUpdateUserDisplayName_Sync() throws {
+        try doTestUpdateUserDisplayName { connection, username, displayName in
+            try IamUtil.updateUserDisplayName(connection: connection, username: username, displayName: displayName)
+        }
+    }
+
+    func testUpdateUserDisplayName_Async() throws {
+        try doTestUpdateUserDisplayName { connection, username, displayName in
+            let exp = XCTestExpectation(description: "set password done")
+            var err: IamError? = nil
+            try IamUtil.updateUserDisplayNameAsync(connection: connection, username: username, displayName: displayName) { error in
+                exp.fulfill()
+                err = error
+            }
+            wait(for: [exp], timeout: 2.0)
+            if (err != IamError.OK) {
+                throw err!
+            }
+        }
+    }
+
+    func doTestRenameUser(updateFunc: (Connection, String, String) throws -> ()) throws {
+        let device = self.testDevices.localPasswordInvite
+        let guestPassword = "guestpassword"
+        let user = try self.createAdminAndGuest(device: device, guestPassword: guestPassword)
+
+        let newUsername = uniqueUser()
+
+        // gracefully handle bad user name
+        XCTAssertThrowsError(try updateFunc(self.connection, "unexistinguser", newUsername)) { error in
+            XCTAssertEqual(error as? IamError, IamError.USER_DOES_NOT_EXIST)
+        }
+
+        // sunshine scenario
+        try updateFunc(self.connection, user, newUsername)
+
+        XCTAssertThrowsError(try IamUtil.getUser(connection: self.connection, username: user)) { error in
+            XCTAssertEqual(error as? IamError, IamError.USER_DOES_NOT_EXIST)
+        }
+
+        let userObj = try IamUtil.getUser(connection: self.connection, username: newUsername)
+        XCTAssertEqual(userObj.Username, newUsername)
+    }
+
+    func testRenameUser_Sync() throws {
+        try doTestRenameUser { connection, username, newUsername in
+            try IamUtil.renameUser(connection: connection, username: username, newUsername: newUsername)
+        }
+    }
+
+    func testRenameUser_Async() throws {
+        try doTestRenameUser { connection, username, newUsername in
+            let exp = XCTestExpectation(description: "rename done")
+            var err: IamError? = nil
+            try IamUtil.renameUserAsync(connection: connection, username: username, newUsername: newUsername) { error in
+                exp.fulfill()
+                err = error
+            }
+            wait(for: [exp], timeout: 2.0)
+            if (err != IamError.OK) {
+                throw err!
+            }
+        }
+    }
+
 
 }
