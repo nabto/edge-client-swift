@@ -35,7 +35,7 @@
 		E2FB5D4F1AA78AC7D4FAEA68 /* Pods_NabtoEdgeClientTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28C850E1A5507E6CEBD10099 /* Pods_NabtoEdgeClientTests.framework */; };
 		E920D40C05B13294EE40B302 /* DeleteUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92C74DF43642ECF620F0D94 /* DeleteUser.swift */; };
 		E92302F614DFF1CE2D44AF7A /* IamUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92E1F3B78BE7B59AA656356 /* IamUtil.swift */; };
-		E923120C46CF30C6E5681300 /* AbstractIamInvocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92AE96525DAF4143AE97A68 /* AbstractIamInvocation.swift */; };
+		E923120C46CF30C6E5681300 /* AbstractIamInvocationTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92AE96525DAF4143AE97A68 /* AbstractIamInvocationTemplate.swift */; };
 		E9245BF32A15FBF23112817E /* UpdateUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92815681CC90C4994059AE6 /* UpdateUser.swift */; };
 		E924950057813BDEED31E0BE /* CreateUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92151858B2D17A5B9806BD1 /* CreateUser.swift */; };
 		E924E25FC8B3E45F8B6FE14D /* GetAvailablePairingModes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92B906B4787E59860DA7927 /* GetAvailablePairingModes.swift */; };
@@ -136,7 +136,7 @@
 		E92815681CC90C4994059AE6 /* UpdateUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdateUser.swift; sourceTree = "<group>"; };
 		E9286DFA00DD128C54F1E8BA /* IsCurrentUserPaired.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IsCurrentUserPaired.swift; sourceTree = "<group>"; };
 		E92939973C97A9709F442C94 /* PairPasswordOpen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairPasswordOpen.swift; sourceTree = "<group>"; };
-		E92AE96525DAF4143AE97A68 /* AbstractIamInvocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AbstractIamInvocation.swift; sourceTree = "<group>"; };
+		E92AE96525DAF4143AE97A68 /* AbstractIamInvocationTemplate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AbstractIamInvocationTemplate.swift; sourceTree = "<group>"; };
 		E92B906B4787E59860DA7927 /* GetAvailablePairingModes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetAvailablePairingModes.swift; sourceTree = "<group>"; };
 		E92C74DF43642ECF620F0D94 /* DeleteUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeleteUser.swift; sourceTree = "<group>"; };
 		E92CE3DEF30197BFA961376C /* IamUtilTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IamUtilTests.swift; sourceTree = "<group>"; };
@@ -279,7 +279,7 @@
 		E92F919B16104FB2A34E9523 /* iam */ = {
 			isa = PBXGroup;
 			children = (
-				E92AE96525DAF4143AE97A68 /* AbstractIamInvocation.swift */,
+				E92AE96525DAF4143AE97A68 /* AbstractIamInvocationTemplate.swift */,
 				E927FB7D04C0ABD6951697C1 /* IamHelper.swift */,
 				E92CF513E9FC4558DD69F13D /* PairLocalInitial.swift */,
 				E9222CFACFDBA713CE870C08 /* PairLocalOpen.swift */,
@@ -563,7 +563,7 @@
 				D479084927C5803300790A51 /* CoapResponse.swift in Sources */,
 				D479085027C581E400790A51 /* Helper.swift in Sources */,
 				E92302F614DFF1CE2D44AF7A /* IamUtil.swift in Sources */,
-				E923120C46CF30C6E5681300 /* AbstractIamInvocation.swift in Sources */,
+				E923120C46CF30C6E5681300 /* AbstractIamInvocationTemplate.swift in Sources */,
 				E92E743784165CA504619D02 /* IamHelper.swift in Sources */,
 				E925CA6B746BB821ABFC6E33 /* PairLocalInitial.swift in Sources */,
 				E9289DDF58735633C1389870 /* PairLocalOpen.swift in Sources */,
