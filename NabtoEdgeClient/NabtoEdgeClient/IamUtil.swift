@@ -219,9 +219,9 @@ class IamUtil {
     }
 
 
-    static public func updateUserSetPassword(connection: Connection,
-                                      username: String,
-                                      password: String) throws {
+    static public func updateUserPassword(connection: Connection,
+                                          username: String,
+                                          password: String) throws {
         try UpdateUser(
                 connection: connection,
                 username: username,
@@ -229,10 +229,10 @@ class IamUtil {
                 parameterValue: password).execute()
     }
 
-    static public func updateUserSetPasswordAsync(connection: Connection,
-                                                  username: String,
-                                                  password: String,
-                                                  closure: @escaping AsyncIamResultReceiver) throws {
+    static public func updateUserPasswordAsync(connection: Connection,
+                                               username: String,
+                                               password: String,
+                                               closure: @escaping AsyncIamResultReceiver) throws {
         try UpdateUser(
                 connection: connection,
                 username: username,
@@ -240,33 +240,34 @@ class IamUtil {
                 parameterValue: password).executeAsync(closure)
     }
 
-    static public func updateUserSetRole(connection: Connection,
-                                         username: String,
-                                         role: String) throws {
+    static public func updateUserRole(connection: Connection,
+                                      username: String,
+                                      role: String) throws {
         try UpdateUser(
                 connection: connection,
                 username: username,
                 parameterName: "role",
                 parameterValue: role,
-                // user was just created - so ambiguous 404 is most likely due to missing role (... unless race condition)
                 fourOhFourMapping: IamError.ROLE_DOES_NOT_EXIST
         ).execute()
     }
 
-    static public func updateUserSetRoleAsync(connection: Connection,
-                                                  username: String,
-                                                  role: String,
-                                                  closure: @escaping AsyncIamResultReceiver) throws {
+    static public func updateUserRoleAsync(connection: Connection,
+                                           username: String,
+                                           role: String,
+                                           closure: @escaping AsyncIamResultReceiver) throws {
         try UpdateUser(
                 connection: connection,
                 username: username,
                 parameterName: "role",
-                parameterValue: role).executeAsync(closure)
+                parameterValue: role,
+                fourOhFourMapping: IamError.ROLE_DOES_NOT_EXIST
+        ).executeAsync(closure)
     }
 
-    static public func updateUserSetDisplayName(connection: Connection,
-                                         username: String,
-                                         displayName: String) throws{
+    static public func updateUserDisplayName(connection: Connection,
+                                             username: String,
+                                             displayName: String) throws{
         try UpdateUser(
                 connection: connection,
                 username: username,
@@ -274,10 +275,10 @@ class IamUtil {
                 parameterValue: displayName).execute()
     }
 
-    static public func updateUserSetDisplayNameAsync(connection: Connection,
-                                                     username: String,
-                                                     displayName: String,
-                                                     closure: @escaping AsyncIamResultReceiver) throws {
+    static public func updateUserDisplayNameAsync(connection: Connection,
+                                                  username: String,
+                                                  displayName: String,
+                                                  closure: @escaping AsyncIamResultReceiver) throws {
         try UpdateUser(
                 connection: connection,
                 username: username,
