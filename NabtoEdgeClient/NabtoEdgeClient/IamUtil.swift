@@ -145,9 +145,9 @@ class IamUtil {
     }
 
     static public func createUser(connection: Connection,
-                                   username: String,
-                                   password: String,
-                                   role: String) throws {
+                                  username: String,
+                                  password: String,
+                                  role: String) throws {
         try CreateUser(connection, username).execute()
         // if the following fails, a zombie user now exists on device
         // TODO, document when it can occur (network error or race condition (user renamed before password/role set, quite unlikely))
@@ -164,78 +164,146 @@ class IamUtil {
                 fourOhFourMapping: IamError.ROLE_DOES_NOT_EXIST).execute()
     }
 
+    static public func createUserAsync(connection: Connection,
+                                       username: String,
+                                       password: String,
+                                       role: String,
+                                       closure: @escaping AsyncIamResultReceiver) {
+        do {
+            try CreateUser(connection, username).executeAsync { error in
+                if (error == IamError.OK) {
+                    do {
+                        // if the following fails, a zombie user now exists on device
+                        // TODO, document when it can occur (network error or race condition (user renamed before password/role set, quite unlikely))
+                        try UpdateUser(
+                                connection: connection,
+                                username: username,
+                                parameterName: "password",
+                                parameterValue: password).executeAsync { error in
+                            if (error == IamError.OK) {
+                                do {
+                                    try UpdateUser(
+                                            connection: connection,
+                                            username: username,
+                                            parameterName: "role",
+                                            parameterValue: role,
+                                            fourOhFourMapping: IamError.ROLE_DOES_NOT_EXIST).executeAsync { error in
+                                        if (error == IamError.OK) {
+                                            closure(IamError.OK)
+                                        } else {
+                                            // UpdateUser (role) failed
+                                            IamHelper.invokeIamErrorHandler(error, closure)
+                                        }
+                                    }
+                                } catch {
+                                    // cbor encoding failed in ctor before async UpdateUser (role) invocation started
+                                    IamHelper.invokeIamErrorHandler(error, closure)
+                                }
+                            } else {
+                                // UpdateUser (password) failed
+                                IamHelper.invokeIamErrorHandler(error, closure)
+                            }
+                        }
+                    } catch {
+                        // cbor encoding failed in ctor before async UpdateUser (password) invocation started
+                        IamHelper.invokeIamErrorHandler(error, closure)
+                    }
+                } else {
+                    IamHelper.invokeIamErrorHandler(error, closure)
+                }
+            }
+        } catch {
+            // cbor encoding failed in ctor before async CreateUser invocation started
+            IamHelper.invokeIamErrorHandler(error, closure)
+        }
+    }
+
+
     static public func updateUserSetPassword(connection: Connection,
                                       username: String,
                                       password: String) throws {
-        try updateUser(
+        try UpdateUser(
                 connection: connection,
                 username: username,
-                parameter: "password",
-                value: password)
+                parameterName: "password",
+                parameterValue: password).execute()
+    }
+
+    static public func updateUserSetPasswordAsync(connection: Connection,
+                                                  username: String,
+                                                  password: String,
+                                                  closure: @escaping AsyncIamResultReceiver) throws {
+        try UpdateUser(
+                connection: connection,
+                username: username,
+                parameterName: "password",
+                parameterValue: password).executeAsync(closure)
     }
 
     static public func updateUserSetRole(connection: Connection,
                                          username: String,
-                                         role: String) throws{
-        try updateUser(
+                                         role: String) throws {
+        try UpdateUser(
                 connection: connection,
                 username: username,
-                parameter: "role",
-                value: role,
+                parameterName: "role",
+                parameterValue: role,
                 // user was just created - so ambiguous 404 is most likely due to missing role (... unless race condition)
-                fourOhFourMapping: IamError.ROLE_DOES_NOT_EXIST)
+                fourOhFourMapping: IamError.ROLE_DOES_NOT_EXIST
+        ).execute()
+    }
+
+    static public func updateUserSetRoleAsync(connection: Connection,
+                                                  username: String,
+                                                  role: String,
+                                                  closure: @escaping AsyncIamResultReceiver) throws {
+        try UpdateUser(
+                connection: connection,
+                username: username,
+                parameterName: "role",
+                parameterValue: role).executeAsync(closure)
     }
 
     static public func updateUserSetDisplayName(connection: Connection,
                                          username: String,
                                          displayName: String) throws{
-        try updateUser(
+        try UpdateUser(
                 connection: connection,
                 username: username,
-                parameter: "display-name",
-                value: displayName)
+                parameterName: "display-name",
+                parameterValue: displayName).execute()
+    }
+
+    static public func updateUserSetDisplayNameAsync(connection: Connection,
+                                                     username: String,
+                                                     displayName: String,
+                                                     closure: @escaping AsyncIamResultReceiver) throws {
+        try UpdateUser(
+                connection: connection,
+                username: username,
+                parameterName: "display-name",
+                parameterValue: displayName).executeAsync(closure)
     }
 
     static public func renameUser(connection: Connection,
                                   username: String,
                                   newUsername: String) throws {
-        try updateUser(
+        try UpdateUser(
                 connection: connection,
                 username: username,
-                parameter: "username",
-                value: newUsername)
+                parameterName: "username",
+                parameterValue: newUsername).execute()
     }
 
-    static private func updateUser(connection: Connection,
-                                   username: String,
-                                   parameter: String,
-                                   value: String,
-                                   fourOhFourMapping: IamError=IamError.USER_DOES_NOT_EXIST) throws {
-        let encoder = CBOREncoder()
-        let cborRequest: Data = try encoder.encode(value)
-        do {
-            let coap = try connection.createCoapRequest(method: "PUT", path: "/iam/users/\(username)/\(parameter)")
-            try coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: cborRequest)
-            let response = try coap.execute()
-            switch (response.status) {
-            case 204: break
-            case 400: throw IamError.INVALID_INPUT
-            case 403: throw IamError.BLOCKED_BY_DEVICE_CONFIGURATION
-            case 404: throw fourOhFourMapping
-            default: throw IamError.FAILED
-            }
-        } catch {
-            try rethrowPairingError(error)
-        }
-    }
-
-    static private func rethrowPairingError(_ error: Error) throws {
-        if let pairingError = error as? IamError {
-            throw pairingError
-        } else if let apiError = error as? NabtoEdgeClientError {
-            throw IamError.API_ERROR(cause: apiError)
-        }
-        throw IamError.FAILED
+    static public func renameUserAsync(connection: Connection,
+                                       username: String,
+                                       newUsername: String,
+                                       closure: @escaping AsyncIamResultReceiver) throws {
+        try UpdateUser(
+                connection: connection,
+                username: username,
+                parameterName: "username",
+                parameterValue: newUsername).executeAsync(closure)
     }
 
 }

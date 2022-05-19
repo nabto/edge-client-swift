@@ -370,11 +370,20 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
 
         let guest = uniqueUser()
         let guestPassword = "guestpassword"
-        try IamUtil.createUser(
+
+        let expCreate = XCTestExpectation(description: "create user invocation done")
+
+        var err: IamError? = nil
+        try IamUtil.createUserAsync(
                 connection: self.connection,
                 username: guest,
                 password: guestPassword,
-                role: "Guest")
+                role: "Guest") { error in
+            err = error
+            expCreate.fulfill()
+        }
+        wait(for: [expCreate], timeout: 2.0)
+        XCTAssertEqual(err, .OK)
 
         // currently connected as admin - connect as new user
         try self.connection.close()
@@ -382,15 +391,15 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
         try self.connect(device)
         try IamUtil.pairPasswordInvite(connection: self.connection, username: guest, password: guestPassword)
 
-        let exp = XCTestExpectation(description: "invocation done")
-        var err: IamError? = nil
+        let expGetUser = XCTestExpectation(description: "get user invocation done")
+        err = nil
         var me: IamUser!
         IamUtil.getCurrentUserAsync(connection: self.connection) { error, user in
             err = error
             me = user
-            exp.fulfill()
+            expGetUser.fulfill()
         }
-        wait(for: [exp], timeout: 2.0)
+        wait(for: [expGetUser], timeout: 2.0)
         XCTAssertEqual(err, .OK)
         XCTAssertEqual(me.Username, guest)
         XCTAssertEqual(me.Role, "Guest")
