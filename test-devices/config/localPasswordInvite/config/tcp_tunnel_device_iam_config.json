@@ -43,6 +43,7 @@
                   "IAM:ListRoles",
                   "IAM:CreateUser",
                   "IAM:SetUserPassword",
+                  "IAM:SetUserUsername",
                   "IAM:SetUserDisplayName",
                   "IAM:SetSettings",
                   "IAM:GetSettings"
