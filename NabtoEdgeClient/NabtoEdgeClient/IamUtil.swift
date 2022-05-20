@@ -5,42 +5,53 @@
 import Foundation
 import CBORCoding
 
-public enum IamError: Error, Equatable {
-    case OK
-    case INVALID_INPUT
-    case USERNAME_EXISTS
-    case USER_DOES_NOT_EXIST
-    case USER_IS_NOT_PAIRED
-    case INITIAL_USER_ALREADY_PAIRED
-    case ROLE_DOES_NOT_EXIST
-    case AUTHENTICATION_ERROR
-    case TOO_MANY_WRONG_PASSWORD_ATTEMPTS
-    case PAIRING_MODE_DISABLED
-    case BLOCKED_BY_DEVICE_CONFIGURATION
-    case INVALID_RESPONSE(error: String)
-    case INVALID_PAIRING_STRING(error: String)
-    case IAM_NOT_SUPPORTED
-    case API_ERROR(cause: NabtoEdgeClientError)
-    case FAILED
-}
-
-public enum PairingMode {
-    case LocalOpen
-    case LocalInitial
-    case PasswordOpen
-    case PasswordInvite
-}
-
-public typealias AsyncIamResultReceiver = (IamError) -> Void
-public typealias AsyncIamResultReceiverWithData<T> = (IamError, T?) -> Void
-public typealias AsyncIamPayloadReceiver<T> = (IamError, Data?) -> Void
-
+/**
+ * This class simplifies interaction with the Nabto Edge Embedded SDK device's CoAP IAM endpoints.
+ *
+ * For instance, it is made simple to invoke the different pairing endpoints - just invoke a simple high level
+ * pairing function to pair the client with the connected device and don't worry about CBOR encoding and decoding.
+ *
+ * Read more about the important concept of pairing here: https://docs.nabto.com/developer/guides/concepts/iam/pairing.html
+ *
+ * All the most popular IAM device endpoints are wrapped to also allow management of user profile on the device
+ * (own or other users' if client is in admin role)., depending on the client role).
+ *
+ * Note that the device's IAM configuration must allow invocation of the different functions and the pairing modes must
+ * be enabled at runtime. Read more about that in the general IAM intro here: https://docs.nabto.com/developer/guides/concepts/iam/intro.html
+ */
 class IamUtil {
 
+    /**
+     * Perform Local Open pairing, requesting the specified username.
+     *
+     * Local open pairing uses the trusted local network (LAN) pairing mechanism. No password is required for pairing and no
+     * invitation is needed, anybody on the LAN can initiate pairing.
+     *
+     * Read more here: https://docs.nabto.com/developer/guides/concepts/iam/pairing.html#open-local
+     *
+     * @param connection an established connection to the device this client should be paired with
+     * @param desiredUsername Assign this username on the device if available (pairing fails with .USERNAME_EXISTS if not)
+     *
+     * @throws USERNAME_EXISTS if desiredUsername is already in use on the device
+     * @throws INVALID_INPUT if desiredUsername is not valid as per https://docs.nabto.com/developer/api-reference/coap/iam/post-users.html#request
+     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not support local open pairing (the `IAM:PairingLocalOpen` action
+     * is not set for the Unpaired role or the device does not support the pairing mode at all)
+     * @throws PAIRING_MODE_DISABLED if the pairing mode is configured on the device but is disabled at runtime.
+     */
     static public func pairLocalOpen(connection: Connection, desiredUsername: String) throws {
         try PairLocalOpen(connection, desiredUsername).execute()
     }
 
+    /**
+     * Perform Local Open pairing asynchronously, requesting the specified username.
+     *
+     * The specified AsyncIamResultReceiver closure is invoked with an error if an error occurs, see
+     * the `pairLocalOpen()` function for details about error codes.
+     *
+     * @param connection an established connection to the device this client should be paired with
+     * @param desiredUsername Assign this username on the device if available (pairing fails with .USERNAME_EXISTS if not)
+     * @param closure Invoked when the connect attempt succeeds or fails.
+     */
     static public func pairLocalOpenAsync(
             connection: Connection,
             desiredUsername: String,
@@ -48,19 +59,72 @@ class IamUtil {
         try PairLocalOpen(connection, desiredUsername).executeAsync(closure)
     }
 
+    /**
+     * Perform Local Initial pairing, assigning the default initial username configured on the device (typically "admin").
+     *
+     * In this mode, the initial user can be paired on the local network without providing a username or password - and
+     * only the initial user. This is a typical bootstrap scenario to pair the admin user (device owner).
+     *
+     * Read more here: https://docs.nabto.com/developer/guides/concepts/iam/pairing.html#initial-local
+     *
+     * @param connection an established connection to the device this client should be paired with
+     *
+     * @throws INITIAL_USER_ALREADY_PAIRED if the initial user was already paired
+     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not support local open pairing (the `IAM:PairingLocalInitial` action
+     * is not set for the Unpaired role or the device does not support the pairing mode at all)
+     * @throws PAIRING_MODE_DISABLED if the pairing mode is configured on the device but is disabled at runtime.
+     */
     static public func pairLocalInitial(connection: Connection) throws {
         try PairLocalInitial(connection).execute()
     }
 
+    /**
+     * Perform Local Initial pairing asynchronously.
+     *
+     * The specified AsyncIamResultReceiver closure is invoked with an error if an error occurs, see
+     * the `pairLocalInitial()` function for details about error codes.
+     *
+     * @param connection an established connection to the device this client should be paired with
+     * @param closure Invoked when the connect attempt succeeds or fails.
+     */
     static public func pairLocalInitialAsync(connection: Connection, closure: @escaping AsyncIamResultReceiver) {
         PairLocalInitial(connection).executeAsync(closure)
     }
 
+    /**
+     * Perform Password Open pairing, requesting the specified username and authenticating using the specified password.
+     *
+     * In this mode a device has set a password which can be used in the pairing process to grant a client access to the
+     * device. The client can pair remotely to the device if necessary; it is not necessary to be on the same LAN.
+     *
+     * Read more here: https://docs.nabto.com/developer/guides/concepts/iam/pairing.html#open-password
+     *
+     * @param connection an established connection to the device this client should be paired with
+     * @param desiredUsername Assign this username on the device if available (pairing fails with .USERNAME_EXISTS if not)
+     * @param password the common (not user-specific) password to allow pairing using Password Open pairing
+     *
+     * @throws USERNAME_EXISTS if desiredUsername is already in use on the device
+     * @throws INVALID_INPUT if desiredUsername is not valid as per https://docs.nabto.com/developer/api-reference/coap/iam/post-users.html#request
+     * @throws INITIAL_USER_ALREADY_PAIRED if the initial user was already paired
+     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not support local open pairing (the `IAM:PairingPasswordOpen` action
+     * is not set for the Unpaired role or the device does not support the pairing mode at all)
+     * @throws PAIRING_MODE_DISABLED if the pairing mode is configured on the device but is disabled at runtime.
+     */
     static public func pairPasswordOpen(connection: Connection, desiredUsername: String, password: String) throws {
         try PairPasswordOpen(connection: connection, desiredUsername: desiredUsername, password: password)
                 .execute()
     }
 
+    /**
+     * Perform Password Open pairing asynchronously.
+     *
+     * The specified AsyncIamResultReceiver closure is invoked with an error if an error occurs, see
+     * the `pairPasswordOpen()` function for details about error codes.
+     *
+     * @param connection an established connection to the device this client should be paired with
+     * @param desiredUsername Assign this username on the device if available (pairing fails with .USERNAME_EXISTS if not)
+     * @param password the common (not user-specific) password to allow pairing using Password Open pairing
+     */
     static public func pairPasswordOpenAsync(
             connection: Connection,
             desiredUsername: String,
@@ -72,6 +136,24 @@ class IamUtil {
                 password: password).executeAsync(closure)
     }
 
+    /**
+     * Perform Password Invite pairing, authenticating with the specified username and password.
+     *
+     * In the Password invite pairing mode a user is required in the system to be able to pair: An existing user (or
+     * the system autonomously) creates a username and password that is somehow passed to the new user (an invitation).
+     *
+     * Read more here: https://docs.nabto.com/developer/guides/concepts/iam/pairing.html#invite
+     *
+     * @param connection an established connection to the device this client should be paired with
+     * @param username Username of the invited user
+     * @param password Password of the invited user
+     *
+     * @throws USERNAME_EXISTS if desiredUsername is already in use on the device
+     * @throws INITIAL_USER_ALREADY_PAIRED if the initial user was already paired
+     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not support local open pairing (the `IAM:PairingPasswordInvite` action
+     * is not set for the Unpaired role or the device does not support the pairing mode at all)
+     * @throws PAIRING_MODE_DISABLED if the pairing mode is configured on the device but is disabled at runtime.
+     */
     static public func pairPasswordInvite(connection: Connection, username: String, password: String) throws {
         try PairPasswordInvite(
                 connection: connection,
@@ -308,6 +390,36 @@ class IamUtil {
     }
 
 }
+
+public enum IamError: Error, Equatable {
+    case OK
+    case INVALID_INPUT
+    case USERNAME_EXISTS
+    case USER_DOES_NOT_EXIST
+    case USER_IS_NOT_PAIRED
+    case INITIAL_USER_ALREADY_PAIRED
+    case ROLE_DOES_NOT_EXIST
+    case AUTHENTICATION_ERROR
+    case TOO_MANY_WRONG_PASSWORD_ATTEMPTS
+    case PAIRING_MODE_DISABLED
+    case BLOCKED_BY_DEVICE_CONFIGURATION
+    case INVALID_RESPONSE(error: String)
+    case INVALID_PAIRING_STRING(error: String)
+    case IAM_NOT_SUPPORTED
+    case API_ERROR(cause: NabtoEdgeClientError)
+    case FAILED
+}
+
+public enum PairingMode {
+    case LocalOpen
+    case LocalInitial
+    case PasswordOpen
+    case PasswordInvite
+}
+
+public typealias AsyncIamResultReceiver = (IamError) -> Void
+public typealias AsyncIamResultReceiverWithData<T> = (IamError, T?) -> Void
+public typealias AsyncIamPayloadReceiver<T> = (IamError, Data?) -> Void
 
 // upper camelcase field names breaks standard Swift style - they match
 // the key names in the CBOR string map for the "CoAP GET /iam/me" service

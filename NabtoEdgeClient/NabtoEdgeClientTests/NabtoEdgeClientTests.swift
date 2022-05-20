@@ -70,7 +70,7 @@ class NabtoEdgeClientTestBase: XCTestCase {
     }
 
     func enableLogging(_ client: Client) throws {
-        try client.setLogLevel(level: "trace")
+        try client.setLogLevel(level: "info")
         client.enableNsLogLogging()
     }
 

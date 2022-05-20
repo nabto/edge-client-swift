@@ -25,7 +25,7 @@ internal class PairLocalOpen : AbstractIamInvocationTemplate {
         switch (status) {
         case 201: return IamError.OK
         case 400: return IamError.INVALID_INPUT
-        case 403: return IamError.PAIRING_MODE_DISABLED
+        case 403: return IamError.BLOCKED_BY_DEVICE_CONFIGURATION
         case 404: return IamError.PAIRING_MODE_DISABLED
         case 409: return IamError.USERNAME_EXISTS
         default:  return IamError.FAILED

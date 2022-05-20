@@ -37,7 +37,6 @@ internal class PairPasswordInvite : AbstractIamInvocationTemplate {
         case 401: return IamError.FAILED // never here
         case 403: return IamError.BLOCKED_BY_DEVICE_CONFIGURATION
         case 404: return IamError.PAIRING_MODE_DISABLED // never here - authentication error before if not enabled
-        case 409: return IamError.USERNAME_EXISTS
         default:  return IamError.FAILED
         }
     }
