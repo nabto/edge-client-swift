@@ -110,20 +110,24 @@ extension AbstractIamInvocationTemplate {
                             }
                             closure(status, result)
                         } catch {
+                            // mapping of status or response failed
                             IamHelper.invokeIamErrorHandler(error, { error in
                                 closure(error, nil)
                             })
                         }
                     } else {
+                        // ok, but no response - unlikely
                         closure(IamError.INVALID_RESPONSE(error: "status ok with no response from \(self.path)"), nil)
                     }
                 } else {
+                    // lower level api error
                     IamHelper.invokeIamErrorHandler(error, { error in
                         closure(error, nil)
                     })
                 }
             }
         } catch {
+            // create coap request failed
             IamHelper.invokeIamErrorHandler(error, { error in
                 closure(error, nil)
             })

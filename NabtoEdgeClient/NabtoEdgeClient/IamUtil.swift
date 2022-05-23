@@ -29,14 +29,16 @@ class IamUtil {
      *
      * Read more here: https://docs.nabto.com/developer/guides/concepts/iam/pairing.html#open-local
      *
-     * @param connection an established connection to the device this client should be paired with
+     * @param connection An established connection to the device this client should be paired with
      * @param desiredUsername Assign this username on the device if available (pairing fails with .USERNAME_EXISTS if not)
      *
      * @throws USERNAME_EXISTS if desiredUsername is already in use on the device
      * @throws INVALID_INPUT if desiredUsername is not valid as per https://docs.nabto.com/developer/api-reference/coap/iam/post-users.html#request
      * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not support local open pairing (the `IAM:PairingLocalOpen` action
      * is not set for the Unpaired role or the device does not support the pairing mode at all)
-     * @throws PAIRING_MODE_DISABLED if the pairing mode is configured on the device but is disabled at runtime.
+     * @throws PAIRING_MODE_DISABLED if the pairing mode is configured on the device but is disabled at runtime. Note this error could also indicate
+     * that the device does not support Nabto Edge IAM at all (mapping of CoAP status 404), so to be able to interpret the result correctly, this
+     * must be known to be the case or not.
      */
     static public func pairLocalOpen(connection: Connection, desiredUsername: String) throws {
         try PairLocalOpen(connection, desiredUsername).execute()
@@ -45,12 +47,12 @@ class IamUtil {
     /**
      * Perform Local Open pairing asynchronously, requesting the specified username.
      *
-     * The specified AsyncIamResultReceiver closure is invoked with an error if an error occurs, see
-     * the `pairLocalOpen()` function for details about error codes.
+     * The specified AsyncIamResultReceiver closure is invoked with IamError.OK upon successful completion or with an
+     * error if an error occurs. See the `pairLocalOpen()` function for details about possible error codes.
      *
-     * @param connection an established connection to the device this client should be paired with
+     * @param connection An established connection to the device this client should be paired with
      * @param desiredUsername Assign this username on the device if available (pairing fails with .USERNAME_EXISTS if not)
-     * @param closure Invoked when the connect attempt succeeds or fails.
+     * @param closure Invoked when the pairing attempt succeeds or fails.
      */
     static public func pairLocalOpenAsync(
             connection: Connection,
@@ -67,12 +69,14 @@ class IamUtil {
      *
      * Read more here: https://docs.nabto.com/developer/guides/concepts/iam/pairing.html#initial-local
      *
-     * @param connection an established connection to the device this client should be paired with
+     * @param connection An established connection to the device this client should be paired with
      *
      * @throws INITIAL_USER_ALREADY_PAIRED if the initial user was already paired
      * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not support local open pairing (the `IAM:PairingLocalInitial` action
      * is not set for the Unpaired role or the device does not support the pairing mode at all)
-     * @throws PAIRING_MODE_DISABLED if the pairing mode is configured on the device but is disabled at runtime.
+     * @throws PAIRING_MODE_DISABLED if the pairing mode is configured on the device but is disabled at runtime. Note this error could also indicate
+     * that the device does not support Nabto Edge IAM at all (mapping of CoAP status 404), so to be able to interpret the result correctly, this
+     * must be known to be the case or not.
      */
     static public func pairLocalInitial(connection: Connection) throws {
         try PairLocalInitial(connection).execute()
@@ -81,10 +85,10 @@ class IamUtil {
     /**
      * Perform Local Initial pairing asynchronously.
      *
-     * The specified AsyncIamResultReceiver closure is invoked with an error if an error occurs, see
-     * the `pairLocalInitial()` function for details about error codes.
+     * The specified AsyncIamResultReceiver closure is invoked with IamError.OK upon successful completion or with an
+     * error if an error occurs. See the `pairLocalInitial()` function for details about possible error codes.
      *
-     * @param connection an established connection to the device this client should be paired with
+     * @param connection An established connection to the device this client should be paired with
      * @param closure Invoked when the connect attempt succeeds or fails.
      */
     static public func pairLocalInitialAsync(connection: Connection, closure: @escaping AsyncIamResultReceiver) {
@@ -99,16 +103,19 @@ class IamUtil {
      *
      * Read more here: https://docs.nabto.com/developer/guides/concepts/iam/pairing.html#open-password
      *
-     * @param connection an established connection to the device this client should be paired with
+     * @param connection An established connection to the device this client should be paired with
      * @param desiredUsername Assign this username on the device if available (pairing fails with .USERNAME_EXISTS if not)
      * @param password the common (not user-specific) password to allow pairing using Password Open pairing
      *
      * @throws USERNAME_EXISTS if desiredUsername is already in use on the device
+     * @throws AUTHENTICATION_ERROR if the open pairing password was invalid for the device
      * @throws INVALID_INPUT if desiredUsername is not valid as per https://docs.nabto.com/developer/api-reference/coap/iam/post-users.html#request
      * @throws INITIAL_USER_ALREADY_PAIRED if the initial user was already paired
      * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not support local open pairing (the `IAM:PairingPasswordOpen` action
      * is not set for the Unpaired role or the device does not support the pairing mode at all)
-     * @throws PAIRING_MODE_DISABLED if the pairing mode is configured on the device but is disabled at runtime.
+     * @throws PAIRING_MODE_DISABLED if the pairing mode is configured on the device but is disabled at runtime. Note this error could also indicate
+     * that the device does not support Nabto Edge IAM at all (mapping of CoAP status 404), so to be able to interpret the result correctly, this
+     * must be known to be the case or not.
      */
     static public func pairPasswordOpen(connection: Connection, desiredUsername: String, password: String) throws {
         try PairPasswordOpen(connection: connection, desiredUsername: desiredUsername, password: password)
@@ -118,12 +125,13 @@ class IamUtil {
     /**
      * Perform Password Open pairing asynchronously.
      *
-     * The specified AsyncIamResultReceiver closure is invoked with an error if an error occurs, see
-     * the `pairPasswordOpen()` function for details about error codes.
+     * The specified AsyncIamResultReceiver closure is invoked with IamError.OK upon successful completion or with an
+     * error if an error occurs. See the `pairPasswordOpen()` function for details about possible error codes.
      *
-     * @param connection an established connection to the device this client should be paired with
+     * @param connection An established connection to the device this client should be paired with
      * @param desiredUsername Assign this username on the device if available (pairing fails with .USERNAME_EXISTS if not)
      * @param password the common (not user-specific) password to allow pairing using Password Open pairing
+     * @param closure Invoked when the pairing attempt succeeds or fails.
      */
     static public func pairPasswordOpenAsync(
             connection: Connection,
@@ -144,12 +152,11 @@ class IamUtil {
      *
      * Read more here: https://docs.nabto.com/developer/guides/concepts/iam/pairing.html#invite
      *
-     * @param connection an established connection to the device this client should be paired with
-     * @param username Username of the invited user
-     * @param password Password of the invited user
+     * @param connection An established connection to the device this client should be paired with
+     * @param username Username for the invited user
+     * @param password Password for the invited user
      *
-     * @throws USERNAME_EXISTS if desiredUsername is already in use on the device
-     * @throws INITIAL_USER_ALREADY_PAIRED if the initial user was already paired
+     * @throws AUTHENTICATION_ERROR if authentication failed using the specified username/password combination for the device
      * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not support local open pairing (the `IAM:PairingPasswordInvite` action
      * is not set for the Unpaired role or the device does not support the pairing mode at all)
      * @throws PAIRING_MODE_DISABLED if the pairing mode is configured on the device but is disabled at runtime.
@@ -161,6 +168,17 @@ class IamUtil {
                 password: password).execute()
     }
 
+    /**
+     * Perform Password Invite pairing asynchronously.
+     *
+     * The specified AsyncIamResultReceiver closure is invoked with IamError.OK upon successful completion or with an
+     * error if an error occurs. See the `pairPasswordInvite()` function for details about possible error codes.
+     *
+     * @param connection An established connection to the device this client should be paired with
+     * @param username Username for the invited user
+     * @param password Password for the invited user
+     * @param closure Invoked when the pairing attempt succeeds or fails.
+     */
     static public func pairPasswordInviteAsync(connection: Connection,
                                                username: String,
                                                password: String,
@@ -171,33 +189,115 @@ class IamUtil {
                 password: password).executeAsync(closure)
     }
 
+    /**
+     * Retrieve a list of the available pairing modes on the device.
+     *
+     * @param connection An established connection to the device
+     *
+     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow retrieving this list (the
+     * `IAM:GetPairing` action is not set for the Unpaired role)
+     * @throws IAM_NOT_SUPPORTED if the device does not support Nabto Edge IAM (specifically, the GET /iam/pairing
+     * endpoint does not exist)
+     */
     static public func getAvailablePairingModes(connection: Connection) throws -> [PairingMode] {
         return try GetAvailablePairingModes(connection).execute()
     }
 
+    /**
+     * Retrieve a list of the available pairing modes on the device asynchronously.
+     *
+     * The specified AsyncIamResultReceiver closure is invoked with IamError.OK and resulting data upon successful
+     * completion or with an error if an error occurs. See the `getAvailablePairingModes()` function for details about
+     * possible error codes.
+     *
+     * @param connection An established connection to the device
+     * @param closure Invoked when the list of available pairing modes is successfully retrieved or retrieval fails.
+     *
+     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow retrieving this list (the
+     * `IAM:GetPairing` action is not set for the Unpaired role)
+     * @throws IAM_NOT_SUPPORTED if the device does not support Nabto Edge IAM (specifically, the GET /iam/pairing
+     * endpoint does not exist)
+     */
     static public func getAvailablePairingModesAsync(connection: Connection,
                                                      closure: @escaping AsyncIamResultReceiverWithData<[PairingMode]>) {
         return GetAvailablePairingModes(connection).executeAsyncWithData(closure)
     }
 
+    /**
+     * Retrieve device information that typically does not need a paired user.
+     *
+     * @param connection An established connection to the device
+     *
+     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow retrieving this list (the
+     * `IAM:GetPairing` action is not set for the Unpaired role)
+     * @throws IAM_NOT_SUPPORTED if the device does not support Nabto Edge IAM (specifically, the GET /iam/pairing
+     * endpoint does not exist)
+     */
     static public func getDeviceDetails(connection: Connection) throws -> DeviceDetails {
         return try GetDeviceDetails(connection).execute()
     }
 
+    /**
+     * Asynchronously retrieve device information that typically does not need a paired user.
+     *
+     * The specified AsyncIamResultReceiver closure is invoked with IamError.OK and resulting data upon successful
+     * completion or with an error if an error occurs. See the `getDeviceDetails()` function for details about
+     * possible error codes.
+     *
+     * @param connection An established connection to the device
+     * @param closure Invoked when the device information is successfully retrieved or retrieval fails.
+     *
+     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow retrieving this list (the
+     * `IAM:GetPairing` action is not set for the Unpaired role)
+     * @throws IAM_NOT_SUPPORTED if the device does not support Nabto Edge IAM (specifically, the GET /iam/pairing
+     * endpoint does not exist)
+     */
     static public func getDeviceDetailsAsync(connection: Connection,
                                              closure: @escaping (IamError, DeviceDetails?) -> ()) {
         GetDeviceDetails(connection).executeAsyncWithData(closure)
     }
 
+    /**
+     * Query if the current user is paired or not on a specific device.
+     *
+     * Note that a negative answer could also indicate that the device does not support Nabto Edge IAM at all, so
+     * to be able to interpret the result correctly, this must be known to be the case or not.
+     *
+     * @param connection An established connection to the device
+     *
+     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow retrieving this list (the
+     * `IAM:GetPairing` action is not set for the Unpaired role)
+     */
     static public func isCurrentUserPaired(connection: Connection) throws -> Bool {
         return try IsCurrentUserPaired(connection).execute()
     }
 
+    /**
+     * Query asynchronously if the current user is paired or not on a specific device.
+     *
+     * The specified AsyncIamResultReceiver closure is invoked with IamError.OK and a boolean query result upon
+     * successful completion or with an error if an error occurs. See the `isCurrentUserPaired()` function for
+     * details about possible error codes.
+     *
+     * @param connection An established connection to the device
+     * @param closure Invoked when the device information is successfully retrieved or retrieval fails.
+     */
     static public func isCurrentUserPairedAsync(connection: Connection,
                                                 closure: @escaping AsyncIamResultReceiverWithData<Bool>) {
         IsCurrentUserPaired(connection).executeAsyncWithData(closure)
     }
 
+    /**
+     * Get details about a specific user on specific device.
+     *
+     * Note that a negative answer could also indicate that the device does not support Nabto Edge IAM at all, so
+     * to be able to interpret the result correctly, this must be known to be the case or not.
+     *
+     * @param connection An established connection to the device
+     *
+     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow retrieving this list (the
+     * `IAM:GetPairing` action is not set for the Unpaired role)
+     */
     static public func getUser(connection: Connection, username: String) throws -> IamUser {
         try GetUser(connection, username).execute()
     }
