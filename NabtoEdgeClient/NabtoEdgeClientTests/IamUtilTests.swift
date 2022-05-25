@@ -329,6 +329,47 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
         XCTAssertTrue(res)
     }
 
+    func testCheckPairedUser_NoIamSupport() throws {
+        let device = self.testDevices.localMdnsDevice
+        try super.connect(device)
+        XCTAssertThrowsError(try IamUtil.isCurrentUserPaired(connection: self.connection)) { error in
+            XCTAssertEqual(error as? IamError, IamError.IAM_NOT_SUPPORTED)
+        }
+    }
+
+    func testCheckPairedUser_NoIamSupport_Async() throws {
+        let device = self.testDevices.localMdnsDevice
+        try super.connect(device)
+        let exp = XCTestExpectation(description: "invocation done")
+        var err: IamError? = nil
+        var res: Bool!
+        IamUtil.isCurrentUserPairedAsync(connection: self.connection) { error, isPaired in
+            err = error
+            res = isPaired
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 2.0)
+        XCTAssertEqual(err, IamError.IAM_NOT_SUPPORTED)
+        XCTAssertNil(res)
+    }
+
+    func testCheckPairedUser_WithIamSupport_Async() throws {
+        let device = self.testDevices.localPasswordInvite
+        try super.connect(device)
+        let exp = XCTestExpectation(description: "invocation done")
+        var err: IamError? = nil
+        var res: Bool!
+        IamUtil.isCurrentUserPairedAsync(connection: self.connection) { error, isPaired in
+            err = error
+            res = isPaired
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 2.0)
+        XCTAssertEqual(err, .OK)
+        XCTAssertNotNil(res)
+        XCTAssertFalse(res)
+    }
+
     func testCreateUser_and_GetUser() throws {
         let device = self.testDevices.localPasswordInvite
         let admin = uniqueUser()

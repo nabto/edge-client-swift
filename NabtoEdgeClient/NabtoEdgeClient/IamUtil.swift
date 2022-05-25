@@ -13,8 +13,8 @@ import CBORCoding
  *
  * Read more about the important concept of pairing here: https://docs.nabto.com/developer/guides/concepts/iam/pairing.html
  *
- * All the most popular IAM device endpoints are wrapped to also allow management of user profile on the device
- * (own or other users' if client is in admin role)., depending on the client role).
+ * All the most popular IAM device endpoints are wrapped to also allow management of the user profile on the device
+ * (own or other users' if client is in admin role).
  *
  * Note that the device's IAM configuration must allow invocation of the different functions and the pairing modes must
  * be enabled at runtime. Read more about that in the general IAM intro here: https://docs.nabto.com/developer/guides/concepts/iam/intro.html
@@ -36,9 +36,8 @@ class IamUtil {
      * @throws INVALID_INPUT if desiredUsername is not valid as per https://docs.nabto.com/developer/api-reference/coap/iam/post-users.html#request
      * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not support local open pairing (the `IAM:PairingLocalOpen` action
      * is not set for the Unpaired role or the device does not support the pairing mode at all)
-     * @throws PAIRING_MODE_DISABLED if the pairing mode is configured on the device but is disabled at runtime. Note this error could also indicate
-     * that the device does not support Nabto Edge IAM at all (mapping of CoAP status 404), so to be able to interpret the result correctly, this
-     * must be known to be the case or not.
+     * @throws PAIRING_MODE_DISABLED if the pairing mode is configured on the device but is disabled at runtime
+     * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
      */
     static public func pairLocalOpen(connection: Connection, desiredUsername: String) throws {
         try PairLocalOpen(connection, desiredUsername).execute()
@@ -74,9 +73,8 @@ class IamUtil {
      * @throws INITIAL_USER_ALREADY_PAIRED if the initial user was already paired
      * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not support local open pairing (the `IAM:PairingLocalInitial` action
      * is not set for the Unpaired role or the device does not support the pairing mode at all)
-     * @throws PAIRING_MODE_DISABLED if the pairing mode is configured on the device but is disabled at runtime. Note this error could also indicate
-     * that the device does not support Nabto Edge IAM at all (mapping of CoAP status 404), so to be able to interpret the result correctly, this
-     * must be known to be the case or not.
+     * @throws PAIRING_MODE_DISABLED if the pairing mode is configured on the device but is disabled at runtime.
+     * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
      */
     static public func pairLocalInitial(connection: Connection) throws {
         try PairLocalInitial(connection).execute()
@@ -113,9 +111,8 @@ class IamUtil {
      * @throws INITIAL_USER_ALREADY_PAIRED if the initial user was already paired
      * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not support local open pairing (the `IAM:PairingPasswordOpen` action
      * is not set for the Unpaired role or the device does not support the pairing mode at all)
-     * @throws PAIRING_MODE_DISABLED if the pairing mode is configured on the device but is disabled at runtime. Note this error could also indicate
-     * that the device does not support Nabto Edge IAM at all (mapping of CoAP status 404), so to be able to interpret the result correctly, this
-     * must be known to be the case or not.
+     * @throws PAIRING_MODE_DISABLED if the pairing mode is configured on the device but is disabled at runtime
+     * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
      */
     static public func pairPasswordOpen(connection: Connection, desiredUsername: String, password: String) throws {
         try PairPasswordOpen(connection: connection, desiredUsername: desiredUsername, password: password)
@@ -159,7 +156,8 @@ class IamUtil {
      * @throws AUTHENTICATION_ERROR if authentication failed using the specified username/password combination for the device
      * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not support local open pairing (the `IAM:PairingPasswordInvite` action
      * is not set for the Unpaired role or the device does not support the pairing mode at all)
-     * @throws PAIRING_MODE_DISABLED if the pairing mode is configured on the device but is disabled at runtime.
+     * @throws PAIRING_MODE_DISABLED if the pairing mode is configured on the device but is disabled at runtime
+     * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
      */
     static public func pairPasswordInvite(connection: Connection, username: String, password: String) throws {
         try PairPasswordInvite(
@@ -196,8 +194,7 @@ class IamUtil {
      *
      * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow retrieving this list (the
      * `IAM:GetPairing` action is not set for the Unpaired role)
-     * @throws IAM_NOT_SUPPORTED if the device does not support Nabto Edge IAM (specifically, the GET /iam/pairing
-     * endpoint does not exist)
+     * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
      */
     static public func getAvailablePairingModes(connection: Connection) throws -> [PairingMode] {
         return try GetAvailablePairingModes(connection).execute()
@@ -212,11 +209,6 @@ class IamUtil {
      *
      * @param connection An established connection to the device
      * @param closure Invoked when the list of available pairing modes is successfully retrieved or retrieval fails.
-     *
-     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow retrieving this list (the
-     * `IAM:GetPairing` action is not set for the Unpaired role)
-     * @throws IAM_NOT_SUPPORTED if the device does not support Nabto Edge IAM (specifically, the GET /iam/pairing
-     * endpoint does not exist)
      */
     static public func getAvailablePairingModesAsync(connection: Connection,
                                                      closure: @escaping AsyncIamResultReceiverWithData<[PairingMode]>) {
@@ -230,8 +222,7 @@ class IamUtil {
      *
      * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow retrieving this list (the
      * `IAM:GetPairing` action is not set for the Unpaired role)
-     * @throws IAM_NOT_SUPPORTED if the device does not support Nabto Edge IAM (specifically, the GET /iam/pairing
-     * endpoint does not exist)
+     * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
      */
     static public func getDeviceDetails(connection: Connection) throws -> DeviceDetails {
         return try GetDeviceDetails(connection).execute()
@@ -246,11 +237,6 @@ class IamUtil {
      *
      * @param connection An established connection to the device
      * @param closure Invoked when the device information is successfully retrieved or retrieval fails.
-     *
-     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow retrieving this list (the
-     * `IAM:GetPairing` action is not set for the Unpaired role)
-     * @throws IAM_NOT_SUPPORTED if the device does not support Nabto Edge IAM (specifically, the GET /iam/pairing
-     * endpoint does not exist)
      */
     static public func getDeviceDetailsAsync(connection: Connection,
                                              closure: @escaping (IamError, DeviceDetails?) -> ()) {
@@ -265,8 +251,7 @@ class IamUtil {
      *
      * @param connection An established connection to the device
      *
-     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow retrieving this list (the
-     * `IAM:GetPairing` action is not set for the Unpaired role)
+     * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
      */
     static public func isCurrentUserPaired(connection: Connection) throws -> Bool {
         return try IsCurrentUserPaired(connection).execute()
@@ -290,13 +275,12 @@ class IamUtil {
     /**
      * Get details about a specific user on specific device.
      *
-     * Note that a negative answer could also indicate that the device does not support Nabto Edge IAM at all, so
-     * to be able to interpret the result correctly, this must be known to be the case or not.
-     *
      * @param connection An established connection to the device
      *
-     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow retrieving this list (the
-     * `IAM:GetPairing` action is not set for the Unpaired role)
+     * @throws USER_DOES_NOT_EXIST if the user does not exist on the device
+     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow retrieving this user  (the
+     * `IAM:GetUser` action is not set for the requesting role)
+     * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
      */
     static public func getUser(connection: Connection, username: String) throws -> IamUser {
         try GetUser(connection, username).execute()
