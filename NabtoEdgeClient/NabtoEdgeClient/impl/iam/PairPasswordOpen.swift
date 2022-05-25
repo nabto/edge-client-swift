@@ -13,15 +13,16 @@ internal class PairPasswordOpen : AbstractIamInvocationTemplate {
     private(set) var hookBeforeCoap: SyncHook? = nil
     private(set) var asyncHookBeforeCoap: AsyncHook? = nil
 
-    init(connection: Connection, desiredUsername: String, password: String) throws {
+    init(connection: Connection, password: String, cbor: Data) {
         self.connection = connection
-        self.cbor = try IamUser(username: desiredUsername).encode()
+        self.cbor = cbor
         self.hookBeforeCoap = {
             try connection.passwordAuthenticate(username: "", password: password)
         }
         self.asyncHookBeforeCoap = { next in
             connection.passwordAuthenticateAsync(username: "", password: password, closure: next)
         }
+
     }
 
     func mapResponse(_ response: CoapResponse) throws -> () {

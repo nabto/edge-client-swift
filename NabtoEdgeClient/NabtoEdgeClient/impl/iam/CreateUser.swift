@@ -25,8 +25,8 @@ internal class CreateUser : AbstractIamInvocationTemplate {
         return
     }
 
-    init(_ connection: Connection, _ username: String) throws {
+    init(_ connection: Connection, _ cbor: Data) {
         self.connection = connection
-        self.cbor = try IamUser(username: username).encode()
+        self.cbor = cbor
     }
 }

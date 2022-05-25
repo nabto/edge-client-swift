@@ -13,7 +13,7 @@ internal class PairPasswordInvite : AbstractIamInvocationTemplate {
     private(set) var hookBeforeCoap: SyncHook? = nil
     private(set) var asyncHookBeforeCoap: AsyncHook? = nil
 
-    init(connection: Connection, username: String, password: String) throws {
+    init(connection: Connection, username: String, password: String) {
         self.connection = connection
         self.hookBeforeCoap = {
             try connection.passwordAuthenticate(username: username, password: password)

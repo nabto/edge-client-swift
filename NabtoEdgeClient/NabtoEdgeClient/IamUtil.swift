@@ -40,7 +40,8 @@ class IamUtil {
      * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
      */
     static public func pairLocalOpen(connection: Connection, desiredUsername: String) throws {
-        try PairLocalOpen(connection, desiredUsername).execute()
+        let cbor = try IamUser(username: desiredUsername).encode()
+        try PairLocalOpen(connection, cbor: cbor).execute()
     }
 
     /**
@@ -56,8 +57,15 @@ class IamUtil {
     static public func pairLocalOpenAsync(
             connection: Connection,
             desiredUsername: String,
-            closure: @escaping AsyncIamResultReceiver) throws {
-        try PairLocalOpen(connection, desiredUsername).executeAsync(closure)
+            closure: @escaping AsyncIamResultReceiver) {
+        let cbor: Data
+        do {
+            cbor = try IamUser(username: desiredUsername).encode()
+        } catch {
+            IamHelper.invokeIamErrorHandler(error, closure)
+            return
+        }
+        PairLocalOpen(connection, cbor: cbor).executeAsync(closure)
     }
 
     /**
@@ -115,8 +123,8 @@ class IamUtil {
      * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
      */
     static public func pairPasswordOpen(connection: Connection, desiredUsername: String, password: String) throws {
-        try PairPasswordOpen(connection: connection, desiredUsername: desiredUsername, password: password)
-                .execute()
+        let cbor = try IamUser(username: desiredUsername).encode()
+        try PairPasswordOpen(connection: connection, password: password, cbor: cbor).execute()
     }
 
     /**
@@ -134,11 +142,18 @@ class IamUtil {
             connection: Connection,
             desiredUsername: String,
             password: String,
-            closure: @escaping AsyncIamResultReceiver) throws {
-        try PairPasswordOpen(
+            closure: @escaping AsyncIamResultReceiver) {
+        let cbor: Data
+        do {
+            cbor = try IamUser(username: desiredUsername).encode()
+        } catch {
+            IamHelper.invokeIamErrorHandler(error, closure)
+            return
+        }
+        PairPasswordOpen(
                 connection: connection,
-                desiredUsername: desiredUsername,
-                password: password).executeAsync(closure)
+                password: password,
+                cbor: cbor).executeAsync(closure)
     }
 
     /**
@@ -180,8 +195,8 @@ class IamUtil {
     static public func pairPasswordInviteAsync(connection: Connection,
                                                username: String,
                                                password: String,
-                                               closure: @escaping AsyncIamResultReceiver) throws {
-        try PairPasswordInvite(
+                                               closure: @escaping AsyncIamResultReceiver) {
+        PairPasswordInvite(
                 connection: connection,
                 username: username,
                 password: password).executeAsync(closure)
@@ -348,19 +363,19 @@ class IamUtil {
                                   username: String,
                                   password: String,
                                   role: String) throws {
-        try CreateUser(connection, username).execute()
+        try CreateUser(connection, IamUser(username: username).encode()).execute()
         // if the following fails, a zombie user now exists on device
         // TODO, document when it can occur (network error or race condition (user renamed before password/role set, quite unlikely))
         try UpdateUser(
                 connection: connection,
                 username: username,
                 parameterName: "password",
-                parameterValue: password).execute()
+                parameterValue: try toCbor(password)).execute()
         try UpdateUser(
                 connection: connection,
                 username: username,
                 parameterName: "role",
-                parameterValue: role,
+                parameterValue: try toCbor(role),
                 fourOhFourMapping: IamError.ROLE_DOES_NOT_EXIST).execute()
     }
 
@@ -381,52 +396,48 @@ class IamUtil {
                                        password: String,
                                        role: String,
                                        closure: @escaping AsyncIamResultReceiver) {
+        let user: Data
+        let encodedPassword: Data
+        let encodedRole: Data
         do {
-            try CreateUser(connection, username).executeAsync { error in
-                if (error == IamError.OK) {
-                    do {
-                        // if the following fails, a zombie user now exists on device
-                        // TODO, document when it can occur (network error or race condition (user renamed before password/role set, quite unlikely))
-                        try UpdateUser(
-                                connection: connection,
-                                username: username,
-                                parameterName: "password",
-                                parameterValue: password).executeAsync { error in
-                            if (error == IamError.OK) {
-                                do {
-                                    try UpdateUser(
-                                            connection: connection,
-                                            username: username,
-                                            parameterName: "role",
-                                            parameterValue: role,
-                                            fourOhFourMapping: IamError.ROLE_DOES_NOT_EXIST).executeAsync { error in
-                                        if (error == IamError.OK) {
-                                            closure(IamError.OK)
-                                        } else {
-                                            // UpdateUser (role) failed
-                                            IamHelper.invokeIamErrorHandler(error, closure)
-                                        }
-                                    }
-                                } catch {
-                                    // cbor encoding failed in ctor before async UpdateUser (role) invocation started
-                                    IamHelper.invokeIamErrorHandler(error, closure)
-                                }
-                            } else {
-                                // UpdateUser (password) failed
-                                IamHelper.invokeIamErrorHandler(error, closure)
-                            }
-                        }
-                    } catch {
-                        // cbor encoding failed in ctor before async UpdateUser (password) invocation started
+            user = try IamUser(username: username).encode()
+            encodedPassword = try toCbor(password)
+            encodedRole = try toCbor(role)
+        } catch {
+            closure(IamError.FAILED)
+            return
+        }
+
+        CreateUser(connection, user).executeAsync { error in
+            guard error == IamError.OK else {
+                IamHelper.invokeIamErrorHandler(error, closure)
+                return
+            }
+            // if the following fails, a zombie user now exists on device
+            // TODO, document when it can occur (network error or race condition (user renamed before password/role set, quite unlikely))
+            UpdateUser(
+                    connection: connection,
+                    username: username,
+                    parameterName: "password",
+                    parameterValue: encodedPassword).executeAsync { error in
+                guard error == IamError.OK else {
+                    IamHelper.invokeIamErrorHandler(error, closure)
+                    return
+                }
+
+                UpdateUser(
+                        connection: connection,
+                        username: username,
+                        parameterName: "role",
+                        parameterValue: encodedRole,
+                        fourOhFourMapping: IamError.ROLE_DOES_NOT_EXIST).executeAsync { error in
+                    if (error == IamError.OK) {
+                        closure(IamError.OK)
+                    } else {
                         IamHelper.invokeIamErrorHandler(error, closure)
                     }
-                } else {
-                    IamHelper.invokeIamErrorHandler(error, closure)
                 }
             }
-        } catch {
-            // cbor encoding failed in ctor before async CreateUser invocation started
-            IamHelper.invokeIamErrorHandler(error, closure)
         }
     }
 
@@ -447,7 +458,7 @@ class IamUtil {
                 connection: connection,
                 username: username,
                 parameterName: "password",
-                parameterValue: password).execute()
+                parameterValue: try toCbor(password)).execute()
     }
 
     /**
@@ -464,12 +475,16 @@ class IamUtil {
     static public func updateUserPasswordAsync(connection: Connection,
                                                username: String,
                                                password: String,
-                                               closure: @escaping AsyncIamResultReceiver) throws {
+                                               closure: @escaping AsyncIamResultReceiver) {
+        guard let cbor = toCbor(password) else {
+            closure(IamError.FAILED)
+            return
+        }
         try UpdateUser(
                 connection: connection,
                 username: username,
                 parameterName: "password",
-                parameterValue: password).executeAsync(closure)
+                parameterValue: cbor).executeAsync(closure)
     }
 
     /**
@@ -484,7 +499,7 @@ class IamUtil {
      * @param connection An established connection to the device
      * @param username Username for the user that should have password updated
      * @param role New role for the user
-     * @throws USER_DOES_NOT_EXIST if the specifid user does not exist on the device (see note above)
+     * @throws USER_DOES_NOT_EXIST if the specified user does not exist on the device (see note above)
      * @throws ROLE_DOES_NOT_EXIST the specified role does not exist in the device IAM configuration (see note above)
      * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow the current user to update the specified user's role (the
      * `IAM:SetUserRole` action is not allowed for the requesting role for the `IAM:Username` user)
@@ -497,7 +512,7 @@ class IamUtil {
                 connection: connection,
                 username: username,
                 parameterName: "role",
-                parameterValue: role,
+                parameterValue: try toCbor(role),
                 fourOhFourMapping: IamError.ROLE_DOES_NOT_EXIST
         ).execute()
     }
@@ -516,12 +531,16 @@ class IamUtil {
     static public func updateUserRoleAsync(connection: Connection,
                                            username: String,
                                            role: String,
-                                           closure: @escaping AsyncIamResultReceiver) throws {
+                                           closure: @escaping AsyncIamResultReceiver) {
+        guard let cbor = toCbor(role) else {
+            closure(IamError.FAILED)
+            return
+        }
         try UpdateUser(
                 connection: connection,
                 username: username,
                 parameterName: "role",
-                parameterValue: role,
+                parameterValue: cbor,
                 fourOhFourMapping: IamError.ROLE_DOES_NOT_EXIST
         ).executeAsync(closure)
     }
@@ -532,8 +551,8 @@ class IamUtil {
      * @param connection An established connection to the device
      * @param username Username for the user that should have display name updated
      * @param displayName New display name
-     * @throws USER_DOES_NOT_EXIST if the specifid user does not exist on the device (see note above)
-     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow the current user to update the specified user's displayname (the
+     * @throws USER_DOES_NOT_EXIST if the specified user does not exist on the device (see note above)
+     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow the current user to update the specified user's display name (the
      * `IAM:SetUserDisplayName` action is not allowed for the requesting role for the `IAM:Username` user)
      * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
      */
@@ -544,7 +563,7 @@ class IamUtil {
                 connection: connection,
                 username: username,
                 parameterName: "display-name",
-                parameterValue: displayName).execute()
+                parameterValue: try toCbor(displayName)).execute()
     }
 
     /**
@@ -561,12 +580,16 @@ class IamUtil {
     static public func updateUserDisplayNameAsync(connection: Connection,
                                                   username: String,
                                                   displayName: String,
-                                                  closure: @escaping AsyncIamResultReceiver) throws {
+                                                  closure: @escaping AsyncIamResultReceiver) {
+        guard let cbor = toCbor(displayName) else {
+            closure(IamError.FAILED)
+            return
+        }
         try UpdateUser(
                 connection: connection,
                 username: username,
                 parameterName: "display-name",
-                parameterValue: displayName).executeAsync(closure)
+                parameterValue: cbor).executeAsync(closure)
     }
 
     /**
@@ -575,9 +598,9 @@ class IamUtil {
      * @param connection An established connection to the device
      * @param username Username for the user that should have username updated
      * @param newUsername New username for the user
-     * @throws USER_DOES_NOT_EXIST if the specifid user does not exist on the device (see note above)
+     * @throws USER_DOES_NOT_EXIST if the specified user does not exist on the device (see note above)
      * @throws INVALID_INPUT if username is not valid as per https://docs.nabto.com/developer/api-reference/coap/iam/post-users.html#request
-     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow the current user to update the specified user's displayname (the
+     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow the current user to update the specified user's display name (the
      * `IAM:SetUserUsername` action is not allowed for the requesting role for the `IAM:Username` user)
      * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
      */
@@ -588,7 +611,7 @@ class IamUtil {
                 connection: connection,
                 username: username,
                 parameterName: "username",
-                parameterValue: newUsername).execute()
+                parameterValue: toCbor(newUsername)).execute()
     }
 
     /**
@@ -605,12 +628,16 @@ class IamUtil {
     static public func renameUserAsync(connection: Connection,
                                        username: String,
                                        newUsername: String,
-                                       closure: @escaping AsyncIamResultReceiver) throws {
+                                       closure: @escaping AsyncIamResultReceiver) {
+        guard let cbor = toCbor(newUsername) else {
+            closure(IamError.FAILED)
+            return
+        }
         try UpdateUser(
                 connection: connection,
                 username: username,
                 parameterName: "username",
-                parameterValue: newUsername).executeAsync(closure)
+                parameterValue: cbor).executeAsync(closure)
     }
 
     /**
@@ -618,7 +645,7 @@ class IamUtil {
      *
      * @param connection An established connection to the device
      *
-     * @throws USER_DOES_NOT_EXIST if the specifid user does not exist on the device
+     * @throws USER_DOES_NOT_EXIST if the specified user does not exist on the device
      * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow deleting this user (the
      * `IAM:DeleteUser` action for the `IAM:Username` attribute is not allowed for the requesting role)
      * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
@@ -637,9 +664,25 @@ class IamUtil {
      * @param closure Invoked when the user is deleted or an error occurs
      */
     static public func deleteUserAsync(connection: Connection, username: String,
-                                       closure: @escaping AsyncIamResultReceiver) throws {
+                                       closure: @escaping AsyncIamResultReceiver) {
         try DeleteUser(connection, username).executeAsync(closure)
     }
+
+    static private func toCbor(_ value: String) throws -> Data {
+        let encoder = CBOREncoder()
+        do {
+            return try encoder.encode(value)
+        } catch {
+            // not to be handled by user - encoding of string should not fail
+            throw IamError.FAILED
+        }
+    }
+
+    static private func toCbor(_ value: String) -> Data? {
+        let encoder = CBOREncoder()
+        return try? encoder.encode(value)
+    }
+
 
 }
 

@@ -34,15 +34,13 @@ internal class UpdateUser : AbstractIamInvocationTemplate {
     init(connection: Connection,
          username: String,
          parameterName: String,
-         parameterValue: String,
+         parameterValue: Data,
          fourOhFourMapping: IamError=IamError.USER_DOES_NOT_EXIST
-         ) throws {
+         ) {
         self.connection = connection
         self.username = username
         self.parameterName = parameterName
         self.fourOhFourMapping = fourOhFourMapping
-
-        let encoder = CBOREncoder()
-        self.cbor = try encoder.encode(parameterValue)
+        self.cbor = parameterValue
     }
 }

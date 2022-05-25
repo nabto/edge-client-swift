@@ -32,8 +32,8 @@ internal class PairLocalOpen : AbstractIamInvocationTemplate {
         }
     }
 
-    init(_ connection: Connection, _ desiredUsername: String) throws {
-        self.cbor = try IamUser(username: desiredUsername).encode()
+    init(_ connection: Connection, cbor: Data) {
+        self.cbor = cbor
         self.connection = connection
     }
 }
