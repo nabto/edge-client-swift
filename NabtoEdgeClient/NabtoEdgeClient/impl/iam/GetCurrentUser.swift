@@ -14,7 +14,7 @@ internal class GetCurrentUser : AbstractIamInvocationTemplate {
         }
         switch (status) {
         case 205: return IamError.OK
-        case 404: return IamError.USER_IS_NOT_PAIRED
+        case 404: return IamError.USER_DOES_NOT_EXIST
         default: return IamError.FAILED
         }
     }

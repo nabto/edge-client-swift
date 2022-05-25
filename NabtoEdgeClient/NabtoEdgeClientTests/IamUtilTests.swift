@@ -289,7 +289,7 @@ class IamUtilTests_LocalTestDevices: NabtoEdgeClientTestBase {
         try super.connect(device)
         XCTAssertFalse(try IamUtil.isCurrentUserPaired(connection: self.connection))
         XCTAssertThrowsError(try IamUtil.getCurrentUser(connection: self.connection)) { error in
-            XCTAssertEqual(error as? IamError, IamError.USER_IS_NOT_PAIRED)
+            XCTAssertEqual(error as? IamError, IamError.USER_DOES_NOT_EXIST)
         }
     }
 
