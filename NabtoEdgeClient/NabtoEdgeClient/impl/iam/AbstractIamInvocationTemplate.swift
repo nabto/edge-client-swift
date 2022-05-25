@@ -22,7 +22,7 @@ internal protocol AbstractIamInvocationTemplate {
 
 extension AbstractIamInvocationTemplate {
 
-    func execute() throws -> T {
+    internal func execute() throws -> T {
         do {
             try self.hookBeforeCoap?()
             let coap = try createCoapRequest(connection: connection)
@@ -31,7 +31,7 @@ extension AbstractIamInvocationTemplate {
             }
             let response = try coap.execute()
             if (response.status == 404) {
-                //throwIfNoIamSupport()
+                try throwIfNoIamSupport()
             }
             let error = mapStatus(status: response.status)
             if (error == IamError.OK) {
@@ -42,7 +42,7 @@ extension AbstractIamInvocationTemplate {
         } catch {
             try IamHelper.throwIamError(error)
         }
-        throw IamError.FAILED // never here
+        throw IamError.FAILED // never here, but compiler insists
     }
 
     internal func executeAsync(_ closure: @escaping AsyncIamResultReceiver) {
@@ -75,7 +75,7 @@ extension AbstractIamInvocationTemplate {
         }
     }
 
-    internal func executeAsyncImpl(_ closure: @escaping AsyncIamResultReceiver) {
+    private func executeAsyncImpl(_ closure: @escaping AsyncIamResultReceiver) {
         do {
             let coap = try createCoapRequest(connection: connection)
             if let cbor = self.cbor {
@@ -98,43 +98,7 @@ extension AbstractIamInvocationTemplate {
         }
     }
 
-    private func handleAsyncResponseVoid(response: CoapResponse, closure: @escaping AsyncIamResultReceiver) {
-        if (response.status == 404) {
-            checkIamSupportAsync { error in
-                if (error == IamError.OK) {
-                    closure(self.mapStatus(status: 404))
-                } else {
-                    closure(error)
-                }
-            }
-        } else {
-            closure(self.mapStatus(status: response.status))
-        }
-    }
-
-    private func checkIamSupportAsync(_ closure: @escaping AsyncIamResultReceiver) {
-        do {
-            let coap = try connection.createCoapRequest(method: "GET", path: "/iam/pairing")
-            coap.executeAsync { error, response in
-                if (error != NabtoEdgeClientError.OK) {
-                    IamHelper.invokeIamErrorHandler(error, closure)
-                } else {
-                    if let response = response {
-                        if (response.status == 403 || response.status == 205) {
-                            // IAM is considered enabled as a meaningful response was provided on /iam/pairing
-                            closure(IamError.OK)
-                        } else {
-                            closure(IamError.IAM_NOT_SUPPORTED)
-                        }
-                    }
-                }
-            }
-        } catch {
-            IamHelper.invokeIamErrorHandler(error, closure)
-        }
-    }
-
-    internal func executeAsyncWithDataImpl(_ closure: @escaping (IamError, T?) -> ()) {
+    private func executeAsyncWithDataImpl(_ closure: @escaping (IamError, T?) -> ()) {
         do {
             let coap = try createCoapRequest(connection: connection)
             if let cbor = self.cbor {
@@ -160,6 +124,20 @@ extension AbstractIamInvocationTemplate {
             IamHelper.invokeIamErrorHandler(error, { error in
                 closure(error, nil)
             })
+        }
+    }
+
+    private func handleAsyncResponseVoid(response: CoapResponse, closure: @escaping AsyncIamResultReceiver) {
+        if (response.status == 404) {
+            checkIamSupportAsync { error in
+                if (error == IamError.OK) {
+                    closure(self.mapStatus(status: 404))
+                } else {
+                    closure(error)
+                }
+            }
+        } else {
+            closure(self.mapStatus(status: response.status))
         }
     }
 
@@ -192,6 +170,41 @@ extension AbstractIamInvocationTemplate {
             IamHelper.invokeIamErrorHandler(error, { error in
                 closure(error, nil)
             })
+        }
+    }
+
+    private func throwIfNoIamSupport() throws {
+        let coap = try connection.createCoapRequest(method: "GET", path: "/iam/pairing")
+        let response = try coap.execute()
+        if (response.status == 403 || response.status == 205) {
+            // IAM is considered enabled as a meaningful response was provided on /iam/pairing
+        } else {
+            throw IamError.IAM_NOT_SUPPORTED
+        }
+    }
+
+    private func checkIamSupportAsync(_ closure: @escaping AsyncIamResultReceiver) {
+        do {
+            let coap = try connection.createCoapRequest(method: "GET", path: "/iam/pairing")
+            coap.executeAsync { error, response in
+                if (error != NabtoEdgeClientError.OK) {
+                    IamHelper.invokeIamErrorHandler(error, closure)
+                } else {
+                    if let response = response {
+                        if (response.status == 403 || response.status == 205) {
+                            // IAM is considered enabled as a meaningful response was provided on /iam/pairing
+                            closure(IamError.OK)
+                        } else {
+                            closure(IamError.IAM_NOT_SUPPORTED)
+                        }
+                    } else {
+                        // ok, but no response - unlikely
+                        closure(IamError.INVALID_RESPONSE(error: "status ok with no response from \(self.path)"))
+                    }
+                }
+            }
+        } catch {
+            IamHelper.invokeIamErrorHandler(error, closure)
         }
     }
 
