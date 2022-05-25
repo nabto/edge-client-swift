@@ -246,12 +246,9 @@ class IamUtil {
     /**
      * Query if the current user is paired or not on a specific device.
      *
-     * Note that a negative answer could also indicate that the device does not support Nabto Edge IAM at all, so
-     * to be able to interpret the result correctly, this must be known to be the case or not.
-     *
      * @param connection An established connection to the device
-     *
      * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
+     * @return true iff the current user is paired with the device
      */
     static public func isCurrentUserPaired(connection: Connection) throws -> Bool {
         return try IsCurrentUserPaired(connection).execute()
@@ -265,7 +262,7 @@ class IamUtil {
      * details about possible error codes.
      *
      * @param connection An established connection to the device
-     * @param closure Invoked when the device information is successfully retrieved or retrieval fails.
+     * @param closure Invoked when the pairing information is successfully retrieved or retrieval fails.
      */
     static public func isCurrentUserPairedAsync(connection: Connection,
                                                 closure: @escaping AsyncIamResultReceiverWithData<Bool>) {
@@ -273,7 +270,7 @@ class IamUtil {
     }
 
     /**
-     * Get details about a specific user on specific device.
+     * Get details about a specific user.
      *
      * @param connection An established connection to the device
      *
@@ -281,35 +278,72 @@ class IamUtil {
      * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow retrieving this user  (the
      * `IAM:GetUser` action is not set for the requesting role)
      * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
+     * @return an IamUser instance describing the requested user
      */
     static public func getUser(connection: Connection, username: String) throws -> IamUser {
         try GetUser(connection, username).execute()
     }
 
+    /**
+     * Asynchronously get details about a specific user.
+     *
+     * The specified AsyncIamResultReceiver closure is invoked with IamError.OK and an IamUser object upon
+     * successful completion or with an error if an error occurs. See the `getUser()` function for
+     * details about possible error codes.
+     *
+     * @param connection An established connection to the device
+     * @param closure Invoked when the user information is successfully retrieved or retrieval fails.
+     */
     static public func getUserAsync(connection: Connection,
                                     username: String,
                                     closure: @escaping AsyncIamResultReceiverWithData<IamUser>) {
         GetUser(connection, username).executeAsyncWithData(closure)
     }
 
+    /**
+     * Get details about the user that has opened the current connection to the device.
+     *
+     * @param connection An established connection to the device
+     *
+     * @throws USER_DOES_NOT_EXIST if the current user is not paired with the device.
+     * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
+     * @return an IamUser instance describing the current user
+     */
     static public func getCurrentUser(connection: Connection) throws -> IamUser {
         try GetCurrentUser(connection).execute()
     }
 
+    /**
+     * Asynchronously get details about a specific user.
+     *
+     * The specified AsyncIamResultReceiver closure is invoked with IamError.OK and an IamUser object upon
+     * successful completion or with an error if an error occurs. See the `getCurrentUser()` function for
+     * details about possible error codes.
+     *
+     * @param connection An established connection to the device
+     * @param closure Invoked when the user information is successfully retrieved or retrieval fails.
+     */
     static public func getCurrentUserAsync(connection: Connection,
                                            closure: @escaping AsyncIamResultReceiverWithData<IamUser>) {
         GetCurrentUser(connection).executeAsyncWithData(closure)
     }
 
-    static public func deleteUser(connection: Connection, username: String) throws {
-        try DeleteUser(connection, username).execute()
-    }
-
-    static public func deleteUserAsync(connection: Connection, username: String,
-                                       closure: @escaping AsyncIamResultReceiver) throws {
-        try DeleteUser(connection, username).executeAsync(closure)
-    }
-
+    /**
+     * Create an IAM user on device.
+     *
+     * See https://docs.nabto.com/developer/guides/concepts/iam/intro.html for an intro to the concept of users and roles.
+     *
+     * @param connection An established connection to the device
+     * @param username Username for the new user
+     * @param password Password for the new user
+     * @param role IAM role for the new user
+     * @throws INVALID_INPUT if username is not valid as per https://docs.nabto.com/developer/api-reference/coap/iam/post-users.html#request
+     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow the current user to create a new user (the
+     * `IAM:CreateUser` action is not allowed for the requesting role)
+     * @throws ROLE_DOES_NOT_EXIST the specified role does not exist in the device IAM configuration
+     * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
+     * @return an IamUser instance describing the current user
+     */
     static public func createUser(connection: Connection,
                                   username: String,
                                   password: String,
@@ -330,6 +364,18 @@ class IamUtil {
                 fourOhFourMapping: IamError.ROLE_DOES_NOT_EXIST).execute()
     }
 
+    /**
+     * Asynchronously create an IAM user on device.
+     *
+     * The specified AsyncIamResultReceiver closure is invoked with IamError.OK upon successful completion or with an
+     * error if an error occurs. See the `createUser()` function for details about possible error codes.
+     *
+     * @param connection An established connection to the device
+     * @param username Username for the new user
+     * @param password Password for the new user
+     * @param role IAM role for the new user
+     * @param closure Invoked when the user is created successfully or an error occurs
+     */
     static public func createUserAsync(connection: Connection,
                                        username: String,
                                        password: String,
@@ -384,7 +430,16 @@ class IamUtil {
         }
     }
 
-
+    /**
+     * Update an IAM user's password on device.
+     *
+     * @param connection An established connection to the device
+     * @param username Username for the user that should have password updated
+     * @param password New password for the user
+     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow the current user to update the specified user's password (the
+     * `IAM:SetUserPassword` action is not allowed for the requesting role for the `IAM:Username` user)
+     * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
+     */
     static public func updateUserPassword(connection: Connection,
                                           username: String,
                                           password: String) throws {
@@ -395,6 +450,17 @@ class IamUtil {
                 parameterValue: password).execute()
     }
 
+    /**
+     * Asynchronously update an IAM user's password on device.
+     *
+     * The specified AsyncIamResultReceiver closure is invoked with IamError.OK upon successful completion or with an
+     * error if an error occurs. See the `updateUserPassword()` function for details about possible error codes.
+     *
+     * @param connection An established connection to the device
+     * @param username Username for the user that should have password updated
+     * @param password New password for the user
+     * @param closure Invoked when the user is deleted or an error occurs
+     */
     static public func updateUserPasswordAsync(connection: Connection,
                                                username: String,
                                                password: String,
@@ -406,6 +472,24 @@ class IamUtil {
                 parameterValue: password).executeAsync(closure)
     }
 
+    /**
+     * Update an IAM user's role on device.
+     *
+     * Known issue: This function currently assumes the user exists. To be able to interpret the
+     * ROLE_DOES_NOT_EXIST code correctly, this assumption most hold. Later it can gracefully handle
+     * non-existing users
+     *
+     * See https://docs.nabto.com/developer/guides/concepts/iam/intro.html for an intro to the concept of roles.
+     *
+     * @param connection An established connection to the device
+     * @param username Username for the user that should have password updated
+     * @param role New role for the user
+     * @throws USER_DOES_NOT_EXIST if the specifid user does not exist on the device (see note above)
+     * @throws ROLE_DOES_NOT_EXIST the specified role does not exist in the device IAM configuration (see note above)
+     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow the current user to update the specified user's role (the
+     * `IAM:SetUserRole` action is not allowed for the requesting role for the `IAM:Username` user)
+     * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
+     */
     static public func updateUserRole(connection: Connection,
                                       username: String,
                                       role: String) throws {
@@ -418,6 +502,17 @@ class IamUtil {
         ).execute()
     }
 
+    /**
+     * Asynchronously update an IAM user's role on device.
+     *
+     * The specified AsyncIamResultReceiver closure is invoked with IamError.OK upon successful completion or with an
+     * error if an error occurs. See the `updateUserRole()` function for details about possible error codes and known issues.
+     *
+     * @param connection An established connection to the device
+     * @param username Username for the user that should have password updated
+     * @param role New role for the user
+     * @param closure Invoked when the user is deleted or an error occurs
+     */
     static public func updateUserRoleAsync(connection: Connection,
                                            username: String,
                                            role: String,
@@ -431,6 +526,17 @@ class IamUtil {
         ).executeAsync(closure)
     }
 
+    /**
+     * Update an IAM user's display name on device.
+     *
+     * @param connection An established connection to the device
+     * @param username Username for the user that should have display name updated
+     * @param displayName New display name
+     * @throws USER_DOES_NOT_EXIST if the specifid user does not exist on the device (see note above)
+     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow the current user to update the specified user's displayname (the
+     * `IAM:SetUserDisplayName` action is not allowed for the requesting role for the `IAM:Username` user)
+     * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
+     */
     static public func updateUserDisplayName(connection: Connection,
                                              username: String,
                                              displayName: String) throws{
@@ -441,6 +547,17 @@ class IamUtil {
                 parameterValue: displayName).execute()
     }
 
+    /**
+     * Asynchronously update an IAM user's display name on device.
+     *
+     * The specified AsyncIamResultReceiver closure is invoked with IamError.OK upon successful completion or with an
+     * error if an error occurs. See the `updateUserDisplayName()` function for details about possible error codes and known issues.
+     *
+     * @param connection An established connection to the device
+     * @param username Username for the user that should have display name updated
+     * @param displayName New display name
+     * @param closure Invoked when the user is deleted or an error occurs
+     */
     static public func updateUserDisplayNameAsync(connection: Connection,
                                                   username: String,
                                                   displayName: String,
@@ -452,6 +569,18 @@ class IamUtil {
                 parameterValue: displayName).executeAsync(closure)
     }
 
+    /**
+     * Update an IAM user's username on device.
+     *
+     * @param connection An established connection to the device
+     * @param username Username for the user that should have username updated
+     * @param newUsername New username for the user
+     * @throws USER_DOES_NOT_EXIST if the specifid user does not exist on the device (see note above)
+     * @throws INVALID_INPUT if username is not valid as per https://docs.nabto.com/developer/api-reference/coap/iam/post-users.html#request
+     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow the current user to update the specified user's displayname (the
+     * `IAM:SetUserUsername` action is not allowed for the requesting role for the `IAM:Username` user)
+     * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
+     */
     static public func renameUser(connection: Connection,
                                   username: String,
                                   newUsername: String) throws {
@@ -462,6 +591,17 @@ class IamUtil {
                 parameterValue: newUsername).execute()
     }
 
+    /**
+     * Asynchronously update an IAM user's username on device.
+     *
+     * The specified AsyncIamResultReceiver closure is invoked with IamError.OK upon successful completion or with an
+     * error if an error occurs. See the `renameUser()` function for details about possible error codes and known issues.
+     *
+     * @param connection An established connection to the device
+     * @param username Username for the user that should have username updated
+     * @param newUsername New username for the user
+     * @param closure Invoked when the user is deleted or an error occurs
+     */
     static public func renameUserAsync(connection: Connection,
                                        username: String,
                                        newUsername: String,
@@ -473,6 +613,34 @@ class IamUtil {
                 parameterValue: newUsername).executeAsync(closure)
     }
 
+    /**
+     * Delete the specified user from device.
+     *
+     * @param connection An established connection to the device
+     *
+     * @throws USER_DOES_NOT_EXIST if the specifid user does not exist on the device
+     * @throws BLOCKED_BY_DEVICE_CONFIGURATION if the device configuration does not allow deleting this user (the
+     * `IAM:DeleteUser` action for the `IAM:Username` attribute is not allowed for the requesting role)
+     * @throws IAM_NOT_SUPPORTED if Nabto Edge IAM is not supported by the device
+     */
+    static public func deleteUser(connection: Connection, username: String) throws {
+        try DeleteUser(connection, username).execute()
+    }
+
+    /**
+     * Asynchronously delete the specified user from device.
+     *
+     * The specified AsyncIamResultReceiver closure is invoked with IamError.OK upon successful completion or with an
+     * error if an error occurs. See the `deleteUser()` function for details about possible error codes.
+     *
+     * @param connection An established connection to the device
+     * @param closure Invoked when the user is deleted or an error occurs
+     */
+    static public func deleteUserAsync(connection: Connection, username: String,
+                                       closure: @escaping AsyncIamResultReceiver) throws {
+        try DeleteUser(connection, username).executeAsync(closure)
+    }
+
 }
 
 public enum IamError: Error, Equatable {
@@ -480,7 +648,6 @@ public enum IamError: Error, Equatable {
     case INVALID_INPUT
     case USERNAME_EXISTS
     case USER_DOES_NOT_EXIST
-    case USER_IS_NOT_PAIRED
     case INITIAL_USER_ALREADY_PAIRED
     case ROLE_DOES_NOT_EXIST
     case AUTHENTICATION_ERROR
