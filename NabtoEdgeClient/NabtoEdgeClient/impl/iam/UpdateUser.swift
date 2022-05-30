@@ -8,7 +8,7 @@ internal class UpdateUser : AbstractIamInvocationTemplate {
     }
     private(set) var username: String
     private(set) var parameterName: String
-    private(set) var fourOhFourMapping: IamError
+    private(set) var status404ErrorCode: IamError
     private(set) var connection: Connection
     private(set) var cbor: Data? = nil
     private(set) var hookBeforeCoap: SyncHook? = nil
@@ -22,7 +22,7 @@ internal class UpdateUser : AbstractIamInvocationTemplate {
         case 204: return IamError.OK
         case 400: return IamError.INVALID_INPUT
         case 403: return IamError.BLOCKED_BY_DEVICE_CONFIGURATION
-        case 404: return self.fourOhFourMapping
+        case 404: return self.status404ErrorCode
         default: return IamError.FAILED
         }
     }
@@ -35,12 +35,12 @@ internal class UpdateUser : AbstractIamInvocationTemplate {
          username: String,
          parameterName: String,
          parameterValue: Data,
-         fourOhFourMapping: IamError=IamError.USER_DOES_NOT_EXIST
+         status404ErrorCode: IamError=IamError.USER_DOES_NOT_EXIST
          ) {
         self.connection = connection
         self.username = username
         self.parameterName = parameterName
-        self.fourOhFourMapping = fourOhFourMapping
+        self.status404ErrorCode = status404ErrorCode
         self.cbor = parameterValue
     }
 }

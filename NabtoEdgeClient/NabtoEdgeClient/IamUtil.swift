@@ -376,7 +376,7 @@ class IamUtil {
                 username: username,
                 parameterName: "role",
                 parameterValue: try toCbor(role),
-                fourOhFourMapping: IamError.ROLE_DOES_NOT_EXIST).execute()
+                status404ErrorCode: IamError.ROLE_DOES_NOT_EXIST).execute()
     }
 
     /**
@@ -430,7 +430,7 @@ class IamUtil {
                         username: username,
                         parameterName: "role",
                         parameterValue: encodedRole,
-                        fourOhFourMapping: IamError.ROLE_DOES_NOT_EXIST).executeAsync { error in
+                        status404ErrorCode: IamError.ROLE_DOES_NOT_EXIST).executeAsync { error in
                     if (error == IamError.OK) {
                         closure(IamError.OK)
                     } else {
@@ -513,7 +513,7 @@ class IamUtil {
                 username: username,
                 parameterName: "role",
                 parameterValue: try toCbor(role),
-                fourOhFourMapping: IamError.ROLE_DOES_NOT_EXIST
+                status404ErrorCode: IamError.ROLE_DOES_NOT_EXIST
         ).execute()
     }
 
@@ -541,7 +541,7 @@ class IamUtil {
                 username: username,
                 parameterName: "role",
                 parameterValue: cbor,
-                fourOhFourMapping: IamError.ROLE_DOES_NOT_EXIST
+                status404ErrorCode: IamError.ROLE_DOES_NOT_EXIST
         ).executeAsync(closure)
     }
 
