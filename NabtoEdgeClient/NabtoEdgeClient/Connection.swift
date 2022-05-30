@@ -199,12 +199,82 @@ public class Connection: NSObject, NativeConnectionWrapper {
     }
 
     /**
-     * Set connection options. Options must be set prior to invoking `connect()`.
+     * Set connection options. Options must be set prior to invoking `connect()`. This allows setting all the
+     * individual options available through the setXyz() functions (e.g., setPrivateKey()).
      * @param json The JSON document with options to set
      * @throws INVALID_ARGUMENT if input is invalid
      */
     public func updateOptions(json: String) throws {
         let status: NabtoClientError = nabto_client_connection_set_options(self.nativeConnection, json)
+        try Helper.throwIfNotOk(status)
+    }
+
+    /**
+     * Set the private key to be used on this connection.
+     *
+     * The private key is a PEM encoded string, it can be created by using the
+     * `Client.createPrivateKey()` function or using another tool which can make an appropriate
+     * private key (see https://docs.nabto.com/developer/guides/security/public_key_auth.html for
+     * more info)
+     *
+     * @param key The PEM encoded private key to set.
+     * @throws INVALID_STATE if the connection is not in the setup phase
+     */
+    public func setPrivateKey(key: String) throws {
+        let status = nabto_client_connection_set_private_key(self.nativeConnection, key)
+        return try Helper.throwIfNotOk(status)
+    }
+
+    /**
+     * Set the product id of the device to connect to.
+     * @param key The product id of the target device.
+     * @throws INVALID_STATE if connection already established
+     */
+    public func setProductId(id: String) throws {
+        let status: NabtoClientError = nabto_client_connection_set_product_id(self.nativeConnection, id)
+        try Helper.throwIfNotOk(status)
+    }
+
+    /**
+     * Set the device id of the device to connect to.
+     * @param key The device id of the target device.
+     * @throws INVALID_STATE if connection already established
+     */
+    public func setDeviceId(id: String) throws {
+        let status: NabtoClientError = nabto_client_connection_set_device_id(self.nativeConnection, id)
+        try Helper.throwIfNotOk(status)
+    }
+
+    /**
+     * Set the server key associated with this client application through the Nabto Cloud Console.
+     * @param key The server key to use.
+     * @throws INVALID_STATE if connection already established
+     */
+    public func setServerKey(key: String) throws {
+        let status: NabtoClientError = nabto_client_connection_set_server_key(self.nativeConnection, key)
+        try Helper.throwIfNotOk(status)
+    }
+
+    /**
+     * Set a server connect token for use with this connection for establishing a remote connection (if the authentication
+     * type for the application associated with this client is set to "SCT" in the Nabto Cloud Console). The SCT must be
+     * shared with the target device, typically setup in the pairing step.
+     * @param key The SCT to use for this connection.
+     * @throws INVALID_STATE if connection already established
+     */
+    public func setServerConnectToken(sct: String) throws {
+        let status: NabtoClientError = nabto_client_connection_set_server_connect_token(self.nativeConnection, sct)
+        try Helper.throwIfNotOk(status)
+    }
+
+    /**
+     * Set a JWT for use with this connection for establishing a remote connection (if the authentication
+     * type for the application associated with this client is set to "JWT" in the Nabto Cloud Console).
+     * @param key The token to use for this connection.
+     * @throws INVALID_STATE if connection already established
+     */
+    public func setServerJwtToken(jwt: String) throws {
+        let status: NabtoClientError = nabto_client_connection_set_server_jwt_token(self.nativeConnection, jwt)
         try Helper.throwIfNotOk(status)
     }
 
@@ -272,22 +342,6 @@ public class Connection: NSObject, NativeConnectionWrapper {
         var p: UnsafeMutablePointer<Int8>? = nil
         let status = nabto_client_connection_get_options(self.nativeConnection, &p)
         return try Helper.handleStringResult(status: status, cstring: p)
-    }
-
-    /**
-     * Set the private key to be used on this connection.
-     *
-     * The private key is a PEM encoded string, it can be created by using the
-     * `Client.createPrivateKey()` function or using another tool which can make an appropriate
-     * private key (see https://docs.nabto.com/developer/guides/security/public_key_auth.html for
-     * more info)
-     *
-     * @param key The PEM encoded private key to set.
-     * @throws INVALID_STATE if the connection is not in the setup phase
-     */
-    public func setPrivateKey(key: String) throws {
-        let status = nabto_client_connection_set_private_key(self.nativeConnection, key)
-        return try Helper.throwIfNotOk(status)
     }
 
     /**
