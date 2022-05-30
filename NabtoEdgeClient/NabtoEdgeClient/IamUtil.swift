@@ -19,7 +19,7 @@ import CBORCoding
  * Note that the device's IAM configuration must allow invocation of the different functions and the pairing modes must
  * be enabled at runtime. Read more about that in the general IAM intro here: https://docs.nabto.com/developer/guides/concepts/iam/intro.html
  */
-class IamUtil {
+public class IamUtil {
 
     /**
      * Perform Local Open pairing, requesting the specified username.
@@ -719,11 +719,11 @@ public typealias AsyncIamPayloadReceiver<T> = (IamError, Data?) -> Void
 // the key names in the CBOR string map for the "CoAP GET /iam/me" service
 // https://docs.nabto.com/developer/api-reference/coap/iam/me.html
 public struct IamUser: Codable {
-    let Username: String
-    let DisplayName: String?
-    let Fingerprint: String?
-    let Sct: String?
-    let Role: String?
+    public let Username: String
+    public let DisplayName: String?
+    public let Fingerprint: String?
+    public let Sct: String?
+    public let Role: String?
 
     init(username: String, displayName: String? = nil, fingerprint: String? = nil, sct: String? = nil, role: String? = nil) {
         self.Username = username
@@ -764,12 +764,12 @@ public struct IamUser: Codable {
 // the key names in the CBOR string map for the "CoAP GET /iam/pairing" service
 // https://docs.nabto.com/developer/api-reference/coap/iam/pairing.html
 public struct DeviceDetails: Codable {
-    let Modes: [String]
-    let NabtoVersion: String
-    let AppVersion: String?
-    let AppName: String?
-    let ProductId: String
-    let DeviceId: String
+    public let Modes: [String]
+    public let NabtoVersion: String
+    public let AppVersion: String?
+    public let AppName: String?
+    public let ProductId: String
+    public let DeviceId: String
 
     public init(Modes: [String], NabtoVersion: String, AppVersion: String, AppName: String, ProductId: String, DeviceId: String) {
         self.Modes = Modes
