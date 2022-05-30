@@ -1,1 +1,14 @@
-{"Version":1,"OpenPairingPassword":"rHfMdaw4zpne","OpenPairingSct":"zAsxwgETYzrX","LocalOpenPairing":true,"PasswordOpenPairing":false,"PasswordInvitePairing":false,"LocalInitialPairing":false,"OpenPairingRole":"Guest","InitialPairingUsername":"admin","Users":[{"Username":"9f130a7d-7844-49","Fingerprint":"1020bd99ea8b299ec389f36b0269b4ee0c3d1777a832776c07a1e24714aaf4b8","ServerConnectToken":"C7lEbAZVoiZp","Role":"Guest"},{"Username":"2e66e245-8629-45","Fingerprint":"82e7b1bff81ac7044fc35a7f8b4dd94d30a2b6f94cf74272eeadaa760396aece","ServerConnectToken":"z44iDzF2Orx8","Role":"Guest"},{"Username":"60c4c5a7-5e7e-4f","Fingerprint":"5eeee9b62dd2c6c8702a098352574d9f2c5f5afb6295361f2dea22ccd4bce876","ServerConnectToken":"dPSFxtHvHMUh","Role":"Guest"},{"Username":"a8a796ca-90e8-4a","Fingerprint":"e319b1e51e82fb0629f60a37b17709ea5503ff5318cb4ae18d2207cf4101efd2","ServerConnectToken":"0gzwACaf871S","Role":"Guest"},{"Username":"2205882d-2d45-49","Fingerprint":"52775905b15cc3a35bcc645dac9701e47665244c2b7e860cf6bba9561413fa35","ServerConnectToken":"HUt4ecHYYiiK","Role":"Guest"},{"Username":"275599e2-caf4-41","Fingerprint":"a9a7754095407f82cd64fee4f982b59e4d328dc6a0e1b6db1065a047edb51fb5","ServerConnectToken":"XFGqiY58cgVI","Role":"Guest"},{"Username":"67238a17-e082-44","Fingerprint":"e1721a35a601e33c04e55116773354063fd571b900655d291d2d93cbf7153db8","ServerConnectToken":"ZyiqyyWZNxzY","Role":"Guest"},{"Username":"82d52fc2-a6c5-40","Fingerprint":"7b9d55b7d5bd473495acad8fce7fb94c2344c8bb0e38ae5a34b2b7871072459b","ServerConnectToken":"yfIvPZol0knl","Role":"Guest"},{"Username":"acc9ac8e-41cf-4b","Fingerprint":"3724fedc4938428e60555cc26fa7fd131b4cc449b3cada8a85c74bd2e5c658ed","ServerConnectToken":"QbVMGNjsGQQJ","Role":"Guest"},{"Username":"beef9858-c941-4f","Fingerprint":"d078fa9517bc3c144475fc9f1fa9824e6da24a46302a180c02ef224da51912d1","ServerConnectToken":"HKo5HRZt2w9V","Role":"Guest"},{"Username":"fc1142c5-eab8-48","Fingerprint":"76e46c9f8744a6314b983c87c36c4a0852963426249d062f8e9cf73ab0b8ed60","ServerConnectToken":"KYDvCOQb5A0X","Role":"Guest"},{"Username":"5805bcb7-0844-4a","Fingerprint":"a7b50279e86e19ff677188bc4b296d697c5e6a741e26534085451c17a177ce24","ServerConnectToken":"Bc8YBeGcVwGb","Role":"Guest"}]}
+{
+   "InitialPairingUsername" : "admin",
+   "LocalInitialPairing" : false,
+   "LocalOpenPairing" : true,
+   "OpenPairingPassword" : "rHfMdaw4zpne",
+   "OpenPairingRole" : "Guest",
+   "OpenPairingSct" : "zAsxwgETYzrX",
+   "PasswordInvitePairing" : false,
+   "PasswordOpenPairing" : false,
+   "Users" : [
+   ],
+   "Version" : 1
+}
+
