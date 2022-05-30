@@ -17,26 +17,31 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6C4-J3-yUo">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Nabto Edge Client App" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6C4-J3-yUo">
                                 <rect key="frame" x="20" y="44" width="374" height="824"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yxt-tP-crm">
-                                <rect key="frame" x="119" y="208" width="177" height="146"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yxt-tP-crm">
+                                <rect key="frame" x="119" y="208" width="176" height="146"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="gray" title="Button"/>
+                                <buttonConfiguration key="configuration" style="gray" title="Invoke test device"/>
                                 <connections>
-                                    <action selector="handleButtonTap:" destination="BYZ-38-t0r" eventType="touchUpInside" id="cp4-Mz-kMK"/>
+                                    <action selector="buttonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="qKC-ar-PbR"/>
                                 </connections>
                             </button>
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="wPO-et-GJ2">
+                                <rect key="frame" x="197" y="559" width="20" height="20"/>
+                            </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="yxt-tP-crm" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="119" id="04P-ki-Oez"/>
+                            <constraint firstItem="wPO-et-GJ2" firstAttribute="top" secondItem="yxt-tP-crm" secondAttribute="bottom" constant="205" id="3gA-8J-ITi"/>
                             <constraint firstItem="6C4-J3-yUo" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="67L-Tg-EHj"/>
+                            <constraint firstItem="wPO-et-GJ2" firstAttribute="centerX" secondItem="6C4-J3-yUo" secondAttribute="centerX" id="BU6-61-uIa"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="yxt-tP-crm" secondAttribute="bottom" constant="508" id="R67-Wg-mDh"/>
                             <constraint firstAttribute="bottomMargin" secondItem="6C4-J3-yUo" secondAttribute="bottom" constant="-6" id="Xci-tI-ZOw"/>
                             <constraint firstItem="6C4-J3-yUo" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="cON-h8-1zh"/>
@@ -47,6 +52,7 @@
                     </view>
                     <connections>
                         <outlet property="label" destination="6C4-J3-yUo" id="y6R-0G-fCZ"/>
+                        <outlet property="spinner" destination="wPO-et-GJ2" id="UbG-Yh-SwV"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
