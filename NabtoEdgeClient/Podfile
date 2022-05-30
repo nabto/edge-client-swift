@@ -8,10 +8,15 @@ use_frameworks!
 platform :ios, '10.2'
 
 target 'NabtoEdgeClient' do
+  pod 'CBORCoding'
   pod 'NabtoEdgeClientApiFW', '5.8.2'
 end
 
+target 'HostForTests' do
+  pod 'CBORCoding'
+end
+
 target 'NabtoEdgeClientTests' do
-  pod 'SwiftCBOR'
+  pod 'CBORCoding'
 #  pod 'NabtoClient'
 end

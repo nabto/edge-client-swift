@@ -44,10 +44,11 @@ internal class Helper {
         case NABTO_CLIENT_EC_UNKNOWN_DEVICE_ID: return NabtoEdgeClientError.UNKNOWN_DEVICE_ID
         case NABTO_CLIENT_EC_UNKNOWN_PRODUCT_ID: return NabtoEdgeClientError.UNKNOWN_PRODUCT_ID
         case NABTO_CLIENT_EC_UNKNOWN_SERVER_KEY: return NabtoEdgeClientError.UNKNOWN_SERVER_KEY
-        case NABTO_CLIENT_EC_UNKNOWN: return NabtoEdgeClientError.FAILED
+        case NABTO_CLIENT_EC_UNKNOWN: return NabtoEdgeClientError.API_UNKNOWN_ERROR
+        case NABTO_CLIENT_EC_TOO_MANY_REQUESTS: return NabtoEdgeClientError.TOO_MANY_WRONG_PASSWORD_ATTEMPTS
 
         default:
-            NSLog("Unexpected API status \(status): \(apiStatusToString(status))")
+            NSLog("Error: UNEXPECTED_API_STATUS \(status): \(apiStatusToString(status))")
             return .UNEXPECTED_API_STATUS
         }
     }

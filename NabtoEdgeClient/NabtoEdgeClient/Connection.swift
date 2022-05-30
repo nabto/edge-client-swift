@@ -41,6 +41,26 @@ internal protocol NativeConnectionWrapper {
     var nativeConnection: OpaquePointer { get }
 }
 
+public class ConnectionOptions : Codable {
+    var PrivateKey: String?
+    var ProductId: String?
+    var DeviceId: String?
+    var ServerUrl: String?
+    var ServerKey: String?
+    var ServerJwtToken: String?
+    var ServerConnectToken: String?
+    var AppName: String?
+    var AppVersion: String?
+    var KeepAliveInterval: Int?
+    var KeepAliveRetryInterval: Int?
+    var KeepAliveMaxRetries: Int?
+    var DtlsHelloTimeout: Int?
+    var Local: Bool?
+    var Remote: Bool?
+    var Rendezvous: Bool?
+    var ScanLocalConnect: Bool?
+}
+
 /**
  * This class represents a connection to a specific Nabto Edge device. The Connection object must
  * be kept alive for the duration of all streams, tunnels, and CoAP sessions created from it.
@@ -153,6 +173,28 @@ public class Connection: NSObject, NativeConnectionWrapper {
     public func closeAsync(closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
             nabto_client_connection_close(self.nativeConnection, future)
+        }
+    }
+
+    /**
+     * Set connection options. Options must be set prior to invoking `connect()`.
+     * @param options The the options to set
+     * @throws INVALID_ARGUMENT if input is invalid
+     */
+    public func updateOptions(options: ConnectionOptions) throws {
+        let encoder = JSONEncoder()
+        let json: Data
+        do {
+            json = try encoder.encode(options)
+        } catch {
+            throw NabtoEdgeClientError.FAILED_WITH_DETAIL(detail: "json encoding error: \(error))")
+        }
+
+        let str = String(data: json, encoding: .utf8)
+        if let str = str {
+            try self.updateOptions(json: str)
+        } else {
+            throw NabtoEdgeClientError.FAILED_WITH_DETAIL(detail: "json encoding error")
         }
     }
 

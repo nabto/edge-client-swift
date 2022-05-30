@@ -1,0 +1,8 @@
+[
+   {
+      "Host" : "8.8.8.8",
+      "Id" : "devnull",
+      "Port" : 9999,
+      "Type" : "devnull"
+   }
+]

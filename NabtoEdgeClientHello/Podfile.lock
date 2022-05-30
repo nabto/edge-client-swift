@@ -1,5 +1,5 @@
 PODS:
-  - NabtoEdgeClientSwift (1.1.0)
+  - NabtoEdgeClientSwift (2.1.1)
 
 DEPENDENCIES:
   - NabtoEdgeClientSwift
@@ -9,8 +9,8 @@ SPEC REPOS:
     - NabtoEdgeClientSwift
 
 SPEC CHECKSUMS:
-  NabtoEdgeClientSwift: 8e74e40059d65d12476659d8c090bd60fb494cb2
+  NabtoEdgeClientSwift: 52460dc215562d4851040881adf69471b7a5e767
 
 PODFILE CHECKSUM: fc0826c0e7508f1533de654e5d4fef5a0dcff67d
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3
