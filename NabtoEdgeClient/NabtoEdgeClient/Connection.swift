@@ -151,17 +151,6 @@ public class Connection: NSObject, NativeConnectionWrapper {
     }
 
     /**
-     * Stop pending connect or close on a connection.
-     *
-     * After stop has been called the connection should not be used any more.
-     *
-     * Stop can be used if the user cancels a connect/close request.
-     */
-    public func stop() {
-        nabto_client_connection_stop(self.nativeConnection)
-    }
-
-    /**
      * Close this connection asynchronously.
      *
      * The specified AsyncStatusReceiver closure is
@@ -174,6 +163,17 @@ public class Connection: NSObject, NativeConnectionWrapper {
         self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
             nabto_client_connection_close(self.nativeConnection, future)
         }
+    }
+
+    /**
+     * Stop pending connect or close on a connection.
+     *
+     * After stop has been called the connection should not be used any more.
+     *
+     * Stop can be used if the user cancels a connect/close request.
+     */
+    public func stop() {
+        nabto_client_connection_stop(self.nativeConnection)
     }
 
     /**
@@ -279,8 +279,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
     }
 
     /**
-     * Password authenticate, do a password authentication exchange with a
-     * device. Blocks until authentication attempt is complete.
+     * Do a password authentication exchange with a device. Blocks until authentication attempt is complete.
      *
      * Password authenticate the client and the device. The password
      * authentication is bidirectional and based on PAKE, such that both
@@ -290,6 +289,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * A specific use case for the password authentication is to prove the
      * identity of a device which identity is not already known, e.g. in a
      * pairing scenario.
+     *
      * @param username The username (note: use the empty string if using for Password Open Pairing, see https://docs.nabto.com/developer/guides/iam/pairing.html)
      * @param password The password (typically the open (global) or invite (per-user) pairing password)
      * @throws UNAUTHORIZED if the username or password is invalid
@@ -305,10 +305,8 @@ public class Connection: NSObject, NativeConnectionWrapper {
         }
     }
 
-
     /**
-     * Password authenticate asynchronously, do a password authentication exchange with a
-     * device.
+     * Do an asynchronous password authentication exchange with a device.
      *
      * Password authenticate the client and the device. The password
      * authentication is bidirectional and based on PAKE, such that both
@@ -321,6 +319,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
      *
      * The specified AsyncStatusReceiver closure is invoked with an error if an error occurs, see
      * the `passwordAuthenticate()` function for details about error codes.
+     *
      * @param username The username (note: use the empty string if using for Password Open Pairing, see https://docs.nabto.com/developer/guides/iam/pairing.html)
      * @param password The password (typically the open (global) or invite (per-user) pairing password)
      */
