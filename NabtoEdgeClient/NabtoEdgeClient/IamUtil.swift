@@ -682,8 +682,6 @@ public class IamUtil {
         let encoder = CBOREncoder()
         return try? encoder.encode(value)
     }
-
-
 }
 
 public enum IamError: Error, Equatable {
@@ -715,17 +713,40 @@ public typealias AsyncIamResultReceiver = (IamError) -> Void
 public typealias AsyncIamResultReceiverWithData<T> = (IamError, T?) -> Void
 public typealias AsyncIamPayloadReceiver<T> = (IamError, Data?) -> Void
 
-// upper camelcase field names breaks standard Swift style - they match
-// the key names in the CBOR string map for the "CoAP GET /iam/me" service
-// https://docs.nabto.com/developer/api-reference/coap/iam/me.html
+/**
+ * This struct contains information about a user on a Nabto Edge Embedded device.
+ *
+ * Note that upper camelcase field names breaks standard Swift style - the field names match
+ * the key names in the CBOR string map for the "CoAP GET /iam/users/:username" endpoint, see
+ * https://docs.nabto.com/developer/api-reference/coap/iam/users-get-user.html
+ */
 public struct IamUser: Codable {
+    /**
+     * The username of this IAM user.
+     */
     public let Username: String
+
+    /**
+     * The display name of this IAM user.
+     */
     public let DisplayName: String?
+
+    /**
+     * The public key fingerprint of this IAM user.
+     */
     public let Fingerprint: String?
+
+    /**
+     * A server connect token for this user.
+     */
     public let Sct: String?
+
+    /**
+     * The role of this user.
+     */
     public let Role: String?
 
-    init(username: String, displayName: String? = nil, fingerprint: String? = nil, sct: String? = nil, role: String? = nil) {
+    public init(username: String, displayName: String? = nil, fingerprint: String? = nil, sct: String? = nil, role: String? = nil) {
         self.Username = username
         self.DisplayName = displayName
         self.Fingerprint = fingerprint
@@ -733,7 +754,14 @@ public struct IamUser: Codable {
         self.Role = role
     }
 
-    static func decode(cbor: Data) throws -> IamUser {
+    /**
+     * Create an IamUser instance based on raw CBOR data.
+     *
+     * @param cbor Raw CBOR data (as received through a CoAP call to a Nabto Embedded SDK device).
+     * @throws INVALID_RESPONSE If the specified data could not be decoded into an IamUser instance.
+     * @return an IamUser instance representing the input raw CBOR data
+     */
+    public static func decode(cbor: Data) throws -> IamUser {
         let decoder = CBORDecoder()
         do {
             return try decoder.decode(IamUser.self, from: cbor)
@@ -742,7 +770,17 @@ public struct IamUser: Codable {
         }
     }
 
-    func encode() throws -> Data {
+    /**
+     * Encode this user instance into CBOR data that can be sent to device.
+     *
+     * If using the IamUtil functions, this function is not necessary to use. But if you invoke the IAM CoAP backend
+     * on the device directly, this function is useful for encoding input. For instance for the /iam/pairing/local-open endpoint
+     * that accepts an encoded user (as documented on https://docs.nabto.com/developer/api-reference/coap/iam/pairing-local-open.html).
+     *
+     * @throws INVALID_INPUT If the user could not be encoded into CBOR data.
+     * @return Raw CBOR data (e.g. to send to a CoAP call to a Nabto Embedded SDK device).
+     */
+    public func encode() throws -> Data {
         let encoder = CBOREncoder()
         do {
             return try encoder.encode(self)
@@ -751,6 +789,9 @@ public struct IamUser: Codable {
         }
     }
 
+    /*
+     * For debugging.
+     */
     public func cborAsHex() -> String? {
         let encoder = CBOREncoder()
         return try? encoder.encode(self).map {
@@ -760,18 +801,46 @@ public struct IamUser: Codable {
     }
 }
 
-// upper camelcase field names breaks standard Swift style - they match
-// the key names in the CBOR string map for the "CoAP GET /iam/pairing" service
-// https://docs.nabto.com/developer/api-reference/coap/iam/pairing.html
+/**
+ * This struct contains detailed information about a Nabto Edge Embedded device.
+ *
+ * Note that upper camelcase field names breaks standard Swift style - the field names match
+ * the key names in the CBOR string map for the "CoAP GET /iam/pairing" endpoint, see
+ * https://docs.nabto.com/developer/api-reference/coap/iam/pairing.html
+ */
 public struct DeviceDetails: Codable {
+
+    /**
+     * Pairing modes currently available for use by the client.
+     */
     public let Modes: [String]
+
+    /**
+     * The version of the Nabto Edge Embedded SDK.
+     */
     public let NabtoVersion: String
+
+    /**
+     * The vendor assigned application version.
+     */
     public let AppVersion: String?
+
+    /**
+     * The vendor assigned application name.
+     */
     public let AppName: String?
+
+    /**
+     * The device's product id.
+     */
     public let ProductId: String
+
+    /**
+     * The device's device id.
+     */
     public let DeviceId: String
 
-    public init(Modes: [String], NabtoVersion: String, AppVersion: String, AppName: String, ProductId: String, DeviceId: String) {
+    internal init(Modes: [String], NabtoVersion: String, AppVersion: String, AppName: String, ProductId: String, DeviceId: String) {
         self.Modes = Modes
         self.NabtoVersion = NabtoVersion
         self.AppVersion = AppVersion
@@ -780,21 +849,19 @@ public struct DeviceDetails: Codable {
         self.DeviceId = DeviceId
     }
 
-    static func decode(cbor: Data) throws -> DeviceDetails {
+    /**
+     * Create a DeviceDetails instance based on raw CBOR data.
+     *
+     * @param cbor Raw CBOR data (as received through a CoAP call to a Nabto Embedded SDK device).
+     * @throws INVALID_RESPONSE If the specified data could not be decoded into a DeviceDetails instance.
+     * @return a DeviceDetails instance representing the input raw CBOR data
+     */
+    public static func decode(cbor: Data) throws -> DeviceDetails {
         let decoder = CBORDecoder()
         do {
             return try decoder.decode(DeviceDetails.self, from: cbor)
         } catch {
             throw IamError.INVALID_RESPONSE(error: "\(error)")
-        }
-    }
-
-    func encode() throws -> Data {
-        let encoder = CBOREncoder()
-        do {
-            return try encoder.encode(self)
-        } catch {
-            throw IamError.INVALID_INPUT
         }
     }
 }

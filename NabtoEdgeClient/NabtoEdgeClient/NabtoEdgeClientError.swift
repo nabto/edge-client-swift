@@ -8,7 +8,7 @@
 
 import Foundation
 
-/*
+/**
  * Error codes directly mapped from the underlying core SDK.
  */
 public indirect enum NabtoEdgeClientError: Error, Equatable {

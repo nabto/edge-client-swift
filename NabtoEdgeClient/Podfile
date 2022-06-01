@@ -9,7 +9,7 @@ platform :ios, '10.2'
 
 target 'NabtoEdgeClient' do
   pod 'CBORCoding'
-  pod 'NabtoEdgeClientApiFW', '5.8.2'
+  pod 'NabtoEdgeClientApiFW', '5.9.0'
 end
 
 target 'HostForTests' do
