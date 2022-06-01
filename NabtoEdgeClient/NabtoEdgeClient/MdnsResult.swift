@@ -9,8 +9,9 @@ import Foundation
  * The result of an mDNS discovery request.
  */
 public class MdnsResult : NSObject {
+
     /**
-     * Actions emitted by device to manipulate the service cache in the client. Applies to the service identified
+     * Actions emitted by device to manipulate the mDNS service cache in the client. Applies to the service identified
      * by serviceInstanceName in the result.
      */
     @objc public enum Action: Int {
