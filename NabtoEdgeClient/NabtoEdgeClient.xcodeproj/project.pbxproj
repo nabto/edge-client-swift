@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2130EA1DD0DFAA9C3CFEEB9C /* Pods_NabtoEdgeClientTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E0BA9A4CFC907D2981485195 /* Pods_NabtoEdgeClientTests.framework */; };
-		606C5990925033691AA3110C /* Pods_NabtoEdgeClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D02FDBE2E1AB6671BF7C1D3E /* Pods_NabtoEdgeClient.framework */; };
-		8CB33D8CC985235AD1283EA2 /* Pods_HostForTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8EA8224FFE504AEDA3789FA /* Pods_HostForTests.framework */; };
+		0CD41CCA6F64AF23F612E7CF /* Pods_NabtoEdgeClientTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4ABEC91FC21ED0977753ECF /* Pods_NabtoEdgeClientTests.framework */; };
+		0E8DCEF767D60DDDC0111BA3 /* Pods_HostForTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 097EFE4A9839D7E53E185330 /* Pods_HostForTests.framework */; };
+		1E657115F1E6C106B15F1C04 /* Pods_NabtoEdgeClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96AF3244B66CB895A561D24C /* Pods_NabtoEdgeClient.framework */; };
 		D43E129027C596C4006D49E2 /* NabtoEdgeClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4655D4327C57CD1001F9AF6 /* NabtoEdgeClient.framework */; };
 		D43E129127C596C4006D49E2 /* NabtoEdgeClient.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D4655D4327C57CD1001F9AF6 /* NabtoEdgeClient.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D4655D4C27C57CD1001F9AF6 /* NabtoEdgeClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4655D4327C57CD1001F9AF6 /* NabtoEdgeClient.framework */; };
@@ -33,23 +33,7 @@
 		D479084F27C581E400790A51 /* ClientImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = D479084C27C581E400790A51 /* ClientImpl.swift */; };
 		D479085027C581E400790A51 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D479084D27C581E400790A51 /* Helper.swift */; };
 		D479085127C581E400790A51 /* CallbackWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D479084E27C581E400790A51 /* CallbackWrapper.swift */; };
-		E920D40C05B13294EE40B302 /* DeleteUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92C74DF43642ECF620F0D94 /* DeleteUser.swift */; };
-		E92302F614DFF1CE2D44AF7A /* IamUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92E1F3B78BE7B59AA656356 /* IamUtil.swift */; };
-		E923120C46CF30C6E5681300 /* AbstractIamInvocationTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92AE96525DAF4143AE97A68 /* AbstractIamInvocationTemplate.swift */; };
-		E9245BF32A15FBF23112817E /* UpdateUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92815681CC90C4994059AE6 /* UpdateUser.swift */; };
-		E924950057813BDEED31E0BE /* CreateUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92151858B2D17A5B9806BD1 /* CreateUser.swift */; };
-		E924E25FC8B3E45F8B6FE14D /* GetAvailablePairingModes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92B906B4787E59860DA7927 /* GetAvailablePairingModes.swift */; };
-		E925CA6B746BB821ABFC6E33 /* PairLocalInitial.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92CF513E9FC4558DD69F13D /* PairLocalInitial.swift */; };
-		E92652701579C3210C57BD1A /* PairPasswordInvite.swift in Sources */ = {isa = PBXBuildFile; fileRef = E922433FDF28CDFC63583059 /* PairPasswordInvite.swift */; };
-		E926F5420D58576D4FD76E4C /* GetUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9270F14E05A5511DF78141A /* GetUser.swift */; };
 		E92837BE0959E8D8679649C7 /* TestDeviceDefinitions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9221D728E77EBE65E3D5868 /* TestDeviceDefinitions.swift */; };
-		E9289DDF58735633C1389870 /* PairLocalOpen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9222CFACFDBA713CE870C08 /* PairLocalOpen.swift */; };
-		E92A57C275EA2FD5BC371D9F /* GetCurrentUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9208EB79DB6FA86A325BE59 /* GetCurrentUser.swift */; };
-		E92B89A1B66E2D1F8F8D818F /* IamUtilTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92CE3DEF30197BFA961376C /* IamUtilTests.swift */; };
-		E92E743784165CA504619D02 /* IamHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E927FB7D04C0ABD6951697C1 /* IamHelper.swift */; };
-		E92F6E6146D807645CDD4B35 /* IsCurrentUserPaired.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9286DFA00DD128C54F1E8BA /* IsCurrentUserPaired.swift */; };
-		E92F92784753ABF65C759A79 /* PairPasswordOpen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92939973C97A9709F442C94 /* PairPasswordOpen.swift */; };
-		E92F9B04F3CB9AB49F114828 /* GetDeviceDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921C62E2CEAA960557ADD43 /* GetDeviceDetails.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -91,12 +75,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		24DB790DE6C3B01FF80BF921 /* Pods-NabtoEdgeClientTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClientTests.release.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClientTests/Pods-NabtoEdgeClientTests.release.xcconfig"; sourceTree = "<group>"; };
-		2899B2C29300E1DB82DBEA54 /* Pods-HostForTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HostForTests.release.xcconfig"; path = "Target Support Files/Pods-HostForTests/Pods-HostForTests.release.xcconfig"; sourceTree = "<group>"; };
-		8972571CD1402F443E74BE2D /* Pods-NabtoEdgeClientTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClientTests.debug.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClientTests/Pods-NabtoEdgeClientTests.debug.xcconfig"; sourceTree = "<group>"; };
-		9C82C8BF2DC9ABEB7001ACA1 /* Pods-NabtoEdgeClient.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClient.debug.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClient/Pods-NabtoEdgeClient.debug.xcconfig"; sourceTree = "<group>"; };
-		C8EA8224FFE504AEDA3789FA /* Pods_HostForTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HostForTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D02FDBE2E1AB6671BF7C1D3E /* Pods_NabtoEdgeClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NabtoEdgeClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		097EFE4A9839D7E53E185330 /* Pods_HostForTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HostForTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C5AED3EF0494607A82E3A8C /* Pods-HostForTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HostForTests.release.xcconfig"; path = "Target Support Files/Pods-HostForTests/Pods-HostForTests.release.xcconfig"; sourceTree = "<group>"; };
+		3645ECD70BFFD026F784C67C /* Pods-NabtoEdgeClientTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClientTests.release.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClientTests/Pods-NabtoEdgeClientTests.release.xcconfig"; sourceTree = "<group>"; };
+		7089B677E99C4B65A608D53D /* Pods-NabtoEdgeClientTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClientTests.debug.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClientTests/Pods-NabtoEdgeClientTests.debug.xcconfig"; sourceTree = "<group>"; };
+		96AF3244B66CB895A561D24C /* Pods_NabtoEdgeClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NabtoEdgeClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B13FE727F792080484C30C9 /* Pods-NabtoEdgeClient.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClient.debug.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClient/Pods-NabtoEdgeClient.debug.xcconfig"; sourceTree = "<group>"; };
+		B4ABEC91FC21ED0977753ECF /* Pods_NabtoEdgeClientTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NabtoEdgeClientTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4655D4327C57CD1001F9AF6 /* NabtoEdgeClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = NabtoEdgeClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4655D4B27C57CD1001F9AF6 /* NabtoEdgeClientTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NabtoEdgeClientTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4655D5027C57CD1001F9AF6 /* NabtoEdgeClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NabtoEdgeClientTests.swift; sourceTree = "<group>"; };
@@ -123,26 +108,9 @@
 		D479084D27C581E400790A51 /* Helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		D479084E27C581E400790A51 /* CallbackWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallbackWrapper.swift; sourceTree = "<group>"; };
 		D4BA975B27D60A2100012902 /* TestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestPlan.xctestplan; sourceTree = "<group>"; };
-		E0BA9A4CFC907D2981485195 /* Pods_NabtoEdgeClientTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NabtoEdgeClientTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		E8FC3EABC6D45EA97F36B731 /* Pods-NabtoEdgeClient.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClient.release.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClient/Pods-NabtoEdgeClient.release.xcconfig"; sourceTree = "<group>"; };
-		E9208EB79DB6FA86A325BE59 /* GetCurrentUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetCurrentUser.swift; sourceTree = "<group>"; };
-		E92151858B2D17A5B9806BD1 /* CreateUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateUser.swift; sourceTree = "<group>"; };
-		E921C62E2CEAA960557ADD43 /* GetDeviceDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetDeviceDetails.swift; sourceTree = "<group>"; };
+		D9C41283F485B01BA5D002A1 /* Pods-NabtoEdgeClient.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClient.release.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClient/Pods-NabtoEdgeClient.release.xcconfig"; sourceTree = "<group>"; };
+		E2912C97DDA838DA5085EF19 /* Pods-HostForTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HostForTests.debug.xcconfig"; path = "Target Support Files/Pods-HostForTests/Pods-HostForTests.debug.xcconfig"; sourceTree = "<group>"; };
 		E9221D728E77EBE65E3D5868 /* TestDeviceDefinitions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestDeviceDefinitions.swift; sourceTree = "<group>"; };
-		E9222CFACFDBA713CE870C08 /* PairLocalOpen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairLocalOpen.swift; sourceTree = "<group>"; };
-		E922433FDF28CDFC63583059 /* PairPasswordInvite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairPasswordInvite.swift; sourceTree = "<group>"; };
-		E9270F14E05A5511DF78141A /* GetUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetUser.swift; sourceTree = "<group>"; };
-		E927FB7D04C0ABD6951697C1 /* IamHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IamHelper.swift; sourceTree = "<group>"; };
-		E92815681CC90C4994059AE6 /* UpdateUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdateUser.swift; sourceTree = "<group>"; };
-		E9286DFA00DD128C54F1E8BA /* IsCurrentUserPaired.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IsCurrentUserPaired.swift; sourceTree = "<group>"; };
-		E92939973C97A9709F442C94 /* PairPasswordOpen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairPasswordOpen.swift; sourceTree = "<group>"; };
-		E92AE96525DAF4143AE97A68 /* AbstractIamInvocationTemplate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AbstractIamInvocationTemplate.swift; sourceTree = "<group>"; };
-		E92B906B4787E59860DA7927 /* GetAvailablePairingModes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetAvailablePairingModes.swift; sourceTree = "<group>"; };
-		E92C74DF43642ECF620F0D94 /* DeleteUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeleteUser.swift; sourceTree = "<group>"; };
-		E92CE3DEF30197BFA961376C /* IamUtilTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IamUtilTests.swift; sourceTree = "<group>"; };
-		E92CF513E9FC4558DD69F13D /* PairLocalInitial.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PairLocalInitial.swift; sourceTree = "<group>"; };
-		E92E1F3B78BE7B59AA656356 /* IamUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IamUtil.swift; sourceTree = "<group>"; };
-		F3E805C5AA5F1B9505483AE2 /* Pods-HostForTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HostForTests.debug.xcconfig"; path = "Target Support Files/Pods-HostForTests/Pods-HostForTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -150,7 +118,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				606C5990925033691AA3110C /* Pods_NabtoEdgeClient.framework in Frameworks */,
+				1E657115F1E6C106B15F1C04 /* Pods_NabtoEdgeClient.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -159,7 +127,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D4655D4C27C57CD1001F9AF6 /* NabtoEdgeClient.framework in Frameworks */,
-				2130EA1DD0DFAA9C3CFEEB9C /* Pods_NabtoEdgeClientTests.framework in Frameworks */,
+				0CD41CCA6F64AF23F612E7CF /* Pods_NabtoEdgeClientTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -168,34 +136,34 @@
 			buildActionMask = 2147483647;
 			files = (
 				D43E129027C596C4006D49E2 /* NabtoEdgeClient.framework in Frameworks */,
-				8CB33D8CC985235AD1283EA2 /* Pods_HostForTests.framework in Frameworks */,
+				0E8DCEF767D60DDDC0111BA3 /* Pods_HostForTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		29686321A0DF26F93F746D3D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				097EFE4A9839D7E53E185330 /* Pods_HostForTests.framework */,
+				96AF3244B66CB895A561D24C /* Pods_NabtoEdgeClient.framework */,
+				B4ABEC91FC21ED0977753ECF /* Pods_NabtoEdgeClientTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		2E9F6224C14B3B54B88AB3B5 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				F3E805C5AA5F1B9505483AE2 /* Pods-HostForTests.debug.xcconfig */,
-				2899B2C29300E1DB82DBEA54 /* Pods-HostForTests.release.xcconfig */,
-				9C82C8BF2DC9ABEB7001ACA1 /* Pods-NabtoEdgeClient.debug.xcconfig */,
-				E8FC3EABC6D45EA97F36B731 /* Pods-NabtoEdgeClient.release.xcconfig */,
-				8972571CD1402F443E74BE2D /* Pods-NabtoEdgeClientTests.debug.xcconfig */,
-				24DB790DE6C3B01FF80BF921 /* Pods-NabtoEdgeClientTests.release.xcconfig */,
+				E2912C97DDA838DA5085EF19 /* Pods-HostForTests.debug.xcconfig */,
+				0C5AED3EF0494607A82E3A8C /* Pods-HostForTests.release.xcconfig */,
+				9B13FE727F792080484C30C9 /* Pods-NabtoEdgeClient.debug.xcconfig */,
+				D9C41283F485B01BA5D002A1 /* Pods-NabtoEdgeClient.release.xcconfig */,
+				7089B677E99C4B65A608D53D /* Pods-NabtoEdgeClientTests.debug.xcconfig */,
+				3645ECD70BFFD026F784C67C /* Pods-NabtoEdgeClientTests.release.xcconfig */,
 			);
 			path = Pods;
-			sourceTree = "<group>";
-		};
-		9E335F8C37A68C98FBE0B81E /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				C8EA8224FFE504AEDA3789FA /* Pods_HostForTests.framework */,
-				D02FDBE2E1AB6671BF7C1D3E /* Pods_NabtoEdgeClient.framework */,
-				E0BA9A4CFC907D2981485195 /* Pods_NabtoEdgeClientTests.framework */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		D4655D3927C57CD1001F9AF6 = {
@@ -206,7 +174,7 @@
 				D474551727C59514008BDE58 /* HostForTests */,
 				D4655D4427C57CD1001F9AF6 /* Products */,
 				2E9F6224C14B3B54B88AB3B5 /* Pods */,
-				9E335F8C37A68C98FBE0B81E /* Frameworks */,
+				29686321A0DF26F93F746D3D /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -235,7 +203,6 @@
 				D479083A27C5803300790A51 /* NabtoEdgeClientError.swift */,
 				D479083427C5803300790A51 /* Stream.swift */,
 				D479083827C5803300790A51 /* TcpTunnel.swift */,
-				E92E1F3B78BE7B59AA656356 /* IamUtil.swift */,
 			);
 			path = NabtoEdgeClient;
 			sourceTree = "<group>";
@@ -245,7 +212,6 @@
 			children = (
 				D4655D5027C57CD1001F9AF6 /* NabtoEdgeClientTests.swift */,
 				E9221D728E77EBE65E3D5868 /* TestDeviceDefinitions.swift */,
-				E92CE3DEF30197BFA961376C /* IamUtilTests.swift */,
 				D4BA975B27D60A2100012902 /* TestPlan.xctestplan */,
 			);
 			path = NabtoEdgeClientTests;
@@ -271,30 +237,8 @@
 				D479084E27C581E400790A51 /* CallbackWrapper.swift */,
 				D479084C27C581E400790A51 /* ClientImpl.swift */,
 				D479084D27C581E400790A51 /* Helper.swift */,
-				E92F919B16104FB2A34E9523 /* iam */,
 			);
 			path = impl;
-			sourceTree = "<group>";
-		};
-		E92F919B16104FB2A34E9523 /* iam */ = {
-			isa = PBXGroup;
-			children = (
-				E92AE96525DAF4143AE97A68 /* AbstractIamInvocationTemplate.swift */,
-				E927FB7D04C0ABD6951697C1 /* IamHelper.swift */,
-				E92CF513E9FC4558DD69F13D /* PairLocalInitial.swift */,
-				E9222CFACFDBA713CE870C08 /* PairLocalOpen.swift */,
-				E922433FDF28CDFC63583059 /* PairPasswordInvite.swift */,
-				E92939973C97A9709F442C94 /* PairPasswordOpen.swift */,
-				E921C62E2CEAA960557ADD43 /* GetDeviceDetails.swift */,
-				E92B906B4787E59860DA7927 /* GetAvailablePairingModes.swift */,
-				E9270F14E05A5511DF78141A /* GetUser.swift */,
-				E9208EB79DB6FA86A325BE59 /* GetCurrentUser.swift */,
-				E92C74DF43642ECF620F0D94 /* DeleteUser.swift */,
-				E9286DFA00DD128C54F1E8BA /* IsCurrentUserPaired.swift */,
-				E92151858B2D17A5B9806BD1 /* CreateUser.swift */,
-				E92815681CC90C4994059AE6 /* UpdateUser.swift */,
-			);
-			path = iam;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -314,7 +258,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D4655D5527C57CD1001F9AF6 /* Build configuration list for PBXNativeTarget "NabtoEdgeClient" */;
 			buildPhases = (
-				670CB33B0D8FCF548EA08866 /* [CP] Check Pods Manifest.lock */,
+				129BF5ADC2EE45295745E737 /* [CP] Check Pods Manifest.lock */,
 				D4655D3E27C57CD1001F9AF6 /* Headers */,
 				D4655D3F27C57CD1001F9AF6 /* Sources */,
 				D4655D4027C57CD1001F9AF6 /* Frameworks */,
@@ -333,11 +277,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D4655D5827C57CD1001F9AF6 /* Build configuration list for PBXNativeTarget "NabtoEdgeClientTests" */;
 			buildPhases = (
-				0F9846BBB53685C3D386152C /* [CP] Check Pods Manifest.lock */,
+				27E7E1A7EEF8F68D7791912D /* [CP] Check Pods Manifest.lock */,
 				D4655D4727C57CD1001F9AF6 /* Sources */,
 				D4655D4827C57CD1001F9AF6 /* Frameworks */,
 				D4655D4927C57CD1001F9AF6 /* Resources */,
-				36724AF2E371D80C8C612CFD /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -354,12 +297,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D474552927C59515008BDE58 /* Build configuration list for PBXNativeTarget "HostForTests" */;
 			buildPhases = (
-				AAE81246E7DDCA7AE25CDDF7 /* [CP] Check Pods Manifest.lock */,
+				35451284C961687E24D7695F /* [CP] Check Pods Manifest.lock */,
 				D474551227C59514008BDE58 /* Sources */,
 				D474551327C59514008BDE58 /* Frameworks */,
 				D474551427C59514008BDE58 /* Resources */,
 				D43E129427C596C4006D49E2 /* Embed Frameworks */,
-				46913F8B8115E1536FF8635A /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -442,63 +384,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0F9846BBB53685C3D386152C /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-NabtoEdgeClientTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		36724AF2E371D80C8C612CFD /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-NabtoEdgeClientTests/Pods-NabtoEdgeClientTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-NabtoEdgeClientTests/Pods-NabtoEdgeClientTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NabtoEdgeClientTests/Pods-NabtoEdgeClientTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		46913F8B8115E1536FF8635A /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-HostForTests/Pods-HostForTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-HostForTests/Pods-HostForTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HostForTests/Pods-HostForTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		670CB33B0D8FCF548EA08866 /* [CP] Check Pods Manifest.lock */ = {
+		129BF5ADC2EE45295745E737 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -520,7 +406,29 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		AAE81246E7DDCA7AE25CDDF7 /* [CP] Check Pods Manifest.lock */ = {
+		27E7E1A7EEF8F68D7791912D /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-NabtoEdgeClientTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		35451284C961687E24D7695F /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -562,21 +470,6 @@
 				D479084A27C5803300790A51 /* MdnsResult.swift in Sources */,
 				D479084927C5803300790A51 /* CoapResponse.swift in Sources */,
 				D479085027C581E400790A51 /* Helper.swift in Sources */,
-				E92302F614DFF1CE2D44AF7A /* IamUtil.swift in Sources */,
-				E923120C46CF30C6E5681300 /* AbstractIamInvocationTemplate.swift in Sources */,
-				E92E743784165CA504619D02 /* IamHelper.swift in Sources */,
-				E925CA6B746BB821ABFC6E33 /* PairLocalInitial.swift in Sources */,
-				E9289DDF58735633C1389870 /* PairLocalOpen.swift in Sources */,
-				E92652701579C3210C57BD1A /* PairPasswordInvite.swift in Sources */,
-				E92F92784753ABF65C759A79 /* PairPasswordOpen.swift in Sources */,
-				E92F9B04F3CB9AB49F114828 /* GetDeviceDetails.swift in Sources */,
-				E924E25FC8B3E45F8B6FE14D /* GetAvailablePairingModes.swift in Sources */,
-				E926F5420D58576D4FD76E4C /* GetUser.swift in Sources */,
-				E92A57C275EA2FD5BC371D9F /* GetCurrentUser.swift in Sources */,
-				E920D40C05B13294EE40B302 /* DeleteUser.swift in Sources */,
-				E92F6E6146D807645CDD4B35 /* IsCurrentUserPaired.swift in Sources */,
-				E924950057813BDEED31E0BE /* CreateUser.swift in Sources */,
-				E9245BF32A15FBF23112817E /* UpdateUser.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -586,7 +479,6 @@
 			files = (
 				D4655D5127C57CD1001F9AF6 /* NabtoEdgeClientTests.swift in Sources */,
 				E92837BE0959E8D8679649C7 /* TestDeviceDefinitions.swift in Sources */,
-				E92B89A1B66E2D1F8F8D818F /* IamUtilTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -764,7 +656,7 @@
 		};
 		D4655D5627C57CD1001F9AF6 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9C82C8BF2DC9ABEB7001ACA1 /* Pods-NabtoEdgeClient.debug.xcconfig */;
+			baseConfigurationReference = 9B13FE727F792080484C30C9 /* Pods-NabtoEdgeClient.debug.xcconfig */;
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_MODULES = YES;
@@ -797,7 +689,7 @@
 		};
 		D4655D5727C57CD1001F9AF6 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E8FC3EABC6D45EA97F36B731 /* Pods-NabtoEdgeClient.release.xcconfig */;
+			baseConfigurationReference = D9C41283F485B01BA5D002A1 /* Pods-NabtoEdgeClient.release.xcconfig */;
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_MODULES = YES;
@@ -829,7 +721,7 @@
 		};
 		D4655D5927C57CD1001F9AF6 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8972571CD1402F443E74BE2D /* Pods-NabtoEdgeClientTests.debug.xcconfig */;
+			baseConfigurationReference = 7089B677E99C4B65A608D53D /* Pods-NabtoEdgeClientTests.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -847,7 +739,7 @@
 		};
 		D4655D5A27C57CD1001F9AF6 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 24DB790DE6C3B01FF80BF921 /* Pods-NabtoEdgeClientTests.release.xcconfig */;
+			baseConfigurationReference = 3645ECD70BFFD026F784C67C /* Pods-NabtoEdgeClientTests.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -865,7 +757,7 @@
 		};
 		D474552727C59515008BDE58 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F3E805C5AA5F1B9505483AE2 /* Pods-HostForTests.debug.xcconfig */;
+			baseConfigurationReference = E2912C97DDA838DA5085EF19 /* Pods-HostForTests.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -895,7 +787,7 @@
 		};
 		D474552827C59515008BDE58 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2899B2C29300E1DB82DBEA54 /* Pods-HostForTests.release.xcconfig */;
+			baseConfigurationReference = 0C5AED3EF0494607A82E3A8C /* Pods-HostForTests.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

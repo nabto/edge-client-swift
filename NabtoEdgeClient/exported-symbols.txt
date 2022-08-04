@@ -1,7 +1,6 @@
 _$s15NabtoEdgeClient*
 _NabtoEdgeClientVersion*
 _OBJC_CLASS_$__TtC15NabtoEdgeClient10Connection*
-_OBJC_CLASS_$__TtC15NabtoEdgeClient10IamUtil*
 _OBJC_CLASS_$__TtC15NabtoEdgeClient10MdnsResult*
 _OBJC_CLASS_$__TtC15NabtoEdgeClient11MdnsScanner*
 _OBJC_CLASS_$__TtC15NabtoEdgeClient6Client*
