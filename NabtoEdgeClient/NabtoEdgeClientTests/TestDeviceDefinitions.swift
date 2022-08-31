@@ -80,6 +80,15 @@ struct TestDevices {
             password: "open-password"
     )
 
+    let offlineDevice = TestDevice(
+            productId: "pr-fatqcwj9",
+            deviceId: "de-jhnoa9u7",
+            url: "https://pr-fatqcwj9.clients.nabto.net",
+            key: "sk-9c826d2ebb4343a789b280fe22b98305",
+            sct: "WzwjoTabnvux",
+            password: "open-password"
+    )
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // local integration test devices that needs to be manually started
     //

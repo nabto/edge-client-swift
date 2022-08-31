@@ -11,7 +11,6 @@ import XCTest
 
 //import NabtoClient
 import Foundation
-import CBORCoding
 
 // test org: or-3uhjvwuh (https://console.cloud.nabto.com/#/dashboard/organizations/or-3uhjvwuh)
 // test device source: nabto-embedded-sdk/examples/simple_coap
@@ -199,8 +198,7 @@ class NabtoEdgeClientTests: NabtoEdgeClientTestBase {
     func testConnectAsyncFailOffline() throws {
         let key = try client.createPrivateKey()
         try self.connection.setPrivateKey(key: key)
-        var device = self.testDevices.coapDevice
-        device.deviceId = "de-jhnoa9u7"
+        var device = self.testDevices.offlineDevice
         try self.connection.updateOptions(json: device.asJson())
         let exp = XCTestExpectation(description: "expect connect callback")
         self.connection.connectAsync { ec in
@@ -980,44 +978,6 @@ class NabtoEdgeClientTests: NabtoEdgeClientTestBase {
             exp.fulfill()
         }
         wait(for: [exp], timeout: 30.0)
-    }
-
-    func testPasswordOpenPairing() throws {
-        let key = try client.createPrivateKey()
-        try self.connection.setPrivateKey(key: key)
-        try self.connection.updateOptions(json: testDevices.passwordProtectedDevice.asJson())
-        try self.connection.connect()
-        try self.connection.passwordAuthenticate(username: "", password: "open-password")
-
-        let coap = try self.connection.createCoapRequest(method: "POST", path: "/iam/pairing/password-open")
-        let user = IamUser(username: UUID().uuidString.lowercased())
-        let cbor = try user.encode()
-        try coap.setRequestPayload(contentFormat: ContentFormat.APPLICATION_CBOR.rawValue, data: cbor)
-        let response = try coap.execute()
-        XCTAssertEqual(response.status, 201)
-        XCTAssertEqual(response.contentFormat, nil)
-        XCTAssertEqual(response.payload, nil)
-
-        // in an actual pairing use case, now persist device's fingerprint (obtained with connection.getDeviceFingerprintHex())
-        // along with device id etc and compare at subsequent connection attempt
-    }
-
-    func testPasswordInvitePairing() throws {
-        throw XCTSkip("An invitation only works for a single pairing so this test needs clearing device state")
-//        let key = try client.createPrivateKey()
-//        try self.connection.setPrivateKey(key: key)
-//        try self.connection.updateOptions(json: passwordProtectedDevice.asJson())
-//        try self.connection.connect()
-//        try self.connection.passwordAuthenticate(username: "admin", password: "admin-password")
-//
-//        let coap = try self.connection.createCoapRequest(method: "POST", path: "/iam/pairing/password-invite")
-//        let response = try coap.execute()
-//        XCTAssertEqual(response.status, 201)
-//        XCTAssertEqual(response.contentFormat, nil)
-//        XCTAssertEqual(response.payload, nil)
-
-        // in an actual pairing use case, now persist device's fingerprint (obtained with connection.getDeviceFingerprintHex())
-        // along with device id etc and compare at subsequent connection attempt
     }
 
     func testGracefullyHandleConnectionLivesLongerThanClient() throws {
