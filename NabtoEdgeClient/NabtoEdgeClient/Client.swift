@@ -23,11 +23,11 @@ public typealias AsyncStatusReceiver = (NabtoEdgeClientError) -> Void
  * The log messages passed to registered `LogCallBackReceiver` callback functions.
  */
 public struct NabtoEdgeClientLogMessage {
-    var severity: Int
-    var severityString: String
-    var file: String
-    var line: Int
-    var message: String
+    public var severity: Int
+    public var severityString: String
+    public var file: String
+    public var line: Int
+    public var message: String
 }
 
 internal protocol NativeClientWrapper {
