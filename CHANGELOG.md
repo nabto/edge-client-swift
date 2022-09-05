@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.0.2]
+
+### Bug fixes
+
+* Fixed crash in mDNS scanner that could occur if scan was stopped while a result callback was still active.
+
 ## [3.0.1]
 
 ### Bug fixes
