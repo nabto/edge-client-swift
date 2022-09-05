@@ -20,6 +20,7 @@ import Foundation
 // "Host Application" setting under the "General" tab for the test target). Note that this then fails or simulator - so
 // to change back and forth between device and simulator, this option must be toggled between "None" and the host application ("HostsForTests").
 
+
 class NabtoEdgeClientTestBase: XCTestCase {
     let testDevices = TestDevices()
     var connection: Connection! = nil
@@ -264,6 +265,20 @@ class NabtoEdgeClientTests: NabtoEdgeClientTestBase {
         XCTAssertEqual(String(decoding: response.payload, as: UTF8.self), "Hello world")
     }
 
+    public class BlockingMdnsResultReceiver : MdnsResultReceiver {
+        let exp: XCTestExpectation
+        let waiter: XCTestCase
+
+        public func onResultReady(result: MdnsResult) {
+            waiter.wait(for: [self.exp], timeout: 10.0)
+        }
+
+        public init(_ exp: XCTestExpectation, _ waiter: XCTestCase) {
+            self.exp = exp
+            self.waiter = waiter
+        }
+    }
+
     public class TestMdnsResultReceiver : MdnsResultReceiver {
         var results: [MdnsResult] = []
         let exp: XCTestExpectation
@@ -316,6 +331,32 @@ class NabtoEdgeClientTests: NabtoEdgeClientTestBase {
         XCTAssertEqual(stub.results[0].txtItems[self.testDevices.mdnsTxtKey], self.testDevices.mdnsTxtVal)
         XCTAssertEqual(stub.results[0].action, .ADD)
         scanner.stop()
+    }
+
+    func testReproduceMdnsCrash() throws {
+        let exp = XCTestExpectation(description: "dummy")
+        let stub = BlockingMdnsResultReceiver(exp, self)
+
+        let scanner1 = self.client.createMdnsScanner(subType: self.testDevices.mdnsSubtype)
+        scanner1.addMdnsResultReceiver(stub)
+        try scanner1.start()
+
+        // allow some time to discover a device then stop scanner before callback is done
+        DispatchQueue.global().asyncAfter(deadline: .now() + 2.0) {
+            try! scanner1.stop()
+
+            // callback completes after stop - allow time to reset listener
+            DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
+                exp.fulfill()
+            }
+        }
+
+        // wait a bit to make sure listener is attempted to be armed (crash occurs)
+        let exp2 = XCTestExpectation(description: "dummy")
+        DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
+            exp2.fulfill()
+        }
+        wait(for: [exp2], timeout: 0.5)
     }
 
     func testForbiddenError() {

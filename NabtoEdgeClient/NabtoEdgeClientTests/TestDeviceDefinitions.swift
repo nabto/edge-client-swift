@@ -82,7 +82,7 @@ struct TestDevices {
 
     let offlineDevice = TestDevice(
             productId: "pr-fatqcwj9",
-            deviceId: "de-jhnoa9u7",
+            deviceId: "de-iykhyidm",
             url: "https://pr-fatqcwj9.clients.nabto.net",
             key: "sk-9c826d2ebb4343a789b280fe22b98305",
             sct: "WzwjoTabnvux",

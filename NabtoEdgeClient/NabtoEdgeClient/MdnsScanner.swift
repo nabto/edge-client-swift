@@ -123,7 +123,9 @@ public class MdnsScanner: NSObject {
                 (cb as! MdnsResultReceiver).onResultReady(result: self.createFromResult(res))
             }
         }
-        if (self.armListener() != NABTO_CLIENT_EC_OK) {
+
+        let stayAlive = self.isStarted() && self.armListener() == NABTO_CLIENT_EC_OK
+        if (!stayAlive) {
             self.selfReference = nil
         }
     }
