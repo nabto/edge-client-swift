@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B8E8A2880ABC99BD961D169D /* Pods_NabtoEdgeClientHello.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5840532509A514925AD4DA57 /* Pods_NabtoEdgeClientHello.framework */; };
+		96DA98C09E3E16E643DD4489 /* Pods_NabtoEdgeClientHello.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98CAC852B39576735E03484B /* Pods_NabtoEdgeClientHello.framework */; };
 		D42A03CA24CEE221008E4B2D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D42A03C924CEE221008E4B2D /* AppDelegate.swift */; };
 		D42A03CC24CEE221008E4B2D /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D42A03CB24CEE221008E4B2D /* SceneDelegate.swift */; };
 		D42A03CE24CEE221008E4B2D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D42A03CD24CEE221008E4B2D /* ViewController.swift */; };
@@ -17,9 +17,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		32BECC7FD501D727BCDFCA57 /* Pods-NabtoEdgeClientHello.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClientHello.debug.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClientHello/Pods-NabtoEdgeClientHello.debug.xcconfig"; sourceTree = "<group>"; };
-		5840532509A514925AD4DA57 /* Pods_NabtoEdgeClientHello.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NabtoEdgeClientHello.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		AE4F0EDBC69953063C3A2666 /* Pods-NabtoEdgeClientHello.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClientHello.release.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClientHello/Pods-NabtoEdgeClientHello.release.xcconfig"; sourceTree = "<group>"; };
+		6A8C732581DAB2525EB22B57 /* Pods-NabtoEdgeClientHello.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClientHello.debug.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClientHello/Pods-NabtoEdgeClientHello.debug.xcconfig"; sourceTree = "<group>"; };
+		98CAC852B39576735E03484B /* Pods_NabtoEdgeClientHello.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NabtoEdgeClientHello.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9F99BBA00CB130F28DC4C341 /* Pods-NabtoEdgeClientHello.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NabtoEdgeClientHello.release.xcconfig"; path = "Target Support Files/Pods-NabtoEdgeClientHello/Pods-NabtoEdgeClientHello.release.xcconfig"; sourceTree = "<group>"; };
 		D42A03C624CEE221008E4B2D /* NabtoEdgeClientHello.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NabtoEdgeClientHello.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D42A03C924CEE221008E4B2D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D42A03CB24CEE221008E4B2D /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -36,7 +36,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B8E8A2880ABC99BD961D169D /* Pods_NabtoEdgeClientHello.framework in Frameworks */,
+				96DA98C09E3E16E643DD4489 /* Pods_NabtoEdgeClientHello.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -46,8 +46,8 @@
 		C410674EE8C6389A140F80FF /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				32BECC7FD501D727BCDFCA57 /* Pods-NabtoEdgeClientHello.debug.xcconfig */,
-				AE4F0EDBC69953063C3A2666 /* Pods-NabtoEdgeClientHello.release.xcconfig */,
+				6A8C732581DAB2525EB22B57 /* Pods-NabtoEdgeClientHello.debug.xcconfig */,
+				9F99BBA00CB130F28DC4C341 /* Pods-NabtoEdgeClientHello.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -88,7 +88,7 @@
 			isa = PBXGroup;
 			children = (
 				D4B54C4A24D0539000BBC161 /* NabtoEdgeClient.framework */,
-				5840532509A514925AD4DA57 /* Pods_NabtoEdgeClientHello.framework */,
+				98CAC852B39576735E03484B /* Pods_NabtoEdgeClientHello.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -100,11 +100,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D42A03DA24CEE222008E4B2D /* Build configuration list for PBXNativeTarget "NabtoEdgeClientHello" */;
 			buildPhases = (
-				E97890DB4957724151AE977C /* [CP] Check Pods Manifest.lock */,
+				5263AA69424A42D80C87976F /* [CP] Check Pods Manifest.lock */,
 				D42A03C224CEE221008E4B2D /* Sources */,
 				D42A03C324CEE221008E4B2D /* Frameworks */,
 				D42A03C424CEE221008E4B2D /* Resources */,
-				626F335E917D4F1518625CE5 /* [CP] Embed Pods Frameworks */,
+				9674A3E0DEB3510BE99BE9A2 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -162,24 +162,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		626F335E917D4F1518625CE5 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-NabtoEdgeClientHello/Pods-NabtoEdgeClientHello-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-NabtoEdgeClientHello/Pods-NabtoEdgeClientHello-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NabtoEdgeClientHello/Pods-NabtoEdgeClientHello-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		E97890DB4957724151AE977C /* [CP] Check Pods Manifest.lock */ = {
+		5263AA69424A42D80C87976F /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -199,6 +182,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9674A3E0DEB3510BE99BE9A2 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-NabtoEdgeClientHello/Pods-NabtoEdgeClientHello-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-NabtoEdgeClientHello/Pods-NabtoEdgeClientHello-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NabtoEdgeClientHello/Pods-NabtoEdgeClientHello-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -352,7 +352,7 @@
 		};
 		D42A03DB24CEE222008E4B2D /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 32BECC7FD501D727BCDFCA57 /* Pods-NabtoEdgeClientHello.debug.xcconfig */;
+			baseConfigurationReference = 6A8C732581DAB2525EB22B57 /* Pods-NabtoEdgeClientHello.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -371,7 +371,7 @@
 		};
 		D42A03DC24CEE222008E4B2D /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AE4F0EDBC69953063C3A2666 /* Pods-NabtoEdgeClientHello.release.xcconfig */;
+			baseConfigurationReference = 9F99BBA00CB130F28DC4C341 /* Pods-NabtoEdgeClientHello.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;

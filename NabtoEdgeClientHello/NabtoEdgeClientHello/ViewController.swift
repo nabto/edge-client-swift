@@ -19,14 +19,20 @@ class ViewController: UIViewController {
         let privateKey = try client.createPrivateKey()
         try connection.setPrivateKey(key: privateKey)
         try connection.setProductId(id: "pr-fatqcwj9")
-        try connection.setDeviceId(id: "de-ijrdq47i")
-        try connection.setServerKey(key: "sk-9c826d2ebb4343a789b280fe22b98305")
-        try connection.setServerConnectToken(sct: "WzwjoTabnvux")
+        try connection.setDeviceId(id: "de-avmqjaje")
+        try connection.setServerKey(key: "sk-72c860c244a6014248e64d5273e3e0ec")
         try connection.connect()
-        let details: NabtoEdgeClient.DeviceDetails = try NabtoEdgeClient.IamUtil.getDeviceDetails(connection: connection)
+        let coap = try connection.createCoapRequest(method: "GET", path: "/hello-world")
+        let response = try coap.execute()
         DispatchQueue.main.async {
             self.spinner.stopAnimating()
-            self.label.text = "Device SDK Version: \(details.NabtoVersion)"
+            let body: String
+            if (response.status == 205) {
+                body = String(decoding: response.payload, as: UTF8.self)
+            } else {
+                body = "(no payload)"
+            }
+            self.label.text = "\(response.status): \(body)"
         }
     }
     @IBOutlet weak var spinner: UIActivityIndicatorView!
