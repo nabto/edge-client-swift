@@ -26,10 +26,18 @@ struct TestDevice {
     }
 
     func asJson() -> String {
+        let pk = """
+                 -----BEGIN EC PRIVATE KEY-----
+                 MHcCAQEEIAl3ZURem5NMCTZA0OeTPcT7y6T2FHjHhmQz54UiH7mQoAoGCCqGSM49
+                 AwEHoUQDQgAEbiabrII+WZ8ABD4VQpmLe3cSIWdQfrRbxXotx5yxwInfgLuDU+rq
+                 OIFReqTf5h+Nwp/jj00fnsII88n1YCveoQ==
+                 -----END EC PRIVATE KEY-----
+                 """
         let sctElement = sct != nil ? "\"ServerConnectToken\": \"\(sct!)\",\n" : ""
         return """
                {\n
                \"Local\": \(self.local),\n
+               \"PrivateKey\": "foo",\n
                \"ProductId\": \"\(self.productId)\",\n
                \"DeviceId\": \"\(self.deviceId)\",\n
                \"ServerUrl\": \"\(self.url)\",\n
@@ -44,15 +52,14 @@ struct TestDevices {
             productId: "pr-fatqcwj9",
             deviceId: "de-avmqjaje",
             url: "https://pr-fatqcwj9.clients.nabto.net",
-            key: "sk-5f3ab4bea7cc2585091539fb950084ce",
-            fp: "fcb78f8d53c67dbc4f72c36ca6cd2d5fc5592d584222059f0d76bdb514a9340c"
-    )
+            key: "sk-72c860c244a6014248e64d5273e3e0ec",
+            fp: "fcb78f8d53c67dbc4f72c36ca6cd2d5fc5592d584222059f0d76bdb514a9340c")
 
     let streamDevice = TestDevice(
             productId: "pr-fatqcwj9",
             deviceId: "de-bdsotcgm",
             url: "https://pr-fatqcwj9.clients.nabto.net",
-            key: "sk-5f3ab4bea7cc2585091539fb950084ce"
+            key: "sk-72c860c244a6014248e64d5273e3e0ec"
     )
 
     let tunnelDevice = TestDevice(

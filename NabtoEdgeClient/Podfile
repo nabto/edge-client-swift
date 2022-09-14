@@ -1,14 +1,14 @@
 # changes seems to take forever to synchronize to pods 1.8+ CDN, use old
 # github approach for immediate retrieval (but slower once synched, so only
 # relevant during development)
-#source 'https://github.com/CocoaPods/Specs.git'
+source 'https://github.com/CocoaPods/Specs.git'
 
 use_frameworks!
 
 platform :ios, '10.2'
 
 target 'NabtoEdgeClient' do
-  pod 'NabtoEdgeClientApiFW', '5.9.0'
+  pod 'NabtoEdgeClientApiFW', '5.11.0'
 end
 
 target 'HostForTests' do

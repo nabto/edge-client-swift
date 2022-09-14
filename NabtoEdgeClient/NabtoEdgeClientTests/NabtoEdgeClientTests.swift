@@ -20,72 +20,6 @@ import Foundation
 // "Host Application" setting under the "General" tab for the test target). Note that this then fails or simulator - so
 // to change back and forth between device and simulator, this option must be toggled between "None" and the host application ("HostsForTests").
 
-
-class NabtoEdgeClientTestBase: XCTestCase {
-    let testDevices = TestDevices()
-    var connection: Connection! = nil
-    var client: Client!
-    var clientRefCount: Int?
-    var connectionRefCount: Int?
-    let streamPort: UInt32 = 42
-
-    func uniqueUser() -> String {
-        String(UUID().uuidString.lowercased().prefix(16))
-    }
-
-    override func setUpWithError() throws {
-        print(Client.versionString())
-        setbuf(__stdoutp, nil)
-        continueAfterFailure = false
-
-        XCTAssertNil(self.client)
-        self.client = Client()
-        try self.enableLogging(self.client)
-        self.clientRefCount = CFGetRetainCount(self.client)
-
-        XCTAssertNil(self.connection)
-        self.connection = try client.createConnection()
-        self.connectionRefCount = CFGetRetainCount(self.connection)
-    }
-
-    override func tearDownWithError() throws {
-        do {
-            try self.connection?.close()
-        } catch (NabtoEdgeClientError.STOPPED) {
-            // client stopped
-        } catch (NabtoEdgeClientError.NOT_CONNECTED) {
-            // connection probably not opened yet
-        }
-        if (self.connection != nil) {
-            XCTAssertEqual(self.connectionRefCount, CFGetRetainCount(self.connection))
-            self.connection = nil
-        }
-        if (self.client != nil) {
-            self.client.stop()
-            XCTAssertEqual(self.clientRefCount, CFGetRetainCount(self.client))
-            self.client = nil
-        }
-        XCTAssertNil(self.client)
-        XCTAssertNil(self.connection)
-    }
-
-    func enableLogging(_ client: Client) throws {
-        try client.setLogLevel(level: "info")
-        client.enableNsLogLogging()
-    }
-
-    func prepareConnection(_ device: TestDevice) throws {
-        let key = try client.createPrivateKey()
-        try self.connection.setPrivateKey(key: key)
-        try self.connection.updateOptions(json: device.asJson())
-    }
-
-    func connect(_ device: TestDevice) throws{
-        try self.prepareConnection(device)
-        try self.connection.connect()
-    }
-}
-
 class NabtoEdgeClientTests: NabtoEdgeClientTestBase {
 
     func testVersionString() throws {
@@ -1109,5 +1043,70 @@ class NabtoEdgeClientTests: NabtoEdgeClientTestBase {
         // callback keeps connection alive which keeps ClientImpl alive - when finally deinitializing ClientImpl
         // from sdk callback thread, free is ignored in ApiContext::free()
         exp.fulfill()
+    }
+}
+
+class NabtoEdgeClientTestBase: XCTestCase {
+    let testDevices = TestDevices()
+    var connection: Connection! = nil
+    var client: Client!
+    var clientRefCount: Int?
+    var connectionRefCount: Int?
+    let streamPort: UInt32 = 42
+
+    func uniqueUser() -> String {
+        String(UUID().uuidString.lowercased().prefix(16))
+    }
+
+    override func setUpWithError() throws {
+        print(Client.versionString())
+        setbuf(__stdoutp, nil)
+        continueAfterFailure = false
+
+        XCTAssertNil(self.client)
+        self.client = Client()
+        try self.enableLogging(self.client)
+        self.clientRefCount = CFGetRetainCount(self.client)
+
+        XCTAssertNil(self.connection)
+        self.connection = try client.createConnection()
+        self.connectionRefCount = CFGetRetainCount(self.connection)
+    }
+
+    override func tearDownWithError() throws {
+        do {
+            try self.connection?.close()
+        } catch (NabtoEdgeClientError.STOPPED) {
+            // client stopped
+        } catch (NabtoEdgeClientError.NOT_CONNECTED) {
+            // connection probably not opened yet
+        }
+        if (self.connection != nil) {
+            XCTAssertEqual(self.connectionRefCount, CFGetRetainCount(self.connection))
+            self.connection = nil
+        }
+        if (self.client != nil) {
+            self.client.stop()
+            XCTAssertEqual(self.clientRefCount, CFGetRetainCount(self.client))
+            self.client = nil
+        }
+        XCTAssertNil(self.client)
+        XCTAssertNil(self.connection)
+    }
+
+    func enableLogging(_ client: Client) throws {
+        try client.setLogLevel(level: "info")
+        client.enableNsLogLogging()
+    }
+
+    func prepareConnection(_ device: TestDevice) throws {
+        let key = try client.createPrivateKey()
+        try self.connection.setPrivateKey(key: key)
+        try self.connection.updateOptions(json: device.asJson())
+    }
+
+    func connect(_ device: TestDevice) throws{
+        try self.prepareConnection(device)
+        try self.connection.connect()
     }
 }

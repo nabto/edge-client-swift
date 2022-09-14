@@ -1,11 +1,15 @@
 #!/bin/bash
 
-set -e
-
 FILE=`pwd`/dist/NabtoEdgeClient.xcframework.zip
+CHANGELOG=`pwd`/CHANGELOG.md
 
 if [ ! -f $FILE ]; then
-    echo "Could find framework zip file $FILE"
+    echo "Could not find framework zip file $FILE"
+    exit 1
+fi
+
+if [ ! -f $CHANGELOG ]; then
+    echo "Could not find changelog $CHANGELOG"
     exit 1
 fi
 
@@ -16,12 +20,19 @@ if [ -z $VERSION ]; then
     exit 1
 fi
 
+grep -q $VERSION CHANGELOG.md
+if [ $? != "0" ]; then
+    echo "Missing documentation of version $VERSION in changelog"
+    exit 1
+fi
+
 DIR=`mktemp -d`
 cd $DIR
 
 SUBDIR="ios/nabto-client-swift/$VERSION"
 mkdir -p $SUBDIR
 cp $FILE $SUBDIR
+cp $CHANGELOG $SUBDIR
 
 S3URL="s3://downloads.nabto.com/assets/edge"
 tree ios

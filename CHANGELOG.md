@@ -1,18 +1,24 @@
 # Changelog
 
-## [3.0.2]
+## [3.0.3] - 2022-09-14
+
+### Changed
+
+* Update underlying Nabto Edge Client SDK to 5.11.0.
+
+## [3.0.2] - 2022-09-05
 
 ### Bug fixes
 
 * Fixed crash in mDNS scanner that could occur if scan was stopped while a result callback was still active.
 
-## [3.0.1]
+## [3.0.1] - 2022-08-31
 
 ### Bug fixes
 
 * Fixed wrong visibility of members in NabtoEdgeClientLogMessage
 
-## [3.0.0]
+## [3.0.0] - 2022-06-12
 
 ### Breaking
 
