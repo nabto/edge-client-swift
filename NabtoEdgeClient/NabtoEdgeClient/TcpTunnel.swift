@@ -104,6 +104,8 @@ public class TcpTunnel {
 
     /**
      * Close this tunnel asynchronously.
+     *
+     * @param closure Invoked when authentication is completed or an error occurs
      */
     public func closeAsync(closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in

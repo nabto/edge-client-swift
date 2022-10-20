@@ -9,13 +9,17 @@
 import Foundation
 @_implementationOnly import NabtoEdgeClientApi
 
-/* TODO nabtodoc
+/**
  * Callback function for receiving log messages from the core SDK.
+ *
+ * @param NabtoEdgeClientLogMessage Log message emitted from the core.
  */
 public typealias LogCallBackReceiver = (NabtoEdgeClientLogMessage) -> Void
 
-/* TODO nabtodoc
+/**
  * Callback function for receiving API status codes asynchronously.
+ *
+ * @param NabtoEdgeClientError Error code indicating the status
  */
 public typealias AsyncStatusReceiver = (NabtoEdgeClientError) -> Void
 
@@ -23,6 +27,9 @@ public typealias AsyncStatusReceiver = (NabtoEdgeClientError) -> Void
  * The log messages passed to registered `LogCallBackReceiver` callback functions.
  */
 public struct NabtoEdgeClientLogMessage {
+    /* TODO: nabtodoc when fixed in underlying API doc
+     * Severity level value 0-4 with 4 being most verbose
+     */
     public var severity: Int
     public var severityString: String
     public var file: String
@@ -30,8 +37,16 @@ public struct NabtoEdgeClientLogMessage {
     public var message: String
 }
 
+/**
+ * Wrapper protocol for the underlying Nabto Client
+ */
 internal protocol NativeClientWrapper {
-    var nativeClient: OpaquePointer { get }
+    /**
+     * The native client object
+     */
+    var nativeClient: OpaquePointer {
+        get
+        }
 }
 
 /**
@@ -45,7 +60,7 @@ public class Client: NSObject {
 
     private let impl: ClientImpl
 
-    /**
+    /*
      * Create a new instance of the Nabto Edge client.
      */
     override public init() {
@@ -59,7 +74,8 @@ public class Client: NSObject {
 
     /**
      * Get the underlying SDK version.
-     * @return the SDK version, e.g. 5.2.0-rc.1024+290f2fa
+     *
+     * @return the SDK version, e.g. 5.2.0
      */
     static public func versionString() -> String {
         return String(cString: nabto_client_version())
@@ -81,6 +97,7 @@ public class Client: NSObject {
      *
      * The result is normally stored in a device specific secure location and retrieved whenever a new connection
      * is established, passed on to a Connection object using `setPrivateKey()`.
+     *
      * @throws NabtoEdgeClientError.FAILED if key could not be created
      * @return the private key as a pem encoded string.
      */
@@ -94,7 +111,7 @@ public class Client: NSObject {
      * @param subType the mDNS subtype to scan for: If nil or the empty string, the mDNS subtype
      * `_nabto._udp.local` is located; if subtype is specified, `[subtype]._sub._nabto._udp.local` is located.
      * @throws NabtoEdgeClientError
-     * @return the MdnsScanner
+     * @return The MdnsScanner
      */
     public func createMdnsScanner(subType: String?=nil) -> MdnsScanner {
         return self.impl.createMdnsScanner(subType: subType)
@@ -131,7 +148,7 @@ public class Client: NSObject {
     /**
      * Set a callback function for custom logging.
      *
-     * @param cb: The LogCallBackReceiver invoked by the wrapper with SDK log lines.
+     * @param cb The LogCallBackReceiver invoked by the wrapper with SDK log lines.
      */
     public func setLogCallBack(cb: @escaping LogCallBackReceiver) {
         self.impl.setLogCallBack(cb: cb)
