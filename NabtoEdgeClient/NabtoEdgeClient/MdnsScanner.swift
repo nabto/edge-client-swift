@@ -10,8 +10,9 @@ import Foundation
  * This protocol specifies a callback function to receive mDNS results
  */
 @objc public protocol MdnsResultReceiver {
-    /*
+    /**
      * The implementation is invoked when an mDNS result is ready
+     *
      * @param result The callback result.
      */
     func onResultReady(result: MdnsResult)

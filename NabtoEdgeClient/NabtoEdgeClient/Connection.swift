@@ -22,7 +22,7 @@ import Foundation
  * This protocol specifies a callback function to receive Connection events.
  */
 @objc public protocol ConnectionEventReceiver {
-    /*
+    /**
      * The implementation is invoked when a connection event occurs.
      *
      * Supported events:

@@ -13,6 +13,10 @@ public class MdnsResult : NSObject {
     /**
      * Actions emitted by device to manipulate the mDNS service cache in the client. Applies to the service identified
      * by serviceInstanceName in the result.
+     *
+     * - `ADD`: Adding a new result
+     * - `UPDATE`: Updating existing result
+     * - `REMOVE`: Removing existing result
      */
     @objc public enum Action: Int {
         case ADD
