@@ -22,7 +22,7 @@ import Foundation
  * This protocol specifies a callback function to receive Connection events.
  */
 @objc public protocol ConnectionEventReceiver {
-    /*
+    /**
      * The implementation is invoked when a connection event occurs.
      *
      * Supported events:
@@ -38,7 +38,9 @@ import Foundation
 }
 
 internal protocol NativeConnectionWrapper {
-    var nativeConnection: OpaquePointer { get }
+    var nativeConnection: OpaquePointer {
+        get
+    }
 }
 
 public class ConnectionOptions : Codable {
@@ -322,6 +324,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
      *
      * @param username The username (note: use the empty string if using for Password Open Pairing, see https://docs.nabto.com/developer/guides/iam/pairing.html)
      * @param password The password (typically the open (global) or invite (per-user) pairing password)
+     * @param closure Invoked when authentication is completed or an error occurs
      */
     public func passwordAuthenticateAsync(username: String, password: String, closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: self) { future in
