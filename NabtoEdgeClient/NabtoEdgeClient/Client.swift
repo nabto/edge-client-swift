@@ -54,7 +54,7 @@ public class Client: NSObject {
 
     private let impl: ClientImpl
 
-    /*
+    /**
      * Create a new instance of the Nabto Edge client.
      */
     override public init() {

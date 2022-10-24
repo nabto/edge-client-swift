@@ -17,6 +17,7 @@ public class MdnsResult : NSObject {
      * - `ADD`: Adding a new result
      * - `UPDATE`: Updating existing result
      * - `REMOVE`: Removing existing result
+     * - `UNEXPECTED_ACTION`: something went wrong
      */
     @objc public enum Action: Int {
         case ADD

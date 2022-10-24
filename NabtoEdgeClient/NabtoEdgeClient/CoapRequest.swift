@@ -6,19 +6,38 @@
 import Foundation
 @_implementationOnly import NabtoEdgeClientApi
 
-/* TODO nabtodoc
+/**
  * Often used CoAP content formats, see https://www.iana.org/assignments/core-parameters/core-parameters.xhtml for
  * exhaustive list.
  */
 public enum ContentFormat: UInt16 {
+    /**
+     * Plain text content
+     */
     case TEXT_PLAIN = 0
+    /**
+     * XML content
+     */
     case APPLICATION_XML = 41
+    /**
+     * Data stream content
+     */
     case APPLICATION_OCTET_STREAM = 42
+    /**
+     * Json encoded content
+     */
+    case APPLICATION_JSON = 50
+    /**
+     * Cbor encoded content
+     */
     case APPLICATION_CBOR = 60
 }
 
-/*
- * TODO nabtodoc
+/**
+ * Callback invoked when a CoAP response is ready or a CoAP request has failed.
+ *
+ * @param NabtoEdgeClientError error code indicating if request succeeded
+ * @param CoapResponse Resulting CoAP response if the error code was OK
  */
 public typealias CoapResponseReceiver = (NabtoEdgeClientError, CoapResponse?) -> Void
 
