@@ -37,13 +37,7 @@ public struct NabtoEdgeClientLogMessage {
     public var message: String
 }
 
-/**
- * Wrapper protocol for the underlying Nabto Client
- */
 internal protocol NativeClientWrapper {
-    /**
-     * The native client object
-     */
     var nativeClient: OpaquePointer {
         get
         }
