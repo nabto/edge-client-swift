@@ -150,6 +150,11 @@ public indirect enum NabtoEdgeClientError: Error, Equatable {
     case TOO_MANY_WRONG_PASSWORD_ATTEMPTS
 
     /**
+     * Requested TCP tunnel port is already in use by another process on the system.
+     */
+    case PORT_IN_USE
+
+    /**
      * Something unspecified failed.
      */
     case FAILED

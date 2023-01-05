@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.0.4] - 2023-01-05
+
+### Added
+
+* Added PORT_IN_USE error code.
+
+### Changed
+
+* Update underlying Nabto Edge Client SDK to 5.12.0.
+
 ## [3.0.3] - 2022-09-14
 
 ### Changed

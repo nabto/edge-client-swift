@@ -46,6 +46,7 @@ internal class Helper {
         case NABTO_CLIENT_EC_UNKNOWN_SERVER_KEY: return NabtoEdgeClientError.UNKNOWN_SERVER_KEY
         case NABTO_CLIENT_EC_UNKNOWN: return NabtoEdgeClientError.API_UNKNOWN_ERROR
         case NABTO_CLIENT_EC_TOO_MANY_REQUESTS: return NabtoEdgeClientError.TOO_MANY_WRONG_PASSWORD_ATTEMPTS
+        case NABTO_CLIENT_EC_PORT_IN_USE: return NabtoEdgeClientError.PORT_IN_USE
 
         default:
             NSLog("Error: UNEXPECTED_API_STATUS \(status): \(apiStatusToString(status))")

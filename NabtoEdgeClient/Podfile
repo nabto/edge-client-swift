@@ -8,7 +8,7 @@ use_frameworks!
 platform :ios, '10.2'
 
 target 'NabtoEdgeClient' do
-  pod 'NabtoEdgeClientApiFW', '5.11.0'
+  pod 'NabtoEdgeClientApiFW', '5.12.0'
 end
 
 target 'HostForTests' do
