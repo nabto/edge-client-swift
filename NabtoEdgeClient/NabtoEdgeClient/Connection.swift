@@ -18,6 +18,17 @@ import Foundation
     case UNEXPECTED_EVENT
 }
 
+/* TODO nabtodoc
+ * Connection types.
+ *
+ * Get the type using `getType()` on a Connection object.
+ */
+@objc public enum NabtoEdgeClientConnectionType: Int {
+    case RELAY
+    case DIRECT
+}
+
+
 /**
  * This protocol specifies a callback function to receive Connection events.
  */
@@ -368,6 +379,32 @@ public class Connection: NSObject, NativeConnectionWrapper {
         var p: UnsafeMutablePointer<Int8>? = nil
         let status = nabto_client_connection_get_client_fingerprint_full_hex(self.nativeConnection, &p)
         return try Helper.handleStringResult(status: status, cstring: p)
+    }
+
+    /**
+     * Get the type of this connection.
+     *
+     * Note that the type may change. All remote connection start out as relay connections. Listen for
+     * ConnectionEvents using addConnectionEventsReceiver to get notified if the type changes.
+     *
+     * Possible values:
+     * ```
+     *  .RELAY          // relay through the basestation
+     *  .DIRECT         // directly connected
+     * ```
+     * @throws NOT_CONNECTED if the connection is not yet established
+     * @throws STOPPED if the connection is stopped
+     * @throws FAILED_WITH_DETAIL if an unexpected connection type was returned by the underlying API
+     * @return the connection type (.RELAY or .DIRECT)
+     */
+    public func getType() throws -> NabtoEdgeClientConnectionType {
+        var type: NabtoClientConnectionType = NABTO_CLIENT_CONNECTION_TYPE_RELAY
+        let status = nabto_client_connection_get_type(self.nativeConnection, &type)
+        switch (type) {
+        case NABTO_CLIENT_CONNECTION_TYPE_RELAY: return .RELAY
+        case NABTO_CLIENT_CONNECTION_TYPE_DIRECT: return .DIRECT
+        default: throw NabtoEdgeClientError.FAILED_WITH_DETAIL(detail: "Unexpected connection type \(type.rawValue)")
+        }
     }
 
     /**

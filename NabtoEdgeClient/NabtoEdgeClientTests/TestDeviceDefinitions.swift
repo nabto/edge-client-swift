@@ -26,13 +26,6 @@ struct TestDevice {
     }
 
     func asJson() -> String {
-        let pk = """
-                 -----BEGIN EC PRIVATE KEY-----
-                 MHcCAQEEIAl3ZURem5NMCTZA0OeTPcT7y6T2FHjHhmQz54UiH7mQoAoGCCqGSM49
-                 AwEHoUQDQgAEbiabrII+WZ8ABD4VQpmLe3cSIWdQfrRbxXotx5yxwInfgLuDU+rq
-                 OIFReqTf5h+Nwp/jj00fnsII88n1YCveoQ==
-                 -----END EC PRIVATE KEY-----
-                 """
         let sctElement = sct != nil ? "\"ServerConnectToken\": \"\(sct!)\",\n" : ""
         return """
                {\n

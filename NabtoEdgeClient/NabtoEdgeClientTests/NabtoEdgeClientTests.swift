@@ -133,7 +133,7 @@ class NabtoEdgeClientTests: NabtoEdgeClientTestBase {
     func testConnectAsyncFailOffline() throws {
         let key = try client.createPrivateKey()
         try self.connection.setPrivateKey(key: key)
-        var device = self.testDevices.offlineDevice
+        let device = self.testDevices.offlineDevice
         try self.connection.updateOptions(json: device.asJson())
         let exp = XCTestExpectation(description: "expect connect callback")
         self.connection.connectAsync { ec in
@@ -277,7 +277,7 @@ class NabtoEdgeClientTests: NabtoEdgeClientTestBase {
 
         // allow some time to discover a device then stop scanner before callback is done
         DispatchQueue.global().asyncAfter(deadline: .now() + 2.0) {
-            try! scanner1.stop()
+            scanner1.stop()
 
             // callback completes after stop - allow time to reset listener
             DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
@@ -1044,6 +1044,19 @@ class NabtoEdgeClientTests: NabtoEdgeClientTestBase {
         // from sdk callback thread, free is ignored in ApiContext::free()
         exp.fulfill()
     }
+
+    func testGetTypeDirect() throws {
+        try self.connect(self.testDevices.localMdnsDevice)
+        XCTAssertEqual(try self.connection.getType(), .DIRECT)
+    }
+
+    func testGetTypeRelay() throws {
+        try self.prepareConnection(self.testDevices.coapDevice)
+        try self.connection.updateOptions(json: "{\"Rendezvous\": false}")
+        try self.connection.connect()
+        XCTAssertEqual(try self.connection.getType(), .RELAY)
+    }
+
 }
 
 class NabtoEdgeClientTestBase: XCTestCase {
@@ -1105,7 +1118,7 @@ class NabtoEdgeClientTestBase: XCTestCase {
         try self.connection.updateOptions(json: device.asJson())
     }
 
-    func connect(_ device: TestDevice) throws{
+    func connect(_ device: TestDevice) throws {
         try self.prepareConnection(device)
         try self.connection.connect()
     }
