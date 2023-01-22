@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0] - 2023-01-22
+
+### Added
+
+* Added Connection.getType() to distinguish between .DIRECT and .RELAY connections.
+
+
 ## [3.0.4] - 2023-01-05
 
 ### Added
