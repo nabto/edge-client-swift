@@ -384,7 +384,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
     /**
      * Get the type of this connection.
      *
-     * Note that the type may change. All remote connection start out as relay connections. Listen for
+     * Note that the type may change. All remote connections start out as relay connections. Listen for
      * ConnectionEvents using addConnectionEventsReceiver to get notified if the type changes.
      *
      * Possible values:
