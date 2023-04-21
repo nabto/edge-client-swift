@@ -28,6 +28,7 @@ run localPairLocalInitial &
 run localPairPasswordOpen &
 run localPasswordPairingDisabledConfig &
 run localPasswordInvite &
+run localAllowAllIam --log-level trace &
 
 ${SIMPLE_MDNS_DEVICE_EXE} pr-mdns de-mdns swift-test-subtype swift-txt-key swift-txt-val
 
