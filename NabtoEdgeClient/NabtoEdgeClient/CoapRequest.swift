@@ -157,6 +157,15 @@ public class CoapRequest {
         }
     }
     
+    /**
+     * Execute a CoAP request asynchronously..
+     *
+     * When the function returns, the CoapResponse object is populated with response data and ready
+     * to use. The response can indicate a remote error. If an error occurs that prevents creating a
+     * response with a status code, an exception is thrown.
+     *
+     * @throws NabtoEdgeClientError if a response could not be created
+     */
     @available(iOS 13.0, *)
     public func executeAsync2() async throws -> CoapResponse {
         let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
