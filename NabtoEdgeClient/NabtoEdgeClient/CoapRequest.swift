@@ -156,6 +156,32 @@ public class CoapRequest {
             })
         }
     }
+    
+    @available(iOS 13.0, *)
+    public func executeAsync2() async throws -> CoapResponse {
+        let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
+        nabto_client_coap_execute(self.coap, future)
+        let w = CallbackWrapper(debugDescription: "coap.executeAsync2", future: future, owner: self, connectionForErrorMessage: self.connection)
+        let res = try await withCheckedThrowingContinuation { continuation in
+            let status = w.registerCallback { ec in
+                if ec == .OK {
+                    do {
+                        let coapResponse = try CoapResponse(self.coap)
+                        continuation.resume(returning: coapResponse)
+                    } catch {
+                        let coapEc = error as? NabtoEdgeClientError
+                        continuation.resume(throwing: coapEc ?? NabtoEdgeClientError.UNEXPECTED_API_STATUS)
+                    }
+                } else {
+                    continuation.resume(throwing: ec)
+                }
+            }
+            if status != NABTO_CLIENT_EC_OK {
+                self.helper.invokeUserClosureAsyncFail(status, { asyncInvokeEc in continuation.resume(throwing: asyncInvokeEc) })
+            }
+        }
+        return res
+    }
 
     /**
      * Stop any pending async request executions.

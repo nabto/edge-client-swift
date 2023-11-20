@@ -21,7 +21,7 @@ internal class Helper {
         return String(cString: nabto_client_error_get_string(status))
     }
 
-    internal static func mapSimpleApiStatusToErrorCode(_ status: NabtoClientError) -> NabtoEdgeClientError {
+    static func mapSimpleApiStatusToErrorCode(_ status: NabtoClientError) -> NabtoEdgeClientError {
         switch (status) {
         case NABTO_CLIENT_EC_OK: return NabtoEdgeClientError.OK
 
@@ -132,6 +132,27 @@ internal class Helper {
         DispatchQueue.global().async {
             let ec = Self.mapSimpleApiStatusToErrorCode(status)
             closure(ec)
+        }
+    }
+    
+    @available(iOS 13.0, *)
+    func invokeAsync2(owner: Any,
+                      connectionForErrorMessage: Connection?,
+                      implClosure: (OpaquePointer) -> ()) async throws {
+        let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
+        implClosure(future)
+        let w = CallbackWrapper(debugDescription: "Helper.invokeAsync2", future: future, owner: owner, connectionForErrorMessage: connectionForErrorMessage)
+        try await withCheckedThrowingContinuation { continuation in
+            let status: NabtoClientError = w.registerCallback { ec in
+                if ec == .OK {
+                    continuation.resume()
+                } else {
+                    continuation.resume(throwing: ec)
+                }
+            }
+            if status != NABTO_CLIENT_EC_OK {
+                continuation.resume(throwing: Self.mapSimpleApiStatusToErrorCode(status))
+            }
         }
     }
 }

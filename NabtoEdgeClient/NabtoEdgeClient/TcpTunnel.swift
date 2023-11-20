@@ -79,6 +79,24 @@ public class TcpTunnel {
             nabto_client_tcp_tunnel_open(self.tunnel, future, service, localPort)
         }
     }
+    
+    /**
+     * Open this tunnel asynchronously.
+     *
+     * @param service The service to connect to on the remote device (as defined in the device's
+     * configuration), e.g. "http", "http-admin", "ssh", "rtsp".
+     * @param localPort The local port to listen on. If 0 is specified, an ephemeral port is used,
+     * it can be retrieved with `getLocalPort()`.
+     * @throws STOPPED if the connection
+     * @throws NOT_FOUND if requesting an unknown service.
+     * @throws FORBIDDEN if target device did not allow opening a tunnel to specified service for the current client
+     */
+    @available(iOS 13.0, *)
+    public func openAsync2(service: String, localPort: UInt16) async throws {
+        try await self.helper.invokeAsync2(owner: self, connectionForErrorMessage: nil) { future in
+            nabto_client_tcp_tunnel_open(self.tunnel, future, service, localPort)
+        }
+    }
 
     /**
      * Get the local TCP port, useful when opening tunnel with 0 as local port.
@@ -109,6 +127,17 @@ public class TcpTunnel {
      */
     public func closeAsync(closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
+            nabto_client_tcp_tunnel_close(self.tunnel, future)
+        }
+    }
+    
+    /**
+     * Close this tunnel. Blocks until the tunnel is closed.
+     * @throws INVALID_STATE if the tunnel is not open.
+     */
+    @available(iOS 13.0, *)
+    public func closeAsync2() async throws {
+        try await self.helper.invokeAsync2(owner: self, connectionForErrorMessage: nil) { future in
             nabto_client_tcp_tunnel_close(self.tunnel, future)
         }
     }

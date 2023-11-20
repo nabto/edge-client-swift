@@ -177,6 +177,32 @@ public class Connection: NSObject, NativeConnectionWrapper {
             nabto_client_connection_close(self.nativeConnection, future)
         }
     }
+    
+    /**
+     * Establish a connection asynchronously using Swift concurrency..
+     *
+     * When the function returns, the connection is established and can be used with CoAP requests,
+     * streams and tunnels.
+     *
+     * @throws UNAUTHORIZED if the authentication options do not match the basestation configuration
+     * for this
+     * @throws TOKEN_REJECTED if the basestation could not validate the specified token
+     * @throws STOPPED if the client instance was stopped
+     * @throws NO_CHANNELS if all parameters input were accepted but a connection could not be
+     * established. Details about what went wrong are available as the
+     * associated localError and remoteError.
+     * @throws NO_CHANNELS.remoteError.NOT_ATTACHED if the target remote device is not attached to the basestation
+     * @throws NO_CHANNELS.remoteError.FORBIDDEN if the basestation request is rejected
+     * @throws NO_CHANNELS.remoteError.NONE if remote relay was not enabled
+     * @throws NO_CHANNELS.localError.NONE if mDNS discovery was not enabled
+     * @throws NO_CHANNELS.localError.NOT_FOUND if no local device was found
+     */
+    @available(iOS 13.0, *)
+    public func connectAsync2() async throws {
+        try await self.helper.invokeAsync2(owner: self, connectionForErrorMessage: self) { future in
+            nabto_client_connection_connect(self.nativeConnection, future)
+        }
+    }
 
     /**
      * Stop pending connect or close on a connection.
@@ -343,6 +369,34 @@ public class Connection: NSObject, NativeConnectionWrapper {
         }
     }
 
+    /**
+     * Do an asynchronous password authentication exchange with a device.
+     *
+     * Password authenticate the client and the device. The password
+     * authentication is bidirectional and based on PAKE, such that both
+     * the client and the device learns that the other end knows the
+     * password, without revealing the password to the other end.
+     *
+     * A specific use case for the password authentication is to prove the
+     * identity of a device which identity is not already known, e.g. in a
+     * pairing scenario.
+     *
+     * @param username The username (note: use the empty string if using for Password Open Pairing, see https://docs.nabto.com/developer/guides/iam/pairing.html)
+     * @param password The password (typically the open (global) or invite (per-user) pairing password)
+     * @throws UNAUTHORIZED if the username or password is invalid
+     * @throws NOT_FOUND if the password authentication feature is not available on the device
+     * @throws NOT_CONNECTED if the connection is not open
+     * @throws OPERATION_IN_PROGRESS if a password authentication request is already in progress on the connection
+     * @throws TOO_MANY_REQUESTS if too many password attempts has been made
+     * @throws STOPPED if the client is stopped
+     */
+    @available(iOS 13.0, *)
+    public func passwordAuthenticateAsync2(username: String, password: String) async throws {
+        try await self.helper.invokeAsync2(owner: self, connectionForErrorMessage: self) { future in
+            nabto_client_connection_password_authenticate(self.nativeConnection, username, password, future)
+        }
+    }
+    
     /**
      * Get current representation of connection options.
      *

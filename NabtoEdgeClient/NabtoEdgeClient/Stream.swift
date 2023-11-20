@@ -68,6 +68,20 @@ public class Stream {
             nabto_client_stream_open(self.stream, future, streamPort)
         }
     }
+    
+    /**
+     * Open this stream asynchronously.
+     *
+     * @param streamPort: The listening id/port to use for the stream. This is used to
+     * distinguish streams in the other end, like a port number.
+     * @throws STOPPED: the stream could not be opened as the handshake was aborted - this includes  an invalid port specified and access denied due to insufficient permissions
+     */
+    @available(iOS 13.0, *)
+    public func openAsync2(streamPort: UInt32) async throws {
+        try await self.helper.invokeAsync2(owner: self, connectionForErrorMessage: nil) { future in
+            nabto_client_stream_open(self.stream, future, streamPort)
+        }
+    }
 
     /**
      * Write data on a stream. Blocks until all data is written.
@@ -103,6 +117,26 @@ public class Stream {
      */
     public func writeAsync(data: Data, closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
+            doWrite(data, future)
+        }
+    }
+    
+    /**
+     * Write data on a stream asynchronously.
+     *
+     * When the call returns, the data is only written to the stream, but not necessarily
+     * acknowledged by the receiver. This is why it does not make sense to return a number of actual
+     * bytes written in case of error since it says nothing about the number of acked bytes. To
+     * ensure that written bytes have been acked, a successful call to `Stream.close()` is
+     * necessary after last call to this `Stream.write()`.
+     *
+     * @param data the data to write
+     * @throws STOPPED if the stream has been closed
+     * @throws OPERATION_IN_PROGRESS if another write operation is already in progress
+     */
+    @available(iOS 13.0, *)
+    public func writeAsync2(data: Data) async throws {
+        try await self.helper.invokeAsync2(owner: self, connectionForErrorMessage: nil) { future in
             doWrite(data, future)
         }
     }
@@ -155,6 +189,38 @@ public class Stream {
                 closure(error, nil)
             })
             buffer.deallocate()
+        }
+    }
+    
+    /**
+     * Read some bytes from a stream asynchronously.
+     * By using await the task will wait until 1 byte is read or the stream is closed or EOF is reached.
+     * @throws EOF if end of file is reached
+     * @throws STOPPED if the stream is stopped
+     * @throws OPERATION_IN_PROGRESS if another read is in progress
+     * @return the data read
+     */
+    @available(iOS 13.0, *)
+    public func readSomeAsync2() async throws -> Data {
+        let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: self.chunkSize)
+        var readSize: Int = 0
+        nabto_client_stream_read_some(self.stream, future, buffer, self.chunkSize, &readSize)
+        let w = CallbackWrapper(debugDescription: "readSomeAsync2", future: future, owner: self, connectionForErrorMessage: nil)
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            let status = w.registerCallback { ec in
+                if (ec == .OK) {
+                    continuation.resume(returning: Data(bytes: buffer, count: readSize))
+                } else {
+                    continuation.resume(throwing: ec)
+                }
+                buffer.deallocate()
+            }
+            if (status != NABTO_CLIENT_EC_OK) {
+                continuation.resume(throwing: Helper.mapSimpleApiStatusToErrorCode(status))
+                buffer.deallocate()
+            }
         }
     }
 
@@ -212,6 +278,43 @@ public class Stream {
             buffer.deallocate()
         }
     }
+    
+    
+    /**
+     * Read exactly the specified amount of bytes asynchronously.
+     *
+     * If all bytes could not be read (EOF or an error occurs or stream is stopped), an error is
+     * thrown.
+     *
+     * @param length: The number of bytes to read
+     * @throws EOF if end of file is reached
+     * @throws STOPPED if the stream is stopped
+     * @throws OPERATION_IN_PROGRESS if another read is in progress
+     * @return the data read
+     */
+    @available(iOS 13.0, *)
+    public func readAllAsync2(length: Int) async throws -> Data {
+        let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: length)
+        var readSize: Int = 0
+        nabto_client_stream_read_all(self.stream, future, buffer, length, &readSize)
+        let w = CallbackWrapper(debugDescription: "readAllAsync2", future: future, owner: self, connectionForErrorMessage: nil)
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            let status = w.registerCallback { ec in
+                if (ec == .OK) {
+                    continuation.resume(returning: Data(bytes: buffer, count: readSize))
+                } else {
+                    continuation.resume(throwing: ec)
+                }
+                buffer.deallocate()
+            }
+            if (status != NABTO_CLIENT_EC_OK) {
+                continuation.resume(throwing: Helper.mapSimpleApiStatusToErrorCode(status))
+                buffer.deallocate()
+            }
+        }
+    }
 
     /**
      * Close the write direction of the stream. Blocks until the close is complete.
@@ -240,6 +343,22 @@ public class Stream {
      */
     public func closeAsync(closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
+            nabto_client_stream_close(self.stream, future)
+        }
+    }
+    
+    /**
+     * Close the write direction of the stream asynchronously.
+     *
+     * This will make the other end reach end of file when reading from a stream when all sent data
+     * has been received and acknowledged. A call to close does not affect the read direction of
+     * the stream.
+     * @throws ABORTED if the stream is closed
+     * @throws OPERATION_IN_PROGRESS if a stream write is in progress
+     */
+    @available(iOS 13.0, *)
+    public func closeAsync2() async throws {
+        try await self.helper.invokeAsync2(owner: self, connectionForErrorMessage: nil) { future in
             nabto_client_stream_close(self.stream, future)
         }
     }
