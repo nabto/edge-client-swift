@@ -1,10 +1,8 @@
-Pods
 .DS_Store
-*/NabtoEdgeClient.xcworkspace/xcuserdata
-*/xcuserdata/*
-*/.DS_Store
-NabtoEdgeClient/.idea/*
-NabtoEdgeClient/NabtoEdgeClient.xcodeproj/xcuserdata/**/*
-NabtoEdgeClientHello/NabtoEdgeClientHello.xcodeproj/project.xcworkspace/xcuserdata/**/*
-.idea/*
-NabtoEdgeClient/NabtoEdgeClient.xcodeproj/xcuserdata/*
+/.build
+/Packages
+xcuserdata/
+DerivedData/
+.swiftpm/configuration/registries.json
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+.netrc

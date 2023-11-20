@@ -1,0 +1,4 @@
+module NabtoEdgeClientApi {
+    umbrella header "nabto_client.h"
+    export *
+}
