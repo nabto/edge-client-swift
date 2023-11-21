@@ -77,8 +77,8 @@ public class Stream {
      * @throws STOPPED: the stream could not be opened as the handshake was aborted - this includes  an invalid port specified and access denied due to insufficient permissions
      */
     @available(iOS 13.0, *)
-    public func openAsync2(streamPort: UInt32) async throws {
-        try await self.helper.invokeAsync2(owner: self, connectionForErrorMessage: nil) { future in
+    public func openAsync(streamPort: UInt32) async throws {
+        try await self.helper.invokeAsync(owner: self, connectionForErrorMessage: nil) { future in
             nabto_client_stream_open(self.stream, future, streamPort)
         }
     }
@@ -135,8 +135,8 @@ public class Stream {
      * @throws OPERATION_IN_PROGRESS if another write operation is already in progress
      */
     @available(iOS 13.0, *)
-    public func writeAsync2(data: Data) async throws {
-        try await self.helper.invokeAsync2(owner: self, connectionForErrorMessage: nil) { future in
+    public func writeAsync(data: Data) async throws {
+        try await self.helper.invokeAsync(owner: self, connectionForErrorMessage: nil) { future in
             doWrite(data, future)
         }
     }
@@ -201,12 +201,12 @@ public class Stream {
      * @return the data read
      */
     @available(iOS 13.0, *)
-    public func readSomeAsync2() async throws -> Data {
+    public func readSomeAsync() async throws -> Data {
         let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: self.chunkSize)
         var readSize: Int = 0
         nabto_client_stream_read_some(self.stream, future, buffer, self.chunkSize, &readSize)
-        let w = CallbackWrapper(debugDescription: "readSomeAsync2", future: future, owner: self, connectionForErrorMessage: nil)
+        let w = CallbackWrapper(debugDescription: "readSomeAsync", future: future, owner: self, connectionForErrorMessage: nil)
         
         return try await withCheckedThrowingContinuation { continuation in
             let status = w.registerCallback { ec in
@@ -293,12 +293,12 @@ public class Stream {
      * @return the data read
      */
     @available(iOS 13.0, *)
-    public func readAllAsync2(length: Int) async throws -> Data {
+    public func readAllAsync(length: Int) async throws -> Data {
         let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: length)
         var readSize: Int = 0
         nabto_client_stream_read_all(self.stream, future, buffer, length, &readSize)
-        let w = CallbackWrapper(debugDescription: "readAllAsync2", future: future, owner: self, connectionForErrorMessage: nil)
+        let w = CallbackWrapper(debugDescription: "readAllAsync", future: future, owner: self, connectionForErrorMessage: nil)
         
         return try await withCheckedThrowingContinuation { continuation in
             let status = w.registerCallback { ec in
@@ -357,8 +357,8 @@ public class Stream {
      * @throws OPERATION_IN_PROGRESS if a stream write is in progress
      */
     @available(iOS 13.0, *)
-    public func closeAsync2() async throws {
-        try await self.helper.invokeAsync2(owner: self, connectionForErrorMessage: nil) { future in
+    public func closeAsync() async throws {
+        try await self.helper.invokeAsync(owner: self, connectionForErrorMessage: nil) { future in
             nabto_client_stream_close(self.stream, future)
         }
     }

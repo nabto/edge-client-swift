@@ -198,8 +198,8 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * @throws NO_CHANNELS.localError.NOT_FOUND if no local device was found
      */
     @available(iOS 13.0, *)
-    public func connectAsync2() async throws {
-        try await self.helper.invokeAsync2(owner: self, connectionForErrorMessage: self) { future in
+    public func connectAsync() async throws {
+        try await self.helper.invokeAsync(owner: self, connectionForErrorMessage: self) { future in
             nabto_client_connection_connect(self.nativeConnection, future)
         }
     }
@@ -391,8 +391,8 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * @throws STOPPED if the client is stopped
      */
     @available(iOS 13.0, *)
-    public func passwordAuthenticateAsync2(username: String, password: String) async throws {
-        try await self.helper.invokeAsync2(owner: self, connectionForErrorMessage: self) { future in
+    public func passwordAuthenticateAsync(username: String, password: String) async throws {
+        try await self.helper.invokeAsync(owner: self, connectionForErrorMessage: self) { future in
             nabto_client_connection_password_authenticate(self.nativeConnection, username, password, future)
         }
     }

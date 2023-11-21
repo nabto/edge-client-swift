@@ -136,12 +136,12 @@ internal class Helper {
     }
     
     @available(iOS 13.0, *)
-    func invokeAsync2(owner: Any,
+    func invokeAsync(owner: Any,
                       connectionForErrorMessage: Connection?,
                       implClosure: (OpaquePointer) -> ()) async throws {
         let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
         implClosure(future)
-        let w = CallbackWrapper(debugDescription: "Helper.invokeAsync2", future: future, owner: owner, connectionForErrorMessage: connectionForErrorMessage)
+        let w = CallbackWrapper(debugDescription: "Helper.invokeAsync", future: future, owner: owner, connectionForErrorMessage: connectionForErrorMessage)
         try await withCheckedThrowingContinuation { continuation in
             let status: NabtoClientError = w.registerCallback { ec in
                 if ec == .OK {

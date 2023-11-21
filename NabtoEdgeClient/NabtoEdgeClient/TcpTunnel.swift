@@ -92,8 +92,8 @@ public class TcpTunnel {
      * @throws FORBIDDEN if target device did not allow opening a tunnel to specified service for the current client
      */
     @available(iOS 13.0, *)
-    public func openAsync2(service: String, localPort: UInt16) async throws {
-        try await self.helper.invokeAsync2(owner: self, connectionForErrorMessage: nil) { future in
+    public func openAsync(service: String, localPort: UInt16) async throws {
+        try await self.helper.invokeAsync(owner: self, connectionForErrorMessage: nil) { future in
             nabto_client_tcp_tunnel_open(self.tunnel, future, service, localPort)
         }
     }
@@ -136,8 +136,8 @@ public class TcpTunnel {
      * @throws INVALID_STATE if the tunnel is not open.
      */
     @available(iOS 13.0, *)
-    public func closeAsync2() async throws {
-        try await self.helper.invokeAsync2(owner: self, connectionForErrorMessage: nil) { future in
+    public func closeAsync() async throws {
+        try await self.helper.invokeAsync(owner: self, connectionForErrorMessage: nil) { future in
             nabto_client_tcp_tunnel_close(self.tunnel, future)
         }
     }

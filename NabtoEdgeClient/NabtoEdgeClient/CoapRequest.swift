@@ -167,10 +167,10 @@ public class CoapRequest {
      * @throws NabtoEdgeClientError if a response could not be created
      */
     @available(iOS 13.0, *)
-    public func executeAsync2() async throws -> CoapResponse {
+    public func executeAsync() async throws -> CoapResponse {
         let future: OpaquePointer = nabto_client_future_new(client.nativeClient)
         nabto_client_coap_execute(self.coap, future)
-        let w = CallbackWrapper(debugDescription: "coap.executeAsync2", future: future, owner: self, connectionForErrorMessage: self.connection)
+        let w = CallbackWrapper(debugDescription: "coap.executeAsync", future: future, owner: self, connectionForErrorMessage: self.connection)
         let res = try await withCheckedThrowingContinuation { continuation in
             let status = w.registerCallback { ec in
                 if ec == .OK {
