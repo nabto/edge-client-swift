@@ -4,7 +4,7 @@
 
 import Foundation
 
-struct TestDevice {
+public struct TestDevice {
     var productId: String
     var deviceId: String
     var url: String
@@ -40,7 +40,7 @@ struct TestDevice {
     }
 }
 
-struct TestDevices {
+public struct TestDevices {
     let coapDevice = TestDevice(
             productId: "pr-fatqcwj9",
             deviceId: "de-avmqjaje",

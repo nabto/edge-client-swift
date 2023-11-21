@@ -112,6 +112,12 @@ class NabtoEdgeClientTests: NabtoEdgeClientTestBase {
         }
         wait(for: [exp], timeout: 10.0)
     }
+    
+    @available(iOS 13.0, *)
+    func testConnectConcurrent() async throws {
+        try self.prepareConnection(self.testDevices.coapDevice)
+        try await self.connection.connectAsync()
+    }
 
     func testConnectAsyncFailUnknown() throws {
         let exp = XCTestExpectation(description: "expect connect callback")
@@ -194,6 +200,16 @@ class NabtoEdgeClientTests: NabtoEdgeClientTestBase {
         try self.connect(self.testDevices.coapDevice)
         let coap = try self.connection.createCoapRequest(method: "GET", path: "/hello-world")
         let response = try coap.execute()
+        XCTAssertEqual(response.status, 205)
+        XCTAssertEqual(response.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
+        XCTAssertEqual(String(decoding: response.payload, as: UTF8.self), "Hello world")
+    }
+    
+    @available(iOS 13.0, *)
+    func testCoapRequestConcurrent() async throws {
+        try self.connect(self.testDevices.coapDevice)
+        let coap = try self.connection.createCoapRequest(method: "GET", path: "/hello-world")
+        let response = try await coap.executeAsync()
         XCTAssertEqual(response.status, 205)
         XCTAssertEqual(response.contentFormat, ContentFormat.TEXT_PLAIN.rawValue)
         XCTAssertEqual(String(decoding: response.payload, as: UTF8.self), "Hello world")
@@ -657,7 +673,7 @@ class NabtoEdgeClientTests: NabtoEdgeClientTestBase {
         let result = try stream.readSome()
         XCTAssertGreaterThan(result.count, 0)
     }
-
+    
     func testStreamWriteThenReadAll() throws {
         try self.connect(self.testDevices.streamDevice)
         let stream = try self.connection.createStream()
@@ -671,6 +687,36 @@ class NabtoEdgeClientTests: NabtoEdgeClientTestBase {
         let result = try stream.readAll(length: len)
         XCTAssertEqual(result.count, len)
         XCTAssertEqual(input, String(decoding: result, as: UTF8.self))
+    }
+    
+    @available(iOS 13.0, *)
+    func testStreamWriteThenReadSomeConcurrent() async throws {
+        try self.connect(self.testDevices.streamDevice)
+        let coap = try self.connection.createCoapRequest(method: "GET", path: "/hello-world")
+        let response = try await coap.executeAsync()
+        XCTAssertEqual(response.status, 404)
+
+        let stream = try self.connection.createStream()
+        try await stream.openAsync(streamPort: self.streamPort)
+        let hello = "Hello"
+        try await stream.writeAsync(data: hello.data(using: .utf8)!)
+        let result = try await stream.readSomeAsync()
+        XCTAssertGreaterThan(result.count, 0)
+        try await stream.closeAsync() // @TODO: not the same as having it in a defer body...
+    }
+    
+    @available(iOS 13.0, *)
+    func testStreamWriteThenReadAllConcurrent() async throws {
+        try self.connect(self.testDevices.streamDevice)
+        let stream = try self.connection.createStream()
+        try await stream.openAsync(streamPort: self.streamPort)
+        let len = 17 * 1024 + 87
+        let input = String(repeating: "X", count: len)
+        try await stream.writeAsync(data: input.data(using: .utf8)!)
+        let result = try await stream.readAllAsync(length: len)
+        XCTAssertEqual(result.count, len)
+        XCTAssertEqual(input, String(decoding: result, as: UTF8.self))
+        try await stream.closeAsync() // @TODO: not the same as having it in a defer body...
     }
 
     func testStreamUseAfterClientStop() throws {
@@ -866,6 +912,15 @@ class NabtoEdgeClientTests: NabtoEdgeClientTestBase {
             }
         }
         wait(for: [exp], timeout: 10.0)
+    }
+    
+    @available(iOS 13.0, *)
+    func testTunnelOpenCloseConcurrentSimple() async throws {
+        try self.connect(self.testDevices.tunnelDevice)
+        let tunnel = try self.connection.createTcpTunnel()
+        
+        try await tunnel.openAsync(service: "http", localPort: 0)
+        try await tunnel.closeAsync()
     }
 
     class K1 {
