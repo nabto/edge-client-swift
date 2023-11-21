@@ -150,6 +150,32 @@ public class Connection: NSObject, NativeConnectionWrapper {
             nabto_client_connection_connect(self.nativeConnection, future)
         }
     }
+    
+    /**
+     * Establish a connection asynchronously using Swift concurrency..
+     *
+     * When the function returns, the connection is established and can be used with CoAP requests,
+     * streams and tunnels.
+     *
+     * @throws UNAUTHORIZED if the authentication options do not match the basestation configuration
+     * for this
+     * @throws TOKEN_REJECTED if the basestation could not validate the specified token
+     * @throws STOPPED if the client instance was stopped
+     * @throws NO_CHANNELS if all parameters input were accepted but a connection could not be
+     * established. Details about what went wrong are available as the
+     * associated localError and remoteError.
+     * @throws NO_CHANNELS.remoteError.NOT_ATTACHED if the target remote device is not attached to the basestation
+     * @throws NO_CHANNELS.remoteError.FORBIDDEN if the basestation request is rejected
+     * @throws NO_CHANNELS.remoteError.NONE if remote relay was not enabled
+     * @throws NO_CHANNELS.localError.NONE if mDNS discovery was not enabled
+     * @throws NO_CHANNELS.localError.NOT_FOUND if no local device was found
+     */
+    @available(iOS 13.0, *)
+    public func connectAsync() async throws {
+        try await self.helper.invokeAsync(owner: self, connectionForErrorMessage: self) { future in
+            nabto_client_connection_connect(self.nativeConnection, future)
+        }
+    }
 
     /**
      * Close this connection gracefully, ie send explicit close to the other peer. Blocks until the
@@ -179,28 +205,14 @@ public class Connection: NSObject, NativeConnectionWrapper {
     }
     
     /**
-     * Establish a connection asynchronously using Swift concurrency..
+     * Close this connection asynchronously.
      *
-     * When the function returns, the connection is established and can be used with CoAP requests,
-     * streams and tunnels.
-     *
-     * @throws UNAUTHORIZED if the authentication options do not match the basestation configuration
-     * for this
-     * @throws TOKEN_REJECTED if the basestation could not validate the specified token
-     * @throws STOPPED if the client instance was stopped
-     * @throws NO_CHANNELS if all parameters input were accepted but a connection could not be
-     * established. Details about what went wrong are available as the
-     * associated localError and remoteError.
-     * @throws NO_CHANNELS.remoteError.NOT_ATTACHED if the target remote device is not attached to the basestation
-     * @throws NO_CHANNELS.remoteError.FORBIDDEN if the basestation request is rejected
-     * @throws NO_CHANNELS.remoteError.NONE if remote relay was not enabled
-     * @throws NO_CHANNELS.localError.NONE if mDNS discovery was not enabled
-     * @throws NO_CHANNELS.localError.NOT_FOUND if no local device was found
+     * @throws a NabtoEdgeClientError if an error occurs during close.
      */
     @available(iOS 13.0, *)
-    public func connectAsync() async throws {
-        try await self.helper.invokeAsync(owner: self, connectionForErrorMessage: self) { future in
-            nabto_client_connection_connect(self.nativeConnection, future)
+    public func closeAsync() async throws {
+        try await self.helper.invokeAsync(owner: self, connectionForErrorMessage: nil) { future in
+            nabto_client_connection_close(self.nativeConnection, future)
         }
     }
 
