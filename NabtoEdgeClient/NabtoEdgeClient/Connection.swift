@@ -196,7 +196,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
      * invoked with an error if an error occurs, see the `close()` function for details about
      * error codes.
      *
-     * @param closure Invoked when the connect attempt succeeds or fails.
+     * @param closure Invoked when the close succeeds or fails.
      */
     public func closeAsync(closure: @escaping AsyncStatusReceiver) {
         self.helper.invokeAsync(userClosure: closure, owner: self, connectionForErrorMessage: nil) { future in
@@ -229,7 +229,7 @@ public class Connection: NSObject, NativeConnectionWrapper {
 
     /**
      * Set connection options. Options must be set prior to invoking `connect()`.
-     * @param options The the options to set
+     * @param options The options to set
      * @throws INVALID_ARGUMENT if input is invalid
      */
     public func updateOptions(options: ConnectionOptions) throws {
