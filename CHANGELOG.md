@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.2.0] - 2023-12-06
+
+### Added
+
+* Added Swift async support.
+
 ## [3.1.0] - 2023-01-22
 
 ### Added

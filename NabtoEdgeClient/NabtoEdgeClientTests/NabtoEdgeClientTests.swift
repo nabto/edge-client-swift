@@ -309,21 +309,6 @@ class NabtoEdgeClientTests: NabtoEdgeClientTestBase {
         wait(for: [exp2], timeout: 0.5)
     }
 
-    func testForbiddenError() {
-        let exp = XCTestExpectation(description: "expect error")
-        do {
-            try self.connect(self.testDevices.forbiddenDevice)
-        } catch NabtoEdgeClientError.NO_CHANNELS(let localError, let remoteError) {
-            XCTAssertEqual(localError, .NONE)
-            XCTAssertEqual(remoteError, .FORBIDDEN)
-            exp.fulfill()
-        } catch {
-            XCTFail("\(error)")
-        }
-        wait(for: [exp], timeout: 0.0)
-    }
-
-
     func testCoapRequestInvalidMethod() throws {
         try self.connect(self.testDevices.coapDevice)
         defer { try! self.connection.close() }

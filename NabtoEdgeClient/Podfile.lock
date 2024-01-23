@@ -1,16 +1,16 @@
 PODS:
-  - NabtoEdgeClientApiFW (5.11.0)
+  - NabtoEdgeClientApiFW (5.12.0)
 
 DEPENDENCIES:
-  - NabtoEdgeClientApiFW (= 5.11.0)
+  - NabtoEdgeClientApiFW (= 5.12.0)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
     - NabtoEdgeClientApiFW
 
 SPEC CHECKSUMS:
-  NabtoEdgeClientApiFW: dfee3f1749659409e66f2227931c8d215dfee779
+  NabtoEdgeClientApiFW: ed3dca3bc151075940cdd0c41d3a03557556276f
 
-PODFILE CHECKSUM: c34b90159de55ec7b02a6471d73affb7c1ec97d4
+PODFILE CHECKSUM: 8413435791aaa9c939365bbaac50a4dad8704303
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.14.2

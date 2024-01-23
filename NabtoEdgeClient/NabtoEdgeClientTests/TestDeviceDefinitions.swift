@@ -64,11 +64,11 @@ public struct TestDevices {
     )
 
     let forbiddenDevice = TestDevice(
-            productId: "pr-t4qwmuba",
-            deviceId: "de-fociuotx",
-            url: "https://pr-t4qwmuba.clients.nabto.net",
-            key: "sk-5f3ab4bea7cc2585091539fb950084ce", // product only configured with tunnel app with sk-9c826d2ebb4343a789b280fe22b98305
-            sct: "WzwjoTabnvux"
+            productId: "pr-fatqcwj9",
+            deviceId: "de-ijrdq47i",
+            url: "https://pr-fatqcwj9.clients.nabto.net",
+            key: "not set",
+            sct: "invalid"
     )
 
     let passwordProtectedDevice = TestDevice(
