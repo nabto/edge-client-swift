@@ -27,8 +27,5 @@ let package = Package(
             dependencies: ["NabtoEdgeClientApi", "CBORCoding"],
             path: "NabtoEdgeClient",
             exclude: ["NabtoEdgeClientTests", "HostForTests"]),
-        .testTarget(
-            name: "NabtoEdgeClientTests",
-            dependencies: ["NabtoEdgeClient"]),
     ]
 )
