@@ -14,7 +14,7 @@ class ViewController: UIViewController {
     func invoke() throws {
         let client = NabtoEdgeClient.Client()
         client.enableNsLogLogging()
-        try client.setLogLevel(level: "trace")
+        try client.setLogLevel(level: "info")
         let connection = try client.createConnection()
         let privateKey = try client.createPrivateKey()
         try connection.setPrivateKey(key: privateKey)
@@ -54,7 +54,9 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        label.text = "Client SDK Version: " + NabtoEdgeClient.Client.versionString()
+        let str = "Client SDK Version: " + NabtoEdgeClient.Client.versionString()
+        print(str)
+        label.text = str
     }
 
 }
