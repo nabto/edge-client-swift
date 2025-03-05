@@ -20,8 +20,8 @@ let package = Package(
         // Targets can depend on other targets in this package and products from dependencies.
         .binaryTarget(
             name: "NabtoEdgeClientApi",
-            url: "https://downloads.nabto.com/assets/edge/ios/api/5.12.0/NabtoEdgeClientApiFW.xcframework.zip",
-            checksum: "1151821d590f40c8affba064bf8ed5c0ca77acb194e0e64ec536fba3578017ff"),
+            url: "https://downloads.nabto.com/assets/edge/ios/api/0.0.4-nsurldebug/NabtoEdgeClientApiFW.xcframework.zip",
+            checksum: "1819582a02520cdc8512a9eaac7e5a049d75a06d82ac93f56f46ba34a7a13c61"),
         .target(
             name: "NabtoEdgeClient",
             dependencies: ["NabtoEdgeClientApi", "CBORCoding"],
