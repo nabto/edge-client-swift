@@ -21,7 +21,7 @@ let package = Package(
         .binaryTarget(
             name: "NabtoEdgeClientApi",
             url: "https://downloads.nabto.com/assets/edge/ios/api/0.0.5-nsurldebug/NabtoEdgeClientApiFW.xcframework.zip",
-            checksum: "1819582a02520cdc8512a9eaac7e5a049d75a06d82ac93f56f46ba34a7a13c61"),
+            checksum: "9cdf35eb9438d0b010a074a70e5aeffe3e43fc75fcb9262f015b3dbb60aa8f2e"),
         .target(
             name: "NabtoEdgeClient",
             dependencies: ["NabtoEdgeClientApi", "CBORCoding"],
