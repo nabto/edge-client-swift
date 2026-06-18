@@ -6,6 +6,7 @@ import PackageDescription
 let package = Package(
     name: "NabtoEdgeClient",
     defaultLocalization: "en",
+    platforms: [.macOS(.v10_15), .iOS(.v13)],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
@@ -20,12 +21,12 @@ let package = Package(
         // Targets can depend on other targets in this package and products from dependencies.
         .binaryTarget(
             name: "NabtoEdgeClientApi",
-            url: "https://downloads.nabto.com/assets/edge/ios/api/5.12.0/NabtoEdgeClientApiFW.xcframework.zip",
-            checksum: "1151821d590f40c8affba064bf8ed5c0ca77acb194e0e64ec536fba3578017ff"),
+            path: "../nabto-client-sdk/artifacts/apple-frameworks-Release/NabtoEdgeClientApi.xcframework"),
         .target(
             name: "NabtoEdgeClient",
-            dependencies: ["NabtoEdgeClientApi", "CBORCoding"],
-            path: "NabtoEdgeClient",
-            exclude: ["NabtoEdgeClientTests", "HostForTests"]),
+            dependencies: ["NabtoEdgeClientApi", "CBORCoding"]),
+        .testTarget(
+            name: "NabtoEdgeClientTests",
+            dependencies: ["NabtoEdgeClient"]),
     ]
 )
