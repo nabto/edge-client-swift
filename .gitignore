@@ -15,3 +15,7 @@ NabtoEdgeClientHello/Signing.xcconfig
 NabtoEdgeClientHello/NabtoEdgeClientHello.xcodeproj/
 NabtoEdgeClientHello/NabtoEdgeClientHello/Info.plist
 
+test-devices/config/localPairLocalOpen/state/tcp_tunnel_device_iam_state.json
+test-devices/config/localPairPasswordOpen/state/tcp_tunnel_device_iam_state.json
+test-devices/config/localPasswordInvite/state/tcp_tunnel_device_iam_state.json
+test-devices/config/localPasswordPairingDisabledConfig/state/tcp_tunnel_device_iam_state.json

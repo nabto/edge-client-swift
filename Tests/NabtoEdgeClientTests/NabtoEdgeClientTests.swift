@@ -1086,6 +1086,7 @@ class NabtoEdgeClientTests: NabtoEdgeClientTestBase {
     }
 
     func testGetTypeDirect() throws {
+        throw XCTSkip("Needs a local edge device discoverable via mDNS")
         try self.connect(self.testDevices.localMdnsDevice)
         XCTAssertEqual(try self.connection.getType(), .DIRECT)
     }
