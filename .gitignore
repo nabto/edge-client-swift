@@ -9,3 +9,8 @@ NabtoEdgeClientHello/NabtoEdgeClientHello.xcodeproj/project.xcworkspace/xcuserda
 .idea/*
 NabtoEdgeClient/NabtoEdgeClient.xcodeproj/xcuserdata/*
 .build
+.swiftpm/xcode/xcuserdata/
+.swiftpm/configuration/
+NabtoEdgeClientHello/Signing.xcconfig
+NabtoEdgeClientHello/NabtoEdgeClientHello.xcodeproj/
+

@@ -1,0 +1,3 @@
+// Copy this file to `Signing.xcconfig` (which is gitignored) and fill in your
+// Apple Developer Team ID. Required before building the Hello app.
+DEVELOPMENT_TEAM = YOUR_TEAM_ID_HERE
