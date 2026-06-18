@@ -13,4 +13,5 @@ NabtoEdgeClient/NabtoEdgeClient.xcodeproj/xcuserdata/*
 .swiftpm/configuration/
 NabtoEdgeClientHello/Signing.xcconfig
 NabtoEdgeClientHello/NabtoEdgeClientHello.xcodeproj/
+NabtoEdgeClientHello/NabtoEdgeClientHello/Info.plist
 
