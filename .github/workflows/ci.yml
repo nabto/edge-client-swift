@@ -24,23 +24,5 @@ jobs:
           swift --version
           xcodebuild -version
 
-      # The Package.swift binary target points at a sibling repo:
-      #   ../nabto-client-sdk/artifacts/apple-frameworks-Release/NabtoEdgeClientApi.xcframework
-      # Make that path available before invoking swift build/test. Adjust the
-      # source (private repo checkout, downloaded release zip, ...) to match
-      # how the SDK is distributed in your environment.
-      - name: Provide NabtoEdgeClientApi.xcframework
-        run: |
-          set -euo pipefail
-          dest="${{ github.workspace }}/../nabto-client-sdk/artifacts/apple-frameworks-Release"
-          mkdir -p "$dest"
-          # TODO: replace the line below with the real fetch step, e.g.:
-          #   curl -fSL -o framework.zip "$NABTO_SDK_URL"
-          #   unzip -q framework.zip -d "$dest"
-          if [ ! -d "$dest/NabtoEdgeClientApi.xcframework" ]; then
-            echo "NabtoEdgeClientApi.xcframework not provisioned at $dest" >&2
-            exit 1
-          fi
-
       - name: Build and test
         run: swift test
