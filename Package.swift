@@ -21,7 +21,8 @@ let package = Package(
         // Targets can depend on other targets in this package and products from dependencies.
         .binaryTarget(
             name: "NabtoEdgeClientApi",
-            path: "../nabto-client-sdk/artifacts/apple-frameworks-Release/NabtoEdgeClientApi.xcframework"),
+            url: "https://raw.githubusercontent.com/nabto/nabto-client-sdk-releases/v5.15.3/lib/ios-xcframework/NabtoEdgeClientApi.xcframework.zip",
+            checksum: "747669aca2c60c32e8653c2018020ca3a51b849c43c1487d71f6e5e992f3feb5"),
         .target(
             name: "NabtoEdgeClient",
             dependencies: ["NabtoEdgeClientApi", "CBORCoding"]),
