@@ -263,10 +263,7 @@ class NabtoEdgeClientTests: NabtoEdgeClientTestBase {
 
     // ./examples/simple_mdns/simple_mdns_device pr-mdns de-mdns swift-test-subtype swift-txt-key swift-txt-val
     func testMdnsDiscovery() throws {
-//        throw XCTSkip("Needs local device for testing")
-        #if !targetEnvironment(simulator)
-        throw XCTSkip("mDNS forbidden on iOS 14.5+ physical device, awaiting apple app approval of container app")
-        #endif
+        try requireLocalMdnsDevice()
         let scanner = self.client.createMdnsScanner(subType: self.testDevices.mdnsSubtype)
         let exp = XCTestExpectation(description: "Expected to find local device for discovery, see instructions on how to run simple_mdns_device stub")
         let stub = TestMdnsResultReceiver(exp)
@@ -284,6 +281,7 @@ class NabtoEdgeClientTests: NabtoEdgeClientTestBase {
     }
 
     func testReproduceMdnsCrash() throws {
+        try requireLocalMdnsDevice()
         let exp = XCTestExpectation(description: "dummy")
         let stub = BlockingMdnsResultReceiver(exp, self)
 
@@ -1086,7 +1084,7 @@ class NabtoEdgeClientTests: NabtoEdgeClientTestBase {
     }
 
     func testGetTypeDirect() throws {
-        throw XCTSkip("Needs a local edge device discoverable via mDNS")
+        try requireLocalMdnsDevice()
         try self.connect(self.testDevices.localMdnsDevice)
         XCTAssertEqual(try self.connection.getType(), .DIRECT)
     }
@@ -1110,6 +1108,13 @@ class NabtoEdgeClientTestBase: XCTestCase {
 
     func uniqueUser() -> String {
         String(UUID().uuidString.lowercased().prefix(16))
+    }
+
+    func requireLocalMdnsDevice() throws {
+        try XCTSkipUnless(
+            ProcessInfo.processInfo.environment["NABTO_TEST_LOCAL_MDNS_DEVICE"] == "1",
+            "Set NABTO_TEST_LOCAL_MDNS_DEVICE=1 and run simple_mdns_device to enable. See README."
+        )
     }
 
     override func setUpWithError() throws {
