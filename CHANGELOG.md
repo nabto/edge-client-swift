@@ -1,5 +1,19 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+* Migrated distribution from CocoaPods to Swift Package Manager. The underlying Nabto Edge Client C SDK is now consumed as a binary `XCFramework` target pulled from [nabto-client-sdk-releases](https://github.com/nabto/nabto-client-sdk-releases) instead of via the `NabtoEdgeClientApi` pod.
+* Source layout moved to the SPM convention: `Sources/NabtoEdgeClient/` and `Tests/NabtoEdgeClientTests/`.
+* Example app rewritten as a SwiftUI project under `NabtoEdgeClientHello/`, consuming the wrapper as a local Swift Package.
+* Tests that require a local `simple_mdns_device` are now opt-in via `NABTO_TEST_LOCAL_MDNS_DEVICE=1`; default `swift test` skips them cleanly so CI and contributors without a local device aren't blocked.
+* Update underlying Nabto Edge Client SDK to 5.15.3.
+
+### Removed
+
+* CocoaPods podspec, Podfile, and `.xcworkspace`. The legacy `build.sh` / `sync.sh` pod-publishing helpers are no longer wired into any release flow.
+
 ## [3.2.0] - 2023-12-06
 
 ### Added

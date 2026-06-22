@@ -1,72 +1,87 @@
 # Nabto Edge Client SDK wrapper for iOS / Swift
 
-High level swift wrapper for the [Nabto Edge Client SDK](https://docs.nabto.com/developer.html). Depends on the [low-level](https://docs.nabto.com/developer/api-reference/plain-c-client-sdk/intro.html) NabtoEdgeClientApi [cocoapod](https://cocoapods.org/pods/NabtoEdgeClientApi).
+High-level Swift wrapper for the [Nabto Edge Client SDK](https://docs.nabto.com/developer.html). Distributed as a Swift Package; the underlying [low-level C SDK](https://docs.nabto.com/developer/api-reference/plain-c-client-sdk/intro.html) is pulled in as a binary `XCFramework` from the [nabto-client-sdk-releases](https://github.com/nabto/nabto-client-sdk-releases) repository.
+
+Supports iOS 13+ and macOS 10.15+.
 
 ## Installation
 
-Use the following Podfile to install through cocoapods:
+### Xcode
+
+`File` → `Add Package Dependencies…` and enter:
 
 ```
-target 'NabtoEdgeClientHello' do
-    use_frameworks!
-    pod 'NabtoEdgeClientSwift'
-end
+https://github.com/nabto/edge-client-swift
 ```
 
-For more installation instructions, see the [iOS getting started guide](https://docs.nabto.com/developer/guides/get-started/ios/intro.html).
+Add the `NabtoEdgeClient` library product to your target.
+
+### Package.swift
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/nabto/edge-client-swift", from: "4.0.0")
+],
+targets: [
+    .target(
+        name: "YourTarget",
+        dependencies: [
+            .product(name: "NabtoEdgeClient", package: "edge-client-swift")
+        ]
+    )
+]
+```
+
+For broader integration guidance, see the [iOS getting started guide](https://docs.nabto.com/developer/guides/get-started/ios/intro.html).
 
 ## Usage
 
-See the [API intro](https://docs.nabto.com/developer/api-reference/ios-sdk/intro.html) to learn how to use the wrapper to invoke Nabto Edge devices.
+See the [API intro](https://docs.nabto.com/developer/api-reference/ios-sdk/intro.html) for an overview of how to use the wrapper to invoke Nabto Edge devices.
 
-Until a full example app is ready, take a look at the [integration tests](https://github.com/nabto/edge-client-swift/blob/master/NabtoEdgeClient/NabtoEdgeClientTests/NabtoEdgeClientTests.swift) for examples of how each SDK feature is used.
+A minimal SwiftUI example app lives in [`NabtoEdgeClientHello/`](NabtoEdgeClientHello/) — see its README for build instructions. For more detailed usage of individual SDK features, the [integration tests](Tests/NabtoEdgeClientTests/NabtoEdgeClientTests.swift) are the most complete reference.
 
-## Development of wrapper
+## Development of the wrapper
 
-To build the wrapper, retrieving dependencies through CocoaPods:
-
-```
+```sh
 git clone git@github.com:nabto/edge-client-swift.git
-cd edge-client-swift/NabtoEdgeClient
-pod install
-open NabtoEdgeClient.xcworkspace
+cd edge-client-swift
+swift build
 ```
 
-Alternatively, obtain the Nabto Edge Client SDK binary library directly from the [artifacts repo](https://github.com/nabto/nabto5-releases) instead of using CocoaPods.
+Or open `Package.swift` directly in Xcode:
 
-## Running integration tests
-
-Remote tests are run towards some central test devices.
-
-To enable testing of mDNS discovery, run a local test device as follows:
-
+```sh
+open Package.swift
 ```
+
+## Running tests
+
+Most tests run against central Nabto-hosted test devices. A few cover mDNS discovery and require a local device — those are opt-in.
+
+### Default run
+
+```sh
+swift test
+```
+
+mDNS-dependent tests skip with a clear message. This is what CI runs (see `.github/workflows/ci.yml`).
+
+### Including the local mDNS tests
+
+First start a local `simple_mdns_device` in another terminal:
+
+```sh
 git clone --recursive git@github.com:nabto/nabto-embedded-sdk.git
 cd nabto-embedded-sdk
-mkdir _build
-cd _build
+mkdir _build && cd _build
 cmake -j ..
-cd _build
 ./examples/simple_mdns/simple_mdns_device pr-mdns de-mdns swift-test-subtype swift-txt-key swift-txt-val
 ```
 
-Execute test from xcode or commandline:
+Then run the suite with the opt-in flag:
 
-```
-xcodebuild test -workspace "NabtoEdgeClient/NabtoEdgeClient.xcworkspace" -scheme NabtoEdgeClientTests \
-  -destination 'platform=iOS Simulator,name=iPhone 8'
-```
-
-## Testing the resulting pod for Swift
-
-Add local repo:
-
-```
-pod repo add local-repo ~/git/local-cocoapods-repo.git
+```sh
+NABTO_TEST_LOCAL_MDNS_DEVICE=1 swift test
 ```
 
-Push spec to local repo:
-
-```
-pod repo push local-repo NabtoEdgeClientSwift.podspec
-```
+From Xcode: open `Package.swift`, edit the `NabtoEdgeClientTests` scheme → `Run` → `Arguments` → `Environment Variables`, and add `NABTO_TEST_LOCAL_MDNS_DEVICE` = `1`. Then `Product` → `Test` (⌘U).
