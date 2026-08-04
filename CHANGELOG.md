@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.0.1] - 2026-08-04
+
+### Changed
+
+* Update underlying Nabto Edge Client SDK to 5.15.4.
+
 ## [4.0.0] - 2026-06-23
 
 ### Changed
